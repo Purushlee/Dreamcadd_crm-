@@ -1,0 +1,301 @@
+{% extends "leads/base.html" %}
+{% block title %}Telecaller Monitor — {{ caller.get_full_name|default:caller.username }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex align-center justify-between mb-4 flex-wrap gap-3">
+  <div>
+    <a href="{% url 'manage_callers' %}" class="btn-neu btn-neu-sm mb-2" style="display:inline-flex;">
+      <i class="bi bi-arrow-left me-1"></i> Back to Monitoring Hub
+    </a>
+    <div class="d-flex align-center gap-3">
+      <div class="avatar" style="width:48px; height:48px; font-size:1.3rem; font-weight:800; background:linear-gradient(135deg, var(--accent), #3b82f6); color:#fff; border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(79,127,250,0.35);">
+        {{ caller.get_full_name|default:caller.username|slice:":2"|upper }}
+      </div>
+      <div>
+        <h1 class="page-title" style="margin-bottom:2px;">
+          {{ caller.get_full_name|default:caller.username }}
+        </h1>
+        <div class="d-flex align-center gap-2" style="font-size:.82rem; color:var(--text-muted);">
+          <span>@{{ caller.username }}</span>
+          <span>•</span>
+          <span style="font-weight:600; color:{{ caller.presence_color }};">
+            <span style="width:8px; height:8px; border-radius:50%; background:{{ caller.presence_color }}; display:inline-block; margin-right:4px;"></span>
+            {{ caller.presence_status }}
+          </span>
+          {% if latest_session %}
+          <span>•</span>
+          <span>Last active: {{ latest_session.last_activity|timesince }} ago</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 align-center flex-wrap">
+    <!-- Unassign All Form -->
+    <form method="post" action="{% url 'unassign_leads' %}" onsubmit="return confirm('Unassign ALL {{ metrics.total_assigned }} leads from {{ caller.username }}? They will return to unallocated pool.');">
+      {% csrf_token %}
+      <input type="hidden" name="caller_id" value="{{ caller.id }}">
+      <button type="submit" class="btn-neu btn-neu-sm btn-danger-neu" style="font-size:.8rem; padding:8px 14px;">
+        <i class="bi bi-person-x me-1"></i> Unassign All Leads
+      </button>
+    </form>
+
+    <!-- Prominent EXPORT CSV Button -->
+    <a href="{% url 'export_telecaller_csv' caller.id %}" class="btn-neu btn-accent" style="font-weight:700; font-size:.85rem; padding:8px 16px; display:flex; align-items:center; gap:6px;">
+      <i class="bi bi-file-earmark-arrow-down-fill" style="font-size:1rem;"></i> EXPORT DATASET CSV
+    </a>
+  </div>
+</div>
+
+<!-- Date Range Filter Bar -->
+<div class="card mb-4 fade-in" style="padding:12px 18px;">
+  <div class="d-flex align-center justify-between flex-wrap gap-2">
+    <div style="font-weight:700; font-size:.85rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+      <i class="bi bi-funnel-fill text-accent"></i> Filter Date Range:
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="?date_range=today" class="btn-neu btn-neu-sm {% if date_filter == 'today' %}btn-accent{% endif %}" style="font-size:.78rem; padding:5px 12px;">Today</a>
+      <a href="?date_range=yesterday" class="btn-neu btn-neu-sm {% if date_filter == 'yesterday' %}btn-accent{% endif %}" style="font-size:.78rem; padding:5px 12px;">Yesterday</a>
+      <a href="?date_range=this_week" class="btn-neu btn-neu-sm {% if date_filter == 'this_week' %}btn-accent{% endif %}" style="font-size:.78rem; padding:5px 12px;">This Week</a>
+      <a href="?date_range=this_month" class="btn-neu btn-neu-sm {% if date_filter == 'this_month' %}btn-accent{% endif %}" style="font-size:.78rem; padding:5px 12px;">This Month</a>
+      <a href="?date_range=all" class="btn-neu btn-neu-sm {% if date_filter == 'all' or not date_filter %}btn-accent{% endif %}" style="font-size:.78rem; padding:5px 12px;">All Time</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ METRIC KPI CARDS ══ -->
+<div class="grid-stat mb-4">
+  <div class="stat-card stat-accent-blue fade-in">
+    <div class="stat-card-icon"><i class="bi bi-person-lines-fill"></i></div>
+    <div class="stat-card-value">{{ metrics.total_assigned }}</div>
+    <div class="stat-card-label">Assigned Leads</div>
+    <div class="stat-card-trend up"><i class="bi bi-dot"></i> {{ metrics.pending_count }} pending work</div>
+  </div>
+
+  <div class="stat-card stat-accent-purple fade-in fade-in-1">
+    <div class="stat-card-icon"><i class="bi bi-telephone-out-fill"></i></div>
+    <div class="stat-card-value">{{ metrics.calls_made }}</div>
+    <div class="stat-card-label">Calls Made</div>
+    <div class="stat-card-trend up"><i class="bi bi-check-lg"></i> {{ metrics.connected_calls }} connected</div>
+  </div>
+
+  <div class="stat-card stat-accent-amber fade-in fade-in-2">
+    <div class="stat-card-icon"><i class="bi bi-star-fill"></i></div>
+    <div class="stat-card-value">{{ metrics.interested_count }}</div>
+    <div class="stat-card-label">Interested Leads</div>
+    <div class="stat-card-trend up"><i class="bi bi-fire"></i> Warm prospects</div>
+  </div>
+
+  <div class="stat-card stat-accent-green fade-in fade-in-3">
+    <div class="stat-card-icon"><i class="bi bi-trophy-fill"></i></div>
+    <div class="stat-card-value">{{ metrics.converted_count }}</div>
+    <div class="stat-card-label">Converted</div>
+    <div class="stat-card-trend up" style="color:var(--success);"><i class="bi bi-check2-circle"></i> Success</div>
+  </div>
+
+  <div class="stat-card stat-accent-cyan fade-in fade-in-4">
+    <div class="stat-card-icon"><i class="bi bi-telephone-forward-fill"></i></div>
+    <div class="stat-card-value">{{ metrics.call_back_count }}</div>
+    <div class="stat-card-label">Call Backs</div>
+    <div class="stat-card-trend up"><i class="bi bi-clock"></i> Scheduled</div>
+  </div>
+
+  <div class="stat-card stat-accent-red fade-in fade-in-4">
+    <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
+    <div class="stat-card-value">{{ metrics.not_interested_count }}</div>
+    <div class="stat-card-label">Not Interested</div>
+    <div class="stat-card-trend down"><i class="bi bi-arrow-down-right"></i> Closed</div>
+  </div>
+</div>
+
+<!-- Detailed Call Response Breakdown Grid -->
+<div class="card mb-4 fade-in" style="padding:16px 20px;">
+  <div class="section-title mb-3" style="font-size:.95rem;">
+    <i class="bi bi-pie-chart-fill text-accent me-2"></i>Call Outcomes & Connection Breakdown
+  </div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
+    <div style="padding:10px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); text-align:center;">
+      <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">CONNECTED</div>
+      <div style="font-size:1.1rem; font-weight:800; color:var(--success);">{{ metrics.connected_calls }}</div>
+    </div>
+    <div style="padding:10px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); text-align:center;">
+      <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">NOT CONNECTED</div>
+      <div style="font-size:1.1rem; font-weight:800; color:var(--warning);">{{ metrics.not_connected_calls }}</div>
+    </div>
+    <div style="padding:10px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); text-align:center;">
+      <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">BUSY</div>
+      <div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);">{{ metrics.busy_calls }}</div>
+    </div>
+    <div style="padding:10px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); text-align:center;">
+      <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">SWITCHED OFF</div>
+      <div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);">{{ metrics.switched_off_calls }}</div>
+    </div>
+    <div style="padding:10px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); text-align:center;">
+      <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">WRONG NUMBER</div>
+      <div style="font-size:1.1rem; font-weight:800; color:var(--danger);">{{ metrics.wrong_number_calls }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Assigned Customer Dataset Table -->
+<div class="card mb-4 fade-in">
+  <div class="d-flex align-center justify-between mb-3 flex-wrap gap-2">
+    <div>
+      <div class="section-title" style="font-size:1.05rem; margin-bottom:2px;">
+        <i class="bi bi-person-lines-fill text-accent me-2"></i>Assigned Customer Dataset ({{ assigned_leads|length }})
+      </div>
+      <div style="font-size:.75rem; color:var(--text-muted);">Only customers currently assigned to {{ caller.get_full_name|default:caller.username }}</div>
+    </div>
+    
+    <a href="{% url 'export_telecaller_csv' caller.id %}" class="btn-neu btn-neu-sm btn-accent" style="font-size:.78rem;">
+      <i class="bi bi-download me-1"></i> Export Customer CSV
+    </a>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="neu-table">
+      <thead>
+        <tr>
+          <th>Customer Name</th>
+          <th>Phone Number</th>
+          <th>Course Interested</th>
+          <th>Branch</th>
+          <th>Lead Status</th>
+          <th>Priority</th>
+          <th>Last Updated</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in assigned_leads %}
+        <tr>
+          <td style="font-weight:700; color:var(--text);">{{ l.name }}</td>
+          <td style="font-size:.85rem; font-weight:600; color:var(--accent);">{{ l.phone }}</td>
+          <td style="font-size:.82rem;">{{ l.interested_course.course_name|default:"—" }}</td>
+          <td style="font-size:.82rem; color:var(--text-muted);">{{ l.preferred_branch.branch_name|default:"—" }}</td>
+          <td>
+            <span class="badge-pill {% if l.status == 'CONVERTED' %}badge-ok{% elif l.status == 'INTERESTED' %}badge-warm{% elif l.status == 'NOT_INTERESTED' %}badge-muted{% else %}badge-accent{% endif %}">
+              {{ l.get_status_display }}
+            </span>
+          </td>
+          <td>
+            {% if l.priority == 'HOT' %}<span class="badge-pill badge-hot">🔥 HOT</span>
+            {% elif l.priority == 'WARM' %}<span class="badge-pill badge-warm">🟡 WARM</span>
+            {% else %}<span class="badge-pill badge-cold">🔵 COLD</span>{% endif %}
+          </td>
+          <td style="font-size:.78rem; color:var(--text-muted);">{{ l.updated_at|date:"d M Y, H:i" }}</td>
+          <td style="text-align:right;">
+            <div class="d-flex gap-2 justify-end">
+              <!-- Open Lead Details -->
+              <a href="{% url 'lead_detail' l.id %}" class="btn-neu-sm btn-neu" style="font-size:.7rem; padding:4px 10px;">
+                <i class="bi bi-folder2-open me-1"></i> Details
+              </a>
+
+              <!-- Unassign Direct Action Button -->
+              <form method="post" action="{% url 'unassign_leads' %}" style="display:inline;" onsubmit="return confirm('Unassign {{ l.name }} from {{ caller.username }}? Customer will return to unallocated pool.');">
+                {% csrf_token %}
+                <input type="hidden" name="lead_ids" value="{{ l.id }}">
+                <button type="submit" class="btn-neu-sm btn-neu btn-danger-neu" style="font-size:.7rem; padding:4px 10px;">
+                  <i class="bi bi-person-x me-1"></i> Remove Assignment
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" style="text-align:center; color:var(--text-muted); padding:36px;">
+            <i class="bi bi-inbox" style="font-size:2.5rem; opacity:.4; display:block; margin-bottom:8px;"></i>
+            No customers currently assigned to this telecaller.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid-2 mb-4">
+  <!-- Session Activity Logs -->
+  <div class="card fade-in">
+    <div class="section-title mb-3" style="font-size:1rem;">
+      <i class="bi bi-clock-history text-accent me-2"></i>Login & Activity Sessions
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="neu-table">
+        <thead>
+          <tr>
+            <th>Login Time</th>
+            <th>Last Active</th>
+            <th>Logout Time</th>
+            <th>IP Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in session_logs %}
+          <tr>
+            <td style="font-weight:700; font-size:.82rem;">
+              <i class="bi bi-box-arrow-in-right text-success me-1"></i>{{ s.login_time|date:"d M Y, H:i" }}
+            </td>
+            <td style="font-size:.8rem; color:var(--text-muted);">{{ s.last_activity|timesince }} ago</td>
+            <td style="font-size:.8rem; color:var(--text-muted);">
+              {% if s.logout_time %}{{ s.logout_time|date:"H:i" }}{% else %}<span class="badge-pill badge-ok">ACTIVE SESSION</span>{% endif %}
+            </td>
+            <td style="font-size:.78rem; color:var(--text-light);">{{ s.ip_address|default:"127.0.0.1" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">No session logs recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Call Logs Breakdown -->
+  <div class="card fade-in fade-in-1">
+    <div class="section-title mb-3" style="font-size:1rem;">
+      <i class="bi bi-telephone-out text-accent me-2"></i>Recent Call Log History ({{ call_logs|length }})
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="neu-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Customer</th>
+            <th>Call Result</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cl in call_logs %}
+          <tr>
+            <td style="font-size:.8rem; color:var(--text-muted);">{{ cl.call_time|date:"d M, H:i" }}</td>
+            <td>
+              <a href="{% url 'lead_detail' cl.lead.id %}" style="font-weight:700; text-decoration:none; color:var(--text);">
+                {{ cl.lead.name }}
+              </a>
+            </td>
+            <td>
+              <span class="badge-pill {% if cl.call_result == 'CONVERTED' %}badge-ok{% elif cl.call_result == 'INTERESTED' %}badge-warm{% else %}badge-muted{% endif %}">
+                {{ cl.get_call_result_display }}
+              </span>
+            </td>
+            <td style="font-size:.78rem; color:var(--text-muted);">{{ cl.duration_seconds }}s</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">No call logs recorded.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+</script>
+{% endblock %}

@@ -1,0 +1,223 @@
+{
+  "name": "DreamCadd Workflow 3 Follow-up Cron Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "node-cron",
+      "name": "Every 15 Minutes Cron",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        300
+      ],
+      "notes": "Fires every 15 min in production. Change to 1 min for testing."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://127.0.0.1:8000/api/n8n/pending-followups/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "DreamCadd_n8n_2026_SecureKey_9876"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-fetch-followups",
+      "name": "Fetch Pending Followups",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        400,
+        300
+      ],
+      "notes": "Returns followups due within 30 min window."
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "followups",
+        "options": {}
+      },
+      "id": "node-split",
+      "name": "Split Followup Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "notes": "Splits the followups array so each item flows through the pipeline individually."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true
+          },
+          "conditions": [
+            {
+              "id": "cond-has-followups",
+              "leftValue": "={{ $json.followup_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ]
+        }
+      },
+      "id": "node-if-has",
+      "name": "Has Followup Due?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        800,
+        300
+      ],
+      "notes": "Continues only if a valid followup item exists."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "msg-field",
+              "name": "reminder_message",
+              "value": "=Hi {{ $json.lead_name }}!\n\nThis is a reminder from DreamCadd regarding your course enquiry.\n\nOur counsellor {{ $json.caller_username }} will be in touch with you shortly to discuss your learning goals.\n\nFor any queries, feel free to reply to this message.",
+              "type": "string"
+            },
+            {
+              "id": "caller-msg-field",
+              "name": "caller_notification",
+              "value": "=Follow-up Reminder Sent!\n\nStudent: {{ $json.lead_name }}\nPhone: {{ $json.lead_phone }}\nScheduled: {{ $json.scheduled_date }}\nNotes: {{ $json.remarks || 'No notes' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-prepare-msg",
+      "name": "Prepare Reminder Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        1020,
+        180
+      ],
+      "notes": "Constructs the student WhatsApp reminder and the caller notification text."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/api/n8n/update-lead/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "DreamCadd_n8n_2026_SecureKey_9876"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "lead_id": "={{ $json.lead_id }}",
+          "note": "=FOLLOWUP_REMINDER_SENT via n8n cron for followup_id: {{ $json.followup_id }}"
+        },
+        "options": {}
+      },
+      "id": "node-mark-sent",
+      "name": "Mark Reminder Sent in Django",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1240,
+        180
+      ],
+      "notes": "Logs reminder activity in Django LeadActivity to prevent duplicate sends."
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes Cron": {
+      "main": [
+        [
+          {
+            "node": "Fetch Pending Followups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Pending Followups": {
+      "main": [
+        [
+          {
+            "node": "Split Followup Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Followup Items": {
+      "main": [
+        [
+          {
+            "node": "Has Followup Due?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Followup Due?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Reminder Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Prepare Reminder Message": {
+      "main": [
+        [
+          {
+            "node": "Mark Reminder Sent in Django",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

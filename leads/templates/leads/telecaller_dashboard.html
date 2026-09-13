@@ -1,0 +1,1006 @@
+{% extends "leads/base.html" %}
+{% block title %}Telecaller Workspace — DreamCadd CRM{% endblock %}
+{% block nav_myLeads %}active{% endblock %}
+
+{% block content %}
+
+<!-- Custom CSS for Mobile Call-Center Neumorphic UI -->
+<style>
+  .caller-hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .customer-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 576px) {
+    .customer-card-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .customer-card {
+    background: var(--bg);
+    box-shadow: 6px 6px 14px var(--sd), -6px -6px 14px var(--sl);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .customer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 8px 8px 18px var(--sd), -8px -8px 18px var(--sl);
+  }
+
+  .customer-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .customer-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.2;
+  }
+
+  .customer-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .customer-phone {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0;
+    text-decoration: none;
+  }
+
+  .customer-details-pill {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .card-action-bar {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid rgba(163,177,198,0.25);
+  }
+
+  /* Direct Call Prominent Button */
+  .btn-call-direct {
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    border-radius: 12px;
+    box-shadow: 4px 4px 10px rgba(34,197,94,0.35), -2px -2px 6px rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .btn-call-direct:active {
+    transform: scale(0.97);
+    box-shadow: inset 2px 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .btn-response-trigger {
+    background: var(--bg);
+    box-shadow: 4px 4px 10px var(--sd), -4px -4px 10px var(--sl);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+  }
+  .btn-response-trigger:active {
+    box-shadow: inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);
+  }
+
+  /* Bottom Sheet Response Panel Modal */
+  .bottom-sheet-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(5px);
+    z-index: 1050;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .bottom-sheet-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+
+  .bottom-sheet {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--bg);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
+    z-index: 1060;
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .bottom-sheet.active {
+    transform: translateY(0);
+  }
+
+  .sheet-handle {
+    width: 44px; height: 5px;
+    background: var(--text-light);
+    border-radius: 3px;
+    margin: 0 auto 14px auto;
+  }
+
+  .response-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .btn-response-opt {
+    background: var(--bg);
+    box-shadow: 4px 4px 10px var(--sd), -4px -4px 10px var(--sl);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 10px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text);
+  }
+  .btn-response-opt i {
+    font-size: 1.3rem;
+  }
+  .btn-response-opt span {
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .btn-response-opt:hover, .btn-response-opt:active {
+    transform: translateY(-2px);
+  }
+  .btn-response-opt.selected {
+    border-color: var(--accent);
+    box-shadow: inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);
+    background: rgba(79,127,250,0.06);
+  }
+
+  /* Response Choice Colors */
+  .opt-interested { color: #EA580C; }
+  .opt-callback { color: #2563EB; }
+  .opt-not-interested { color: #64748B; }
+  .opt-connected { color: #16A34A; }
+  .opt-not-attended { color: #DC2626; }
+  .opt-busy { color: #D97706; }
+  .opt-switched-off { color: #4B5563; }
+  .opt-wrong { color: #991B1B; }
+  .opt-invalid { color: #7F1D1D; }
+  .opt-no-response { color: #475569; }
+  .opt-converted { color: #059669; }
+
+  /* Quick Presets for Follow-up */
+  .preset-chip {
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: var(--bg);
+    box-shadow: 3px 3px 6px var(--sd), -3px -3px 6px var(--sl);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    color: var(--text);
+  }
+  .preset-chip:active {
+    box-shadow: inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl);
+  }
+
+  /* Filter Chips */
+  .filter-chip {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: var(--bg);
+    box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+  }
+  .filter-chip.active {
+    box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+    color: var(--accent);
+    font-weight: 700;
+  }
+</style>
+
+<!-- ══ Mobile Header & Greeting ══ -->
+<div class="section-header mb-3">
+  <div>
+    <h1 class="page-title"><i class="bi bi-headset text-accent me-2"></i>Good day, {{ request.user.first_name|default:request.user.username }}</h1>
+    <div class="page-sub">Call Center Workspace — Mobile First</div>
+  </div>
+</div>
+
+<!-- ══ Hero Stats Bar ══ -->
+<div class="caller-hero-grid" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));">
+  <div class="stat-card stat-accent-red fade-in" style="padding:10px;">
+    <div class="stat-card-value" style="font-size:1.3rem;">{{ assigned_count }}</div>
+    <div class="stat-card-label" style="font-size:.68rem;">Assigned</div>
+  </div>
+  <div class="stat-card stat-accent-green fade-in" style="padding:10px;" title="Unique customers contacted (1 per customer)">
+    <div class="stat-card-value" style="font-size:1.3rem;color:#16A34A;">{{ unique_contacted_count }}</div>
+    <div class="stat-card-label" style="font-size:.68rem;">Contacted (Unique)</div>
+  </div>
+  <div class="stat-card stat-accent-blue fade-in" style="padding:10px;" title="Total call attempts made across all assigned leads">
+    <div class="stat-card-value" style="font-size:1.3rem;">{{ total_call_attempts }}</div>
+    <div class="stat-card-label" style="font-size:.68rem;">Total Call Attempts</div>
+  </div>
+  <div class="stat-card stat-accent-amber fade-in" style="padding:10px;">
+    <div class="stat-card-value" style="font-size:1.3rem;">{{ interested_count }}</div>
+    <div class="stat-card-label" style="font-size:.68rem;">Interested</div>
+  </div>
+  <div class="stat-card stat-accent-purple fade-in" style="padding:10px;">
+    <div class="stat-card-value" style="font-size:1.3rem;">{{ converted_count }}</div>
+    <div class="stat-card-label" style="font-size:.68rem;">Converted</div>
+  </div>
+</div>
+
+<!-- ══ Notifications Alert ══ -->
+{% if notifications %}
+<div class="card mb-3 fade-in" style="border-left:4px solid var(--warm);padding:12px;background:rgba(245,158,11,.04);">
+  <div class="d-flex align-center gap-2 mb-2">
+    <i class="bi bi-bell-fill text-warm"></i>
+    <div class="section-title" style="font-size:.85rem;">Alerts</div>
+  </div>
+  {% for n in notifications %}
+  <div style="font-size:.78rem;padding:6px 10px;border-radius:6px;background:var(--bg);box-shadow:2px 2px 5px var(--sd),-2px -2px 5px var(--sl);margin-bottom:4px;">
+    <strong>{{ n.title }}</strong> — {{ n.message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ══ Due Follow-ups Section ══ -->
+{% if pending_followups %}
+<div class="card mb-4 fade-in" style="border-left:4px solid var(--danger);padding:14px;">
+  <div class="d-flex align-center gap-2 mb-3">
+    <i class="bi bi-alarm-fill text-danger" style="font-size:1.2rem;"></i>
+    <div>
+      <div class="section-title" style="font-size:.92rem;color:var(--danger);">⚡ Due Follow-ups</div>
+      <div class="section-subtitle" style="font-size:.72rem;">{{ pending_followups|length }} scheduled call{{ pending_followups|length|pluralize }} pending</div>
+    </div>
+  </div>
+  
+  <div class="customer-card-grid">
+    {% for f in pending_followups %}
+    <div class="customer-card" style="border-left:3px solid var(--danger);">
+      <div>
+        <div class="customer-card-header">
+          <div>
+            <a href="{% url 'lead_detail' f.lead.id %}" class="customer-name">{{ f.lead.name }}</a>
+            <div class="customer-sub"><i class="bi bi-clock-fill text-danger me-1"></i>Due: {{ f.scheduled_date|date:"d M, H:i" }}</div>
+          </div>
+          {% if f.lead.priority == 'HOT' %}<span class="badge-pill badge-hot"><i class="bi bi-fire"></i> HOT</span>{% endif %}
+        </div>
+
+        <a href="tel:{{ f.lead.phone }}" class="customer-phone" onclick="triggerCallAndPrepareModal({{ f.lead.id }}, '{{ f.lead.name|escapejs }}', '{{ f.lead.phone|escapejs }}')">
+          <i class="bi bi-telephone-fill text-success"></i> {{ f.lead.phone }}
+        </a>
+
+        {% if f.remarks and f.remarks != 'nan' and f.remarks != 'None' %}
+        <div style="font-size:.76rem;color:var(--text-muted);background:var(--bg-deep);padding:6px 10px;border-radius:8px;margin-bottom:8px;">
+          <i class="bi bi-chat-quote me-1"></i>{{ f.remarks }}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="card-action-bar">
+        <a href="tel:{{ f.lead.phone }}" class="btn-call-direct" onclick="triggerCallAndPrepareModal({{ f.lead.id }}, '{{ f.lead.name|escapejs }}', '{{ f.lead.phone|escapejs }}')">
+          <i class="bi bi-telephone-fill me-1"></i> Call Customer
+        </a>
+        <button type="button" class="btn-response-trigger" onclick="openQuickResponseModal({{ f.lead.id }}, '{{ f.lead.name|escapejs }}', '{{ f.lead.phone|escapejs }}')">
+          <i class="bi bi-ui-checks text-accent"></i> Response
+        </button>
+        <a href="{% url 'lead_detail' f.lead.id %}" class="btn-response-trigger" style="text-decoration:none;">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ══ Main Assigned Leads Card List ══ -->
+<div class="card fade-in">
+  <div class="section-header mb-3" style="flex-wrap:wrap;gap:10px;">
+    <div>
+      <div class="section-title" style="font-size:1rem;"><i class="bi bi-person-lines-fill text-accent me-2"></i>My Assigned Customer Pool</div>
+      <div class="section-subtitle">{{ leads.count }} leads strictly assigned to you</div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-wrap" style="width:100%;max-width:260px;">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" id="leadSearchInput" placeholder="Search name or phone…">
+    </div>
+  </div>
+
+  <!-- Quick Filter Chips -->
+  <div class="d-flex gap-2 mb-3" style="overflow-x:auto;padding-bottom:4px;">
+    <button type="button" class="filter-chip active" onclick="filterLeads('ALL', this)">All ({{ leads.count }})</button>
+    <button type="button" class="filter-chip" onclick="filterLeads('HOT', this)">🔥 Hot</button>
+    <button type="button" class="filter-chip" onclick="filterLeads('PENDING', this)">⏰ Pending</button>
+    <button type="button" class="filter-chip" onclick="filterLeads('INTERESTED', this)">🟢 Interested</button>
+    <button type="button" class="filter-chip" onclick="filterLeads('CONVERTED', this)">🎉 Converted</button>
+  </div>
+
+  <!-- Customer Cards Container -->
+  <div class="customer-card-grid" id="leadCardsContainer">
+    {% for lead in leads %}
+    <div class="customer-card lead-item-card" 
+         data-name="{{ lead.name|lower }}" 
+         data-phone="{{ lead.phone }}" 
+         data-status="{{ lead.status }}" 
+         data-priority="{{ lead.priority }}"
+         id="lead-card-{{ lead.id }}">
+      <div>
+        <div class="customer-card-header">
+          <div>
+            <a href="{% url 'lead_detail' lead.id %}" class="customer-name">{{ lead.name }}</a>
+            <!-- Clean display: Hide empty / nan college -->
+            {% if lead.college and lead.college.lower != 'nan' and lead.college.lower != 'none' and lead.college.lower != 'unspecified' %}
+            <div class="customer-sub">{{ lead.college }}</div>
+            {% endif %}
+          </div>
+          <div>
+            {% if lead.priority == 'HOT' %}<span class="badge-pill badge-hot"><i class="bi bi-fire"></i> HOT</span>
+            {% elif lead.priority == 'WARM' %}<span class="badge-pill badge-warm">🟡 WARM</span>
+            {% else %}<span class="badge-pill badge-cold">🔵 COLD</span>{% endif %}
+          </div>
+        </div>
+
+        <!-- Phone link dials phone AND prepares response panel -->
+        <a href="tel:{{ lead.phone }}" class="customer-phone" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
+          <i class="bi bi-telephone-fill text-success"></i> {{ lead.phone }}
+        </a>
+
+        <div class="customer-details-pill">
+          {% if lead.interested_course %}
+          <span class="badge-pill badge-muted" style="font-size:.72rem;">
+            <i class="bi bi-book me-1"></i>{{ lead.interested_course.course_name }}
+          </span>
+          {% endif %}
+          <span class="badge-pill badge-muted lead-status-badge" id="status-badge-{{ lead.id }}" style="font-size:.72rem;background:rgba(79,127,250,.12);color:var(--accent);">
+            {{ lead.get_status_display }}
+          </span>
+        </div>
+
+        <!-- Distinct Current Response & Call Attempt Counter -->
+        <div style="font-size:.78rem;background:var(--bg-deep);padding:6px 10px;border-radius:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <span style="color:var(--text-muted);font-size:.7rem;">Response:</span> 
+            <strong id="response-text-{{ lead.id }}" style="color:var(--text);">{{ lead.current_response|default:"Not Contacted" }}</strong>
+          </div>
+          <span class="badge-pill badge-muted" style="font-size:.68rem;" title="Total call attempts for this customer">
+            <i class="bi bi-telephone-out me-1"></i><span id="attempts-count-{{ lead.id }}">{{ lead.attempts_count }}</span> attempt{% if lead.attempts_count != 1 %}s{% endif %}
+          </span>
+        </div>
+
+        <div style="font-size:.7rem;color:var(--text-light);margin-bottom:10px;">
+          <i class="bi bi-clock me-1"></i>Updated: <span id="updated-time-{{ lead.id }}">{{ lead.updated_at|date:"d M, H:i" }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="card-action-bar" style="grid-template-columns: 1fr auto auto;">
+        <!-- Call Customer button dials AND opens response panel for return -->
+        <a href="tel:{{ lead.phone }}" class="btn-call-direct" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
+          <i class="bi bi-telephone-fill me-1"></i> Call Customer
+        </a>
+        <!-- Response / Edit Response button -->
+        <button type="button" class="btn-response-trigger" onclick="openQuickResponseModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')" title="One-tap response">
+          <i class="bi bi-ui-checks text-accent"></i> Response
+        </button>
+        <button type="button" class="btn-response-trigger" onclick="openEditResponseModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.current_response|escapejs }}')" title="Edit customer response">
+          <i class="bi bi-pencil-square text-accent"></i>
+        </button>
+        <a href="{% url 'lead_detail' lead.id %}" class="btn-response-trigger" style="text-decoration:none;" title="View details & full timeline">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align:center; padding:50px 20px; color:var(--text-muted);" class="neu-inset">
+      <i class="bi bi-inbox" style="font-size:3rem; opacity:0.4; display:block; margin-bottom:10px;"></i>
+      <h5>No Leads Assigned</h5>
+      <p style="font-size:0.85rem;">You currently have zero assigned leads. Ask your MD to assign a lead batch.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ONE-TAP MOBILE BOTTOM SHEET RESPONSE PANEL                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="bottom-sheet-overlay" id="sheetOverlay" onclick="closeQuickResponseModal()"></div>
+
+<div class="bottom-sheet" id="quickResponseSheet">
+  <div class="sheet-handle"></div>
+  
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+      <h5 style="margin:0; font-weight:800; font-size:1.1rem; color:var(--text);" id="modalCustomerName">Customer Name</h5>
+      <div style="font-size:0.82rem; color:var(--text-muted);" id="modalCustomerPhone"><i class="bi bi-telephone-fill text-success me-1"></i>+91 9876543210</div>
+    </div>
+    <button type="button" class="btn-close-neu" onclick="closeQuickResponseModal()" style="border:none;background:none;font-size:1.4rem;color:var(--text-muted);cursor:pointer;">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:10px;">
+    Select Call Outcome (One-Tap Auto Save)
+  </div>
+
+  <!-- 11 One-Tap Response Buttons -->
+  <div class="response-grid">
+    <button type="button" class="btn-response-opt opt-interested" onclick="selectOutcome('INTERESTED', this)">
+      <i class="bi bi-fire"></i>
+      <span>Interested</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-callback" onclick="selectOutcome('CALL_BACK', this)">
+      <i class="bi bi-calendar-event-fill"></i>
+      <span>Call Back</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-not-interested" onclick="selectOutcome('NOT_INTERESTED', this)">
+      <i class="bi bi-hand-thumbs-down-fill"></i>
+      <span>Not Interested</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-connected" onclick="selectOutcome('CONNECTED', this)">
+      <i class="bi bi-telephone-inbound-fill"></i>
+      <span>Connected</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-not-attended" onclick="selectOutcome('NOT_ANSWERED', this)">
+      <i class="bi bi-telephone-x-fill text-danger"></i>
+      <span>Not Answered 📵</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-not-attended" onclick="selectOutcome('NOT_ATTENDED', this)">
+      <i class="bi bi-telephone-minus-fill"></i>
+      <span>Not Attended</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-busy" onclick="selectOutcome('BUSY', this)">
+      <i class="bi bi-phone-vibrate-fill"></i>
+      <span>Busy</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-switched-off" onclick="selectOutcome('SWITCHED_OFF', this)">
+      <i class="bi bi-slash-circle-fill"></i>
+      <span>Switched Off</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-wrong" onclick="selectOutcome('WRONG_NUMBER', this)">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>Wrong Number</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-invalid" onclick="selectOutcome('INVALID_NUMBER', this)">
+      <i class="bi bi-x-circle-fill"></i>
+      <span>Invalid Number</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-no-response" onclick="selectOutcome('NO_RESPONSE', this)">
+      <i class="bi bi-hourglass-split"></i>
+      <span>No Response</span>
+    </button>
+
+    <button type="button" class="btn-response-opt opt-converted" onclick="selectOutcome('CONVERTED', this)">
+      <i class="bi bi-trophy-fill"></i>
+      <span>Converted 🎉</span>
+    </button>
+  </div>
+
+  <!-- CONDITIONAL EXTRA FIELDS FOR INTERESTED / CALL BACK CUSTOMERS ONLY -->
+  <div id="interestedExtraFields" style="display:none; background:rgba(79,127,250,0.06); padding:14px; border-radius:16px; border:1px solid rgba(79,127,250,0.25); margin-bottom:14px;">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div style="font-weight:700; font-size:0.85rem; color:var(--accent);">
+        <i class="bi bi-star-fill me-1"></i> Interested Customer Details
+      </div>
+      <div class="d-flex gap-1">
+        <button type="button" class="preset-chip" onclick="setFollowupPreset('tomorrow')">Tomorrow</button>
+        <button type="button" class="preset-chip" onclick="setFollowupPreset('2days')">+2 Days</button>
+        <button type="button" class="preset-chip" onclick="setFollowupPreset('1week')">+1 Wk</button>
+      </div>
+    </div>
+
+    <div class="row g-2 mb-2">
+      <div class="col-6">
+        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Interested Course</label>
+        <select id="interestedCourse" class="neu-input" style="padding:6px 8px; font-size:0.8rem;">
+          <option value="">-- Select Course --</option>
+          {% for c in courses %}
+          <option value="{{ c.id }}">{{ c.course_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6">
+        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Preferred Branch</label>
+        <select id="preferredBranch" class="neu-input" style="padding:6px 8px; font-size:0.8rem;">
+          <option value="">-- Select Branch --</option>
+          {% for b in branches %}
+          <option value="{{ b.id }}">{{ b.branch_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row g-2 mb-2">
+      <div class="col-6">
+        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Follow-up Date</label>
+        <input type="date" id="followupDate" class="neu-input" style="padding:6px 8px; font-size:0.8rem;">
+      </div>
+      <div class="col-6">
+        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Time</label>
+        <input type="time" id="followupTime" class="neu-input" style="padding:6px 8px; font-size:0.8rem;" value="10:00">
+      </div>
+    </div>
+
+    <div class="row g-2 mb-2">
+      <div class="col-6">
+        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Budget / Expected Fee</label>
+        <input type="text" id="interestedBudget" class="neu-input" placeholder="e.g. 15,000" style="padding:6px 8px; font-size:0.8rem;">
+      </div>
+      <div class="col-6">
+        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Requirement Note</label>
+        <input type="text" id="requirementNote" class="neu-input" placeholder="e.g. Weekend Batch" style="padding:6px 8px; font-size:0.8rem;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Call Remarks -->
+  <div class="mb-3">
+    <input type="text" id="callRemarks" class="neu-input" placeholder="Call notes / remarks..." style="padding:9px 12px; font-size:0.84rem;">
+  </div>
+
+  <!-- Auto-saving Status indicator -->
+  <div id="saveStatusIndicator" class="text-center" style="display:none; font-size:0.82rem; font-weight:700; color:var(--success); padding:6px;">
+    <i class="bi bi-arrow-repeat spin me-1"></i> Saving response to CRM...
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- EDIT CUSTOMER RESPONSE MODAL                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="bottom-sheet-overlay" id="editResponseOverlay" onclick="closeEditResponseModal()"></div>
+
+<div class="bottom-sheet" id="editResponseSheet" style="max-width:550px;">
+  <div class="sheet-handle"></div>
+  
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h5 style="margin:0; font-weight:800; font-size:1.1rem; color:var(--text);" id="editModalCustomerName">Customer Name</h5>
+      <div style="font-size:0.82rem; color:var(--text-muted);">Current Response: <strong id="editModalCurrentResponse" class="text-accent">—</strong></div>
+    </div>
+    <button type="button" class="btn-close-neu" onclick="closeEditResponseModal()" style="border:none;background:none;font-size:1.4rem;color:var(--text-muted);cursor:pointer;">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">
+    Update Customer Response (Preserves Unique Customer Count)
+  </div>
+
+  <div class="response-grid mb-3">
+    <button type="button" class="btn-response-opt opt-interested" onclick="submitEditResponse('INTERESTED')">
+      <i class="bi bi-fire"></i>
+      <span>Interested 🟢</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-callback" onclick="submitEditResponse('CALL_BACK')">
+      <i class="bi bi-calendar-event-fill"></i>
+      <span>Call Back 📞</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-not-attended" onclick="submitEditResponse('NOT_ANSWERED')">
+      <i class="bi bi-telephone-x-fill text-danger"></i>
+      <span>Not Answered 📵</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-not-interested" onclick="submitEditResponse('NOT_INTERESTED')">
+      <i class="bi bi-hand-thumbs-down-fill"></i>
+      <span>Not Interested 🔴</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-busy" onclick="submitEditResponse('BUSY')">
+      <i class="bi bi-phone-vibrate-fill"></i>
+      <span>Busy ⌛</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-switched-off" onclick="submitEditResponse('SWITCHED_OFF')">
+      <i class="bi bi-slash-circle-fill"></i>
+      <span>Switched Off 📱</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-wrong" onclick="submitEditResponse('WRONG_NUMBER')">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>Wrong Number ❌</span>
+    </button>
+    <button type="button" class="btn-response-opt opt-converted" onclick="submitEditResponse('CONVERTED')">
+      <i class="bi bi-trophy-fill"></i>
+      <span>Converted 🎉</span>
+    </button>
+  </div>
+
+  <div class="mb-3">
+    <input type="text" id="editResponseNotes" class="neu-input" placeholder="Optional notes (e.g. Customer called back)" style="padding:9px 12px; font-size:0.84rem;">
+  </div>
+  <div id="editStatusIndicator" class="text-center" style="display:none; font-size:0.82rem; font-weight:700; color:var(--success); padding:6px;">
+    <i class="bi bi-arrow-repeat spin me-1"></i> Updating response...
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentLeadId = null;
+let selectedOutcome = null;
+
+// Search Filter
+document.getElementById('leadSearchInput').addEventListener('input', function() {
+  const query = this.value.toLowerCase().trim();
+  document.querySelectorAll('#leadCardsContainer .lead-item-card').forEach(function(card) {
+    const name = card.getAttribute('data-name');
+    const phone = card.getAttribute('data-phone');
+    if (name.includes(query) || phone.includes(query)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+});
+
+// Category Filter Chips
+function filterLeads(category, btn) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('#leadCardsContainer .lead-item-card').forEach(function(card) {
+    const status = card.getAttribute('data-status');
+    const priority = card.getAttribute('data-priority');
+
+    if (category === 'ALL') {
+      card.style.display = '';
+    } else if (category === 'HOT' && priority === 'HOT') {
+      card.style.display = '';
+    } else if (category === 'PENDING' && (status === 'NEW' || status === 'ASSIGNED')) {
+      card.style.display = '';
+    } else if (category === 'INTERESTED' && (status === 'INTERESTED' || status === 'CONTACTED')) {
+      card.style.display = '';
+    } else if (category === 'CONVERTED' && status === 'CONVERTED') {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+let currentCallSessionId = null;
+let callStartTime = null;
+
+// Trigger Call AND Pre-Open Response Bottom Sheet for seamless return
+function triggerCallAndPrepareModal(leadId, leadName, leadPhone) {
+  currentCallSessionId = "CS-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+  callStartTime = Date.now();
+  openQuickResponseModal(leadId, leadName, leadPhone);
+  // Phone call proceeds naturally via tel: link
+}
+
+// Open Bottom Sheet Modal
+function openQuickResponseModal(leadId, leadName, leadPhone) {
+  currentLeadId = leadId;
+  selectedOutcome = null;
+  
+  const nameEl = document.getElementById('modalCustomerName');
+  if (nameEl) nameEl.textContent = leadName;
+
+  const phoneEl = document.getElementById('modalCustomerPhone');
+  if (phoneEl) phoneEl.innerHTML = `<i class="bi bi-telephone-fill text-success me-1"></i>${leadPhone}`;
+
+  const remarksEl = document.getElementById('callRemarks');
+  if (remarksEl) remarksEl.value = '';
+
+  const budgetEl = document.getElementById('interestedBudget');
+  if (budgetEl) budgetEl.value = '';
+
+  const reqEl = document.getElementById('requirementNote');
+  if (reqEl) reqEl.value = '';
+
+  const extraEl = document.getElementById('interestedExtraFields');
+  if (extraEl) extraEl.style.display = 'none';
+
+  const indicatorEl = document.getElementById('saveStatusIndicator');
+  if (indicatorEl) indicatorEl.style.display = 'none';
+
+  // Clear button selections
+  document.querySelectorAll('#quickResponseSheet .btn-response-opt').forEach(btn => btn.classList.remove('selected'));
+
+  // Pre-fill tomorrow for date picker
+  setFollowupPreset('tomorrow');
+
+  const overlay = document.getElementById('sheetOverlay');
+  if (overlay) overlay.classList.add('active');
+
+  const sheet = document.getElementById('quickResponseSheet');
+  if (sheet) sheet.classList.add('active');
+}
+
+function closeQuickResponseModal() {
+  document.getElementById('sheetOverlay').classList.remove('active');
+  document.getElementById('quickResponseSheet').classList.remove('active');
+}
+
+// Preset helper for follow-up date
+function setFollowupPreset(preset) {
+  const d = new Date();
+  if (preset === 'tomorrow') {
+    d.setDate(d.getDate() + 1);
+  } else if (preset === '2days') {
+    d.setDate(d.getDate() + 2);
+  } else if (preset === '1week') {
+    d.setDate(d.getDate() + 7);
+  }
+  const isoStr = d.toISOString().split('T')[0];
+  document.getElementById('followupDate').value = isoStr;
+}
+
+// Select Call Outcome
+function selectOutcome(outcome, btnElement) {
+  selectedOutcome = outcome;
+
+  document.querySelectorAll('.btn-response-opt').forEach(btn => btn.classList.remove('selected'));
+  if (btnElement) {
+    btnElement.classList.add('selected');
+  }
+
+  const extraFields = document.getElementById('interestedExtraFields');
+  if (outcome === 'INTERESTED' || outcome === 'CALL_BACK') {
+    // Reveal extra fields for interested / call back customers
+    extraFields.style.display = 'block';
+  } else {
+    // Hide extra fields for non-interested/busy/wrong number and save immediately
+    extraFields.style.display = 'none';
+    saveQuickResponse();
+  }
+}
+
+// Automatically save when date or course/branch selected
+document.getElementById('followupDate').addEventListener('change', function() {
+  if (selectedOutcome) saveQuickResponse();
+});
+
+// Primary Save Logic via AJAX
+function saveQuickResponse() {
+  if (!currentLeadId || !selectedOutcome) return;
+
+  const indicator = document.getElementById('saveStatusIndicator');
+  indicator.style.display = 'block';
+  indicator.innerHTML = '<i class="bi bi-arrow-repeat spin me-1"></i> Auto-saving to CRM...';
+
+  const notes = document.getElementById('callRemarks').value;
+  const isInterested = (selectedOutcome === 'INTERESTED' || selectedOutcome === 'CALL_BACK');
+  
+  let durationSecs = 0;
+  if (callStartTime) {
+    durationSecs = Math.max(0, Math.round((Date.now() - callStartTime) / 1000));
+  }
+
+  const payload = {
+    outcome: selectedOutcome,
+    notes: notes,
+    call_duration: durationSecs,
+    course_id: isInterested ? document.getElementById('interestedCourse').value : '',
+    preferred_branch_id: isInterested ? document.getElementById('preferredBranch').value : '',
+    budget: isInterested ? document.getElementById('interestedBudget').value : '',
+    requirement_note: isInterested ? document.getElementById('requirementNote').value : '',
+    followup_date: isInterested ? document.getElementById('followupDate').value : '',
+    followup_time: isInterested ? document.getElementById('followupTime').value : '',
+    followup_note: notes,
+    call_session_id: currentCallSessionId
+  };
+
+  fetch(`/api/leads/${currentLeadId}/quick-call-log/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrfToken()
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      indicator.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Saved! Status: ${data.new_status_display}`;
+      
+      // Update badge on card
+      const badge = document.getElementById(`status-badge-${currentLeadId}`);
+      if (badge) {
+        badge.textContent = data.new_status_display;
+        badge.style.background = 'rgba(34,197,94,0.15)';
+        badge.style.color = '#16A34A';
+      }
+
+      const timeSpan = document.getElementById(`updated-time-${currentLeadId}`);
+      if (timeSpan) {
+        timeSpan.textContent = data.updated_at;
+      }
+
+      // Update card data-status
+      const card = document.getElementById(`lead-card-${currentLeadId}`);
+      if (card) {
+        card.setAttribute('data-status', data.new_status);
+      }
+
+      // Update stats counters dynamically
+      const callsTodayEl = document.getElementById('callsTodayStat');
+      if (callsTodayEl) {
+        callsTodayEl.textContent = parseInt(callsTodayEl.textContent || '0') + 1;
+      }
+      if (selectedOutcome === 'INTERESTED' || selectedOutcome === 'CONNECTED') {
+        const interestedEl = document.getElementById('interestedStat');
+        if (interestedEl) interestedEl.textContent = parseInt(interestedEl.textContent || '0') + 1;
+      } else if (selectedOutcome === 'CONVERTED') {
+        const convertedEl = document.getElementById('convertedStat');
+        if (convertedEl) convertedEl.textContent = parseInt(convertedEl.textContent || '0') + 1;
+      }
+
+      setTimeout(() => {
+        closeQuickResponseModal();
+      }, 700);
+    } else {
+      indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> ${data.message}</span>`;
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Network error saving response</span>`;
+  });
+}
+
+let currentEditLeadId = null;
+
+function openEditResponseModal(leadId, leadName, currentResponse) {
+  currentEditLeadId = leadId;
+  const nameEl = document.getElementById('editModalCustomerName');
+  if (nameEl) nameEl.innerText = leadName;
+
+  const respEl = document.getElementById('editModalCurrentResponse');
+  if (respEl) respEl.innerText = currentResponse || "Not Contacted";
+
+  const notesEl = document.getElementById('editResponseNotes');
+  if (notesEl) notesEl.value = "";
+
+  const indicatorEl = document.getElementById('editStatusIndicator');
+  if (indicatorEl) indicatorEl.style.display = 'none';
+
+  const overlay = document.getElementById('editResponseOverlay');
+  if (overlay) overlay.classList.add('active');
+
+  const sheet = document.getElementById('editResponseSheet');
+  if (sheet) sheet.classList.add('active');
+}
+
+function closeEditResponseModal() {
+  const overlay = document.getElementById('editResponseOverlay');
+  if (overlay) overlay.classList.remove('active');
+
+  const sheet = document.getElementById('editResponseSheet');
+  if (sheet) sheet.classList.remove('active');
+
+  currentEditLeadId = null;
+}
+
+function submitEditResponse(newResponseKey) {
+  if (!currentEditLeadId) return;
+
+  const indicator = document.getElementById('editStatusIndicator');
+  indicator.style.display = 'block';
+  indicator.innerHTML = '<i class="bi bi-arrow-repeat spin me-1"></i> Updating response...';
+
+  const notes = document.getElementById('editResponseNotes').value;
+  const url = `/api/leads/${currentEditLeadId}/edit-response/`;
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCsrfToken()
+    },
+    body: JSON.stringify({
+      new_response: newResponseKey,
+      notes: notes
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      indicator.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Updated to ${data.new_response}`;
+      const respEl = document.getElementById(`response-text-${currentEditLeadId}`);
+      if (respEl) respEl.innerText = data.new_response;
+
+      const statusEl = document.getElementById(`status-badge-${currentEditLeadId}`);
+      if (statusEl) statusEl.innerText = data.new_status_display;
+
+      const timeSpan = document.getElementById(`updated-time-${currentEditLeadId}`);
+      if (timeSpan) timeSpan.innerText = data.updated_at;
+
+      setTimeout(() => {
+        closeEditResponseModal();
+      }, 700);
+
+      if (window.notifyAppChange) window.notifyAppChange();
+    } else {
+      indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> ${data.message}</span>`;
+    }
+  })
+  .catch(err => {
+    console.error("Edit response error:", err);
+    indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Network error</span>`;
+  });
+}
+
+function getCsrfToken() {
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    ?.split('=')[1];
+  return cookieValue || '{{ csrf_token }}';
+}
+</script>
+{% endblock %}

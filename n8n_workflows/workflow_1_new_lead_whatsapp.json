@@ -1,0 +1,70 @@
+{
+  "name": "DreamCadd - Workflow 1: New Lead WhatsApp Greeting",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead-webhook",
+        "options": {}
+      },
+      "name": "New Lead Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://127.0.0.1:8000/api/n8n/company-info/",
+        "headers": {
+          "X-API-KEY": "dreamcadd-n8n-secret-key"
+        }
+      },
+      "name": "Fetch Company & Branch Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://graph.facebook.com/v20.0/YOUR_WHATSAPP_PHONE_NUMBER_ID/messages",
+        "headers": {
+          "Authorization": "Bearer YOUR_WHATSAPP_ACCESS_TOKEN",
+          "Content-Type": "application/json"
+        },
+        "jsonParameters": true,
+        "options": {},
+        "body": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{$json[\"lead_phone\"]}}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"dreamcadd_welcome\",\n    \"language\": {\n      \"code\": \"en\"\n    },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json[\"lead_name\"]}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json[\"course_name\"]}}\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+      },
+      "name": "Send WhatsApp Welcome Template",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "New Lead Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Company & Branch Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Company & Branch Details": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Welcome Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

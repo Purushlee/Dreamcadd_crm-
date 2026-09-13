@@ -1,0 +1,88 @@
+{% extends "leads/base.html" %}
+{% block title %}All Leads — DreamCadd CRM{% endblock %}
+{% block nav_leads %}active{% endblock %}
+
+{% block content %}
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-person-lines-fill text-accent me-2"></i>All Leads</h1>
+    <div class="page-sub">Browse, filter & search all system leads</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'md_dashboard' %}" class="btn-neu btn-neu-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+    <a href="{% url 'export_leads_csv' %}" class="btn-neu btn-neu-sm btn-success-neu"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</a>
+  </div>
+</div>
+
+<div class="card fade-in">
+  <div class="section-header mb-3">
+    <form method="get" class="d-flex gap-2 align-center" style="margin:0;">
+      <select name="status" onchange="this.form.submit()" style="width:200px;">
+        <option value="">All Statuses</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    <div class="search-wrap" style="width:240px;">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" id="leadListSearch" placeholder="Search leads…">
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="neu-table" id="leadListTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>College</th>
+          <th>Course</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Assigned To</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for lead in leads %}
+        <tr>
+          <td>
+            <a href="{% url 'lead_detail' lead.id %}" style="font-weight:700;text-decoration:none;color:var(--text);">{{ lead.name }}</a>
+          </td>
+          <td style="font-size:.82rem;color:var(--text-muted);">{{ lead.phone }}</td>
+          <td style="font-size:.82rem;color:var(--text-muted);">{{ lead.college|default:"—" }}</td>
+          <td style="font-size:.82rem;">{{ lead.interested_course.course_name|default:"—" }}</td>
+          <td>
+            {% if lead.priority == 'HOT' %}<span class="badge-pill badge-hot"><i class="bi bi-fire"></i> HOT</span>
+            {% elif lead.priority == 'WARM' %}<span class="badge-pill badge-warm">🟡 WARM</span>
+            {% else %}<span class="badge-pill badge-cold">🔵 COLD</span>{% endif %}
+          </td>
+          <td><span class="badge-pill badge-muted">{{ lead.get_status_display }}</span></td>
+          <td style="font-size:.82rem;">{{ lead.assignee_display }}</td>
+          <td style="font-size:.75rem;color:var(--text-muted);">{{ lead.updated_at|date:"d M, H:i" }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="8" style="text-align:center;color:var(--text-muted);padding:40px;">
+            <i class="bi bi-person-x" style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:10px;"></i>
+            No leads found for this filter.
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('leadListSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#leadListTable tbody tr').forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,463 @@
+{% extends "leads/base.html" %}
+{% block title %}Executive Dashboard — DreamCadd CRM{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-speedometer2 text-accent me-2"></i>Executive Dashboard</h1>
+    <div class="page-sub">Real-time lead analytics & automation overview</div>
+  </div>
+  <div class="d-flex gap-2" style="flex-wrap:wrap;">
+    <a href="{% url 'export_leads_csv' %}" class="btn-neu btn-neu-sm btn-success-neu">
+      <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+    </a>
+    <a href="{% url 'bulk_allocate' %}" class="btn-neu btn-neu-sm">
+      <i class="bi bi-funnel"></i> Leads
+    </a>
+    <a href="{% url 'manage_callers' %}" class="btn-neu btn-neu-sm">
+      <i class="bi bi-people"></i> Callers
+    </a>
+    <button type="button" class="btn-neu btn-neu-sm btn-danger-neu"
+            data-bs-toggle="modal" data-bs-target="#clearDbModal">
+      <i class="bi bi-trash3"></i> Clear DB
+    </button>
+  </div>
+</div>
+
+<!-- ══ KPI STAT CARDS ══ -->
+<div class="grid-stat mb-4">
+  <div class="stat-card stat-accent-blue fade-in fade-in-1">
+    <div class="stat-card-icon"><i class="bi bi-database-fill"></i></div>
+    <div class="stat-card-value">{{ stats.total }}</div>
+    <div class="stat-card-label">Master Dataset Total</div>
+    <div class="stat-card-trend up"><i class="bi bi-stack"></i> All imported leads</div>
+  </div>
+
+  <div class="stat-card stat-accent-purple fade-in fade-in-1">
+    <div class="stat-card-icon"><i class="bi bi-box-arrow-in-down"></i></div>
+    <div class="stat-card-value">{{ stats.unallocated }}</div>
+    <div class="stat-card-label">Unallocated Pool</div>
+    <div class="stat-card-trend up" style="color:var(--accent);"><i class="bi bi-arrow-down-circle"></i> Ready to allocate</div>
+  </div>
+
+  <div class="stat-card stat-accent-cyan fade-in fade-in-2">
+    <div class="stat-card-icon"><i class="bi bi-person-check-fill"></i></div>
+    <div class="stat-card-value">{{ stats.allocated }}</div>
+    <div class="stat-card-label">Allocated Total</div>
+    <div class="stat-card-trend up"><i class="bi bi-headset"></i> With telecallers</div>
+  </div>
+
+  <div class="stat-card stat-accent-amber fade-in fade-in-2">
+    <div class="stat-card-icon"><i class="bi bi-telephone-out-fill"></i></div>
+    <div class="stat-card-value">{{ stats.today_calls }}</div>
+    <div class="stat-card-label">Calls Today</div>
+    <div class="stat-card-trend up"><i class="bi bi-activity"></i> Active outbound</div>
+  </div>
+
+  <div class="stat-card stat-accent-red fade-in fade-in-3">
+    <div class="stat-card-icon"><i class="bi bi-fire"></i></div>
+    <div class="stat-card-value">{{ stats.hot_leads }}</div>
+    <div class="stat-card-label">Hot Leads 🔥</div>
+    <div class="stat-card-trend" style="color:var(--hot)"><i class="bi bi-arrow-up-right"></i> Priority follow-up</div>
+  </div>
+
+  <div class="stat-card stat-accent-green fade-in fade-in-3">
+    <div class="stat-card-icon"><i class="bi bi-star"></i></div>
+    <div class="stat-card-value">{{ stats.interested }}</div>
+    <div class="stat-card-label">Interested</div>
+    <div class="stat-card-trend up"><i class="bi bi-dot"></i> Warm pipeline</div>
+  </div>
+
+  <div class="stat-card stat-accent-blue fade-in fade-in-4">
+    <div class="stat-card-icon"><i class="bi bi-alarm"></i></div>
+    <div class="stat-card-value">{{ stats.overdue_followups }}</div>
+    <div class="stat-card-label">Overdue Follow-ups</div>
+    <div class="stat-card-trend down"><i class="bi bi-arrow-down-right"></i> Action needed</div>
+  </div>
+
+  <div class="stat-card stat-accent-green fade-in fade-in-4">
+    <div class="stat-card-icon"><i class="bi bi-trophy-fill"></i></div>
+    <div class="stat-card-value">{{ stats.conversion_rate }}%</div>
+    <div class="stat-card-label">Conversion Rate</div>
+    <div class="stat-card-trend up"><i class="bi bi-check2-circle"></i> {{ stats.converted }} converted</div>
+  </div>
+</div>
+
+<!-- ══ ROW 2: Telecaller Real-time Session & Performance Monitoring ══ -->
+<div class="card mb-4 fade-in">
+  <div class="section-header mb-3">
+    <div>
+      <div class="section-title" style="font-size:1rem;"><i class="bi bi-person-workspace text-accent me-2"></i>Telecaller Monitoring & Real-time Sessions</div>
+      <div class="section-subtitle">Live activity tracking, login timestamps, and calls completed</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'allocation_history' %}" class="btn-neu-sm btn-neu btn-accent" style="font-size:.73rem;">
+        <i class="bi bi-journal-check me-1"></i> Allocation History
+      </a>
+      <a href="{% url 'manage_callers' %}" class="btn-neu-sm btn-neu" style="font-size:.73rem;">
+        <i class="bi bi-gear me-1"></i> Manage Callers
+      </a>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="neu-table">
+      <thead>
+        <tr>
+          <th>Telecaller</th>
+          <th>Presence Status</th>
+          <th>Login Time</th>
+          <th>Working Duration</th>
+          <th>Allocated Customers</th>
+          <th>Unique Contacted</th>
+          <th>Total Call Attempts</th>
+          <th>Conversions</th>
+          <th>Report</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tc in telecallers %}
+        <tr>
+          <td>
+            <div style="font-weight:700;">{{ tc.full_name }}</div>
+            <div style="font-size:.7rem;color:var(--text-muted);">{{ tc.username }}</div>
+          </td>
+          <td>
+            <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:12px;background:var(--bg);box-shadow:inset 2px 2px 5px var(--sd),inset -2px -2px 5px var(--sl);font-size:.75rem;font-weight:700;">
+              <span style="width:8px;height:8px;border-radius:50%;background:{{ tc.presence_color }};"></span>
+              {{ tc.presence_status }}
+            </div>
+          </td>
+          <td style="font-size:.82rem;color:var(--text-muted);">
+            {% if tc.login_time %}<i class="bi bi-clock me-1 text-accent"></i>{{ tc.login_time|date:"H:i" }}{% else %}—{% endif %}
+          </td>
+          <td style="font-size:.82rem;font-weight:600;">
+            {{ tc.working_time }}
+          </td>
+          <td>
+            <span class="badge-pill badge-accent">{{ tc.assigned_count }} / {{ tc.max_leads }}</span>
+          </td>
+          <td>
+            <span class="badge-pill badge-ok" style="background:rgba(34,197,94,0.12);color:#16A34A;font-weight:700;">{{ tc.unique_contacted_count }}</span>
+          </td>
+          <td>
+            <span class="badge-pill badge-warm">{{ tc.total_call_attempts }} attempts</span>
+          </td>
+          <td>
+            <span class="badge-pill badge-ok">{{ tc.converted_count }} ✓</span>
+          </td>
+          <td>
+            <a href="{% url 'telecaller_report' tc.id %}" class="btn-neu-sm btn-neu" style="font-size:.7rem;">
+              <i class="bi bi-bar-chart-fill me-1"></i> Full Report
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:24px;">No telecallers added yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ ROW 3: Performance Charts ══ -->
+<div class="grid-2 mb-4">
+  <!-- Calls per Telecaller Chart -->
+  <div class="card fade-in fade-in-2">
+    <div class="section-title mb-1" style="font-size:1rem;">📊 Calls & Conversions per Telecaller</div>
+    <div class="section-subtitle mb-3">Today's call output comparison</div>
+    <canvas id="callerPerfChart" height="200"></canvas>
+  </div>
+
+  <!-- Call Results Distribution Chart -->
+  <div class="card fade-in fade-in-3">
+    <div class="section-title mb-1" style="font-size:1rem;">🎯 Call Results Distribution</div>
+    <div class="section-subtitle mb-3">Overall call status breakdown</div>
+    <canvas id="resultsPieChart" height="200"></canvas>
+  </div>
+</div>
+
+<!-- ══ ROW 3: Upload + n8n Automation Status ══ -->
+<div class="grid-2 mb-4">
+
+  <!-- Excel Upload -->
+  <div class="card fade-in fade-in-3">
+    <div class="section-title mb-1" style="font-size:1rem;"><i class="bi bi-file-earmark-excel text-success me-1"></i>Import Leads (Excel)</div>
+    <div class="section-subtitle mb-3">Upload .xlsx with Name, Phone, Course columns</div>
+    <form method="post" action="{% url 'upload_excel' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Select Excel File</label>
+        {{ upload_form.file }}
+      </div>
+      <button type="submit" class="btn-neu btn-neu w-100 btn-accent">
+        <i class="bi bi-cloud-upload-fill"></i> Upload & Auto-Assign Round-Robin
+      </button>
+    </form>
+    <div style="margin-top:12px;font-size:.72rem;color:var(--text-muted);">
+      <i class="bi bi-info-circle me-1"></i>
+      Required columns: <code>name</code>, <code>phone</code> &nbsp;|&nbsp; Optional: <code>email</code>, <code>education</code>, <code>college</code>, <code>course</code>
+    </div>
+  </div>
+
+  <!-- n8n Automation Status -->
+  <div class="card fade-in fade-in-4">
+    <div class="section-title mb-1" style="font-size:1rem;"><i class="bi bi-diagram-3 text-accent me-1"></i>n8n Automation Status</div>
+    <div class="section-subtitle mb-3">Real-time workflow indicators</div>
+
+    <div class="automation-item">
+      <div class="d-flex align-center gap-2">
+        <div class="automation-dot active"></div>
+        <div>
+          <div style="font-size:.84rem;font-weight:600;">Workflow 1 — New Lead Greeting</div>
+          <div style="font-size:.7rem;color:var(--text-muted);">Webhook → Company Info → WhatsApp</div>
+        </div>
+      </div>
+      <span class="badge-pill badge-ok">ACTIVE</span>
+    </div>
+
+    <div class="automation-item">
+      <div class="d-flex align-center gap-2">
+        <div class="automation-dot active"></div>
+        <div>
+          <div style="font-size:.84rem;font-weight:600;">Workflow 2 — AI Reply Intent</div>
+          <div style="font-size:.7rem;color:var(--text-muted);">Student Reply → AI → Lead Update → Alert</div>
+        </div>
+      </div>
+      <span class="badge-pill badge-ok">ACTIVE</span>
+    </div>
+
+    <div class="automation-item">
+      <div class="d-flex align-center gap-2">
+        <div class="automation-dot active"></div>
+        <div>
+          <div style="font-size:.84rem;font-weight:600;">Workflow 3 — Follow-up Cron</div>
+          <div style="font-size:.7rem;color:var(--text-muted);">Every 15 min → Reminder → Caller Notify</div>
+        </div>
+      </div>
+      <span class="badge-pill badge-ok">ACTIVE</span>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;border-radius:var(--radius-sm);background:rgba(79,127,250,.06);font-size:.75rem;color:var(--text-muted);">
+      <i class="bi bi-robot me-1 text-accent"></i>
+      n8n running at <strong>localhost:5678</strong>. Configure API keys in <code>.env</code> to connect WhatsApp.
+    </div>
+  </div>
+</div>
+
+<!-- ══ ROW 4: Recent Leads Table + Activity Timeline ══ -->
+<div class="grid-2">
+
+  <!-- Recent Leads -->
+  <div class="card fade-in fade-in-3">
+    <div class="section-header mb-3">
+      <div>
+        <div class="section-title" style="font-size:1rem;"><i class="bi bi-person-lines-fill text-accent me-1"></i>Recent Leads</div>
+        <div class="section-subtitle">Latest {{ recent_leads|length }} entries</div>
+      </div>
+      <a href="{% url 'bulk_allocate' %}" class="btn-neu-sm btn-neu" style="font-size:.72rem;">View All</a>
+    </div>
+
+    <div class="search-wrap mb-3">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" id="leadSearch" placeholder="Search leads…" style="padding-left:38px!important;">
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="neu-table" id="leadTable">
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead in recent_leads %}
+          <tr>
+            <td>
+              <a href="{% url 'lead_detail' lead.id %}" style="font-weight:700;text-decoration:none;color:var(--text);">{{ lead.name }}</a>
+              <div style="font-size:.7rem;color:var(--text-muted);">{{ lead.phone }}</div>
+            </td>
+            <td>
+              {% if lead.priority == 'HOT' %}
+                <span class="badge-pill badge-hot"><i class="bi bi-fire"></i> HOT</span>
+              {% elif lead.priority == 'WARM' %}
+                <span class="badge-pill badge-warm">🟡 WARM</span>
+              {% else %}
+                <span class="badge-pill badge-cold">🔵 COLD</span>
+              {% endif %}
+            </td>
+            <td><span class="badge-pill badge-muted">{{ lead.get_status_display }}</span></td>
+            <td style="font-size:.8rem;color:var(--text-muted);">{{ lead.assignee_display }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px;">
+              <i class="bi bi-person-x" style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px;"></i>
+              No leads yet. Upload an Excel file to get started.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Activity Timeline -->
+  <div class="card fade-in fade-in-4">
+    <div class="section-title mb-1" style="font-size:1rem;"><i class="bi bi-activity text-accent me-1"></i>Activity Timeline</div>
+    <div class="section-subtitle mb-3">Latest system events</div>
+
+    <div class="timeline">
+      {% for act in recent_activities %}
+      <div class="timeline-item">
+        <div class="timeline-dot {% if act.activity_type == 'N8N_UPDATE' or act.activity_type == 'WA_SENT' %}ok{% elif act.activity_type == 'WA_FAILED' %}hot{% else %}muted{% endif %}"></div>
+        <div class="timeline-time">{{ act.timestamp|timesince }} ago</div>
+        <div class="timeline-content">
+          <span class="timeline-badge">{{ act.activity_type }}</span>
+          <a href="{% url 'lead_detail' act.lead.id %}" style="font-weight:600;text-decoration:none;color:var(--text);">{{ act.lead.name }}</a>
+          <span style="color:var(--text-muted);"> — {{ act.description|truncatechars:60 }}</span>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align:center;color:var(--text-muted);font-size:.85rem;padding:24px 0;">
+        <i class="bi bi-clock-history" style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px;"></i>
+        No activity logged yet.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<!-- ══ Clear DB Modal ══ -->
+<div class="modal fade" id="clearDbModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background:rgba(239,68,68,.06);border-bottom-color:rgba(239,68,68,.15);">
+        <h5 class="modal-title" style="color:var(--danger);"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanently Clear All Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-neu alert-neu-danger mb-3">
+          <i class="bi bi-shield-x"></i>
+          <span><strong>This action is irreversible.</strong> All leads, call logs, follow-ups, WhatsApp messages, and import history will be permanently deleted.</span>
+        </div>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px;">Type <strong style="color:var(--danger);">DELETE</strong> to confirm:</p>
+        <form method="post" action="{% url 'clear_database' %}" id="clearDbForm">
+          {% csrf_token %}
+          <input type="text" name="confirm_text" id="confirmDeleteInput"
+                 placeholder="Type DELETE here" autocomplete="off" spellcheck="false"
+                 style="text-align:center;font-weight:700;font-size:1rem;margin-bottom:12px;">
+          <div>
+            <button type="submit" id="confirmClearBtn" class="btn-neu w-100 btn-danger-neu" disabled
+                    style="padding:12px;width:100%;justify-content:center;">
+              <i class="bi bi-trash3-fill"></i> Yes, Delete Everything
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-neu btn-neu-sm" data-bs-dismiss="modal">Cancel — Keep Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Clear DB confirm logic
+document.getElementById('confirmDeleteInput').addEventListener('input', function() {
+  document.getElementById('confirmClearBtn').disabled = (this.value.trim() !== 'DELETE');
+});
+document.getElementById('clearDbModal').addEventListener('hidden.bs.modal', function() {
+  document.getElementById('confirmDeleteInput').value = '';
+  document.getElementById('confirmClearBtn').disabled = true;
+});
+
+// Lead search filter
+document.getElementById('leadSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#leadTable tbody tr').forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+// Caller Performance Bar Chart
+const cLabels = {{ chart_calls_labels|safe }};
+const cCalls  = {{ chart_calls_data|safe }};
+const cConvs  = {{ chart_conversions_data|safe }};
+
+const cpCtx = document.getElementById('callerPerfChart').getContext('2d');
+new Chart(cpCtx, {
+  type: 'bar',
+  data: {
+    labels: cLabels,
+    datasets: [
+      {
+        label: 'Calls Today',
+        data: cCalls,
+        backgroundColor: 'rgba(79,127,250,.85)',
+        borderRadius: 8,
+      },
+      {
+        label: 'Conversions',
+        data: cConvs,
+        backgroundColor: 'rgba(34,197,94,.85)',
+        borderRadius: 8,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 } } },
+      tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.parsed.y } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } },
+      y: { grid: { color: 'rgba(163,177,198,.15)' }, ticks: { font: { family: 'Inter', size: 11 }, precision: 0 } }
+    }
+  }
+});
+
+// Call Results Distribution Chart
+const resData = {{ chart_results_data|safe }};
+const rpCtx = document.getElementById('resultsPieChart').getContext('2d');
+new Chart(rpCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Connected', 'Interested', 'Call Back', 'Not Connected', 'Busy', 'Not Interested', 'Converted'],
+    datasets: [{
+      data: resData,
+      backgroundColor: [
+        '#4F7FFA',
+        '#F59E0B',
+        '#60A5FA',
+        '#A0AEC0',
+        '#718096',
+        '#EF4444',
+        '#22C55E',
+      ],
+      borderWidth: 2,
+      borderColor: '#E4EAF0'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'right', labels: { font: { family: 'Inter', size: 11 } } }
+    },
+    cutout: '65%'
+  }
+});
+
+</script>
+{% endblock %}

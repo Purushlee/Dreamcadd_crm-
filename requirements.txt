@@ -1,0 +1,12 @@
+Django>=5.0,<6.2
+pandas>=2.0
+openpyxl>=3.1
+requests>=2.31
+python-dotenv>=1.0
+
+# Uncomment if deploying against PostgreSQL (see README / dreamcadd_schema.sql)
+# psycopg2-binary>=2.9
+
+# Uncomment for production serving
+# gunicorn>=21.0
+# whitenoise>=6.6

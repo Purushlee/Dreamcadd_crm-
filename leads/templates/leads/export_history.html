@@ -1,0 +1,85 @@
+{% extends "leads/base.html" %}
+{% block title %}Dataset Export Audit History — DreamCadd CRM{% endblock %}
+{% block nav_importHistory %}active{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-file-earmark-bar-graph text-accent me-2"></i>Export Audit History</h1>
+    <div class="page-sub">Audit trail of all CSV data exports performed by MD & Administrators</div>
+  </div>
+  <div>
+    <a href="{% url 'export_leads_csv' %}" class="btn-neu btn-neu-sm btn-success-neu">
+      <i class="bi bi-download me-1"></i> Quick Export All CSV
+    </a>
+  </div>
+</div>
+
+<!-- Export History Table Card -->
+<div class="card fade-in">
+  <div class="section-header mb-3">
+    <div>
+      <div class="section-title" style="font-size:1rem;"><i class="bi bi-journal-text text-accent me-1"></i>Export Logs</div>
+      <div class="section-subtitle">{{ exports.count }} total export operation{{ exports.count|pluralize }} recorded</div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="neu-table">
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Exported By</th>
+          <th>Export Type</th>
+          <th>Filters Applied</th>
+          <th>Records Exported</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exp in exports %}
+        <tr>
+          <td style="font-size:.82rem;font-weight:700;color:var(--text);">
+            <i class="bi bi-clock-history text-accent me-1"></i>{{ exp.exported_at|date:"d M Y, H:i:s" }}
+          </td>
+          <td>
+            <div style="font-weight:700;">{{ exp.user.get_full_name|default:exp.user.username }}</div>
+            <div style="font-size:.7rem;color:var(--text-muted);">{{ exp.user.role }}</div>
+          </td>
+          <td style="font-size:.85rem;font-weight:600;color:var(--accent);">
+            {{ exp.export_type }}
+          </td>
+          <td style="font-size:.78rem;color:var(--text-muted);">
+            {% if exp.filters_applied %}
+              <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                {% for k, v in exp.filters_applied.items %}
+                  <span class="badge-pill badge-muted" style="font-size:.7rem;">{{ k }}: {{ v }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="badge-pill badge-muted">All Leads (No Filter)</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge-pill badge-ok" style="font-size:.82rem;">{{ exp.record_count }} records</span>
+          </td>
+          <td>
+            <span class="badge-pill badge-ok"><i class="bi bi-check-circle-fill me-1"></i>Completed</span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px;">
+            <i class="bi bi-journal-x" style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:10px;"></i>
+            No export history recorded yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

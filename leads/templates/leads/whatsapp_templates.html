@@ -1,0 +1,75 @@
+{% extends "leads/base.html" %}
+{% block title %}WhatsApp Templates — DreamCadd CRM{% endblock %}
+{% block nav_whatsapp %}active{% endblock %}
+
+{% block content %}
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-whatsapp text-success me-2"></i>WhatsApp Templates</h1>
+    <div class="page-sub">Manage Meta-approved message templates for automated outreach</div>
+  </div>
+  <a href="{% url 'md_dashboard' %}" class="btn-neu btn-neu-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+
+<div class="grid-2">
+
+  <!-- Add Template -->
+  <div class="card fade-in">
+    <div class="d-flex align-center gap-2 mb-3">
+      <div style="width:32px;height:32px;border-radius:10px;background:rgba(37,211,102,.1);display:flex;align-items:center;justify-content:center;"><i class="bi bi-plus-circle-fill" style="color:#25D366;"></i></div>
+      <div class="section-title" style="font-size:.95rem;">Create Template</div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in template_form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% if field.errors %}<div style="color:var(--danger);font-size:.75rem;margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" name="save_template" value="1" class="btn-neu btn-accent w-100" style="display:flex;justify-content:center;">
+        <i class="bi bi-save"></i> Save Template
+      </button>
+    </form>
+
+    <div class="divider"></div>
+    <div style="font-size:.78rem;color:var(--text-muted);background:rgba(79,127,250,.05);padding:12px;border-radius:var(--radius-xs);">
+      <div style="font-weight:700;margin-bottom:6px;"><i class="bi bi-info-circle text-accent me-1"></i> Available Variables</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <code style="background:rgba(79,127,250,.1);padding:2px 8px;border-radius:4px;font-size:.72rem;">&#123;&#123;name&#125;&#125;</code>
+        <code style="background:rgba(79,127,250,.1);padding:2px 8px;border-radius:4px;font-size:.72rem;">&#123;&#123;course&#125;&#125;</code>
+        <code style="background:rgba(79,127,250,.1);padding:2px 8px;border-radius:4px;font-size:.72rem;">&#123;&#123;caller_name&#125;&#125;</code>
+        <code style="background:rgba(79,127,250,.1);padding:2px 8px;border-radius:4px;font-size:.72rem;">&#123;&#123;company_name&#125;&#125;</code>
+        <code style="background:rgba(79,127,250,.1);padding:2px 8px;border-radius:4px;font-size:.72rem;">&#123;&#123;fee&#125;&#125;</code>
+        <code style="background:rgba(79,127,250,.1);padding:2px 8px;border-radius:4px;font-size:.72rem;">&#123;&#123;phone&#125;&#125;</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates List -->
+  <div class="card fade-in fade-in-1">
+    <div class="section-title mb-3" style="font-size:.95rem;"><i class="bi bi-chat-quote text-accent me-1"></i>Message Templates ({{ templates|length }})</div>
+    {% for t in templates %}
+    <div style="padding:14px;border-radius:var(--radius-sm);background:var(--bg);box-shadow:4px 4px 10px var(--sd),-4px -4px 10px var(--sl);margin-bottom:10px;">
+      <div class="d-flex align-center justify-between mb-2">
+        <div style="font-weight:700;font-size:.88rem;">{{ t.template_name }}</div>
+        <div style="display:flex;gap:6px;">
+          <span class="badge-pill badge-muted">{{ t.category }}</span>
+          <span class="badge-pill {% if t.status == 'APPROVED' %}badge-ok{% elif t.status == 'PENDING_APPROVAL' %}badge-warm{% elif t.status == 'REJECTED' %}badge-hot{% else %}badge-muted{% endif %}">{{ t.get_status_display }}</span>
+        </div>
+      </div>
+      <div style="font-size:.75rem;color:var(--text-muted);background:rgba(163,177,198,.1);padding:8px 10px;border-radius:var(--radius-xs);border-left:3px solid rgba(79,127,250,.3);line-height:1.5;">{{ t.body_text|truncatechars:120 }}</div>
+      <div style="font-size:.68rem;color:var(--text-light);margin-top:6px;"><i class="bi bi-clock me-1"></i>Updated {{ t.updated_at|timesince }} ago</div>
+    </div>
+    {% empty %}
+    <div style="text-align:center;color:var(--text-muted);padding:32px 0;">
+      <i class="bi bi-chat-square-dots" style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:8px;"></i>
+      No templates created yet. Build your first template.
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

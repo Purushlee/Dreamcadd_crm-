@@ -1,0 +1,350 @@
+{
+  "name": "DreamCadd Workflow 2 Student Reply AI Intent Action",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-student-reply",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "node-wh-trigger",
+      "name": "Student Reply Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        180,
+        300
+      ],
+      "notes": "Receives incoming WhatsApp student message. Payload: { phone, message }"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://127.0.0.1:8000/api/n8n/find-lead/?phone={{ $json.body.phone || $json.phone }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "DreamCadd_n8n_2026_SecureKey_9876"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-find-lead",
+      "name": "Find Lead by Phone",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        400,
+        300
+      ],
+      "notes": "Fetches lead from Django using the student phone number."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true
+          },
+          "conditions": [
+            {
+              "id": "cond-lead-found",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "node-if-lead-found",
+      "name": "Lead Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        620,
+        300
+      ],
+      "notes": "TRUE = known lead, continue. FALSE = unknown number, stop."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://127.0.0.1:8000/api/n8n/course-lookup/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "DreamCadd_n8n_2026_SecureKey_9876"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-course-lookup",
+      "name": "Fetch Course Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        840,
+        180
+      ],
+      "notes": "Fetches all active courses to provide AI context."
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a concise AI sales assistant for DreamCadd, a CAD/BIM training institute. Always respond with valid JSON only. No preamble, no markdown, no code fences."
+            },
+            {
+              "role": "user",
+              "content": "=Student WhatsApp message: \"{{ $('Student Reply Webhook').item.json.body.message || $('Student Reply Webhook').item.json.message }}\"\n\nStudent: {{ $('Find Lead by Phone').item.json.name }}\nCourse interest: {{ $('Find Lead by Phone').item.json.course ? $('Find Lead by Phone').item.json.course.name : 'Not specified' }}\nCurrent status: {{ $('Find Lead by Phone').item.json.status }}\n\nAvailable courses: {{ JSON.stringify($json.courses) }}\n\nDetect intent from: COURSE_ENQUIRY, FEE_ENQUIRY, DURATION_ENQUIRY, ADMISSION_INTEREST, CALL_REQUEST, BRANCH_ENQUIRY, NOT_INTERESTED, GENERAL_QUERY\n\nGenerate warm WhatsApp reply (max 100 words, 1 emoji, end with CTA).\n\nnew_status rules: ADMISSION_INTEREST or FEE_ENQUIRY -> INTERESTED | NOT_INTERESTED -> NOT_INTERESTED | others -> CONTACTED\n\nReply ONLY with JSON: {\"intent\": \"...\", \"reply_message\": \"...\", \"new_status\": \"...\", \"ai_next_action\": \"...\", \"ai_summary\": \"...\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-ai-intent",
+      "name": "AI Intent Detection",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        180
+      ],
+      "notes": "OpenAI gpt-4o-mini detects intent and generates reply. Requires OpenAI credential in n8n."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Parse AI JSON response safely\nlet aiResponse;\ntry {\n  const raw = $input.item.json.message?.content\n    || $input.item.json.choices?.[0]?.message?.content\n    || $input.item.json.text || '{}';\n  const clean = raw.replace(/```json\\n?/g, '').replace(/```/g, '').trim();\n  aiResponse = JSON.parse(clean);\n} catch(e) {\n  aiResponse = {\n    intent: 'GENERAL_QUERY',\n    reply_message: 'Thank you for reaching out! Our counsellor will contact you shortly. 😊',\n    new_status: 'CONTACTED',\n    ai_next_action: 'Review student message and call manually.',\n    ai_summary: 'AI parse failed — manual review needed.'\n  };\n}\n\nconst lead = $('Find Lead by Phone').item.json;\nconst wh = $('Student Reply Webhook').item.json;\nconst msg = wh.body?.message || wh.message || '';\n\nreturn {\n  json: {\n    lead_id: lead.lead_id,\n    lead_name: lead.name,\n    lead_phone: lead.phone,\n    student_message: msg,\n    caller_name: lead.caller?.full_name || 'Our Team',\n    caller_phone: lead.caller?.phone || '',\n    course_name: lead.course?.name || 'our courses',\n    course_fee: lead.course?.fee || null,\n    course_duration: lead.course?.duration || null,\n    intent: aiResponse.intent,\n    reply_message: aiResponse.reply_message,\n    new_status: aiResponse.new_status,\n    ai_next_action: aiResponse.ai_next_action,\n    ai_summary: aiResponse.ai_summary,\n    is_hot: ['ADMISSION_INTEREST', 'FEE_ENQUIRY'].includes(aiResponse.intent)\n  }\n};"
+      },
+      "id": "node-parse-ai",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        180
+      ],
+      "notes": "Parses AI JSON, merges lead context, flags is_hot."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/api/n8n/update-lead/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "DreamCadd_n8n_2026_SecureKey_9876"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "lead_id": "={{ $json.lead_id }}",
+          "status": "={{ $json.new_status }}",
+          "ai_intent": "={{ $json.intent }}",
+          "ai_next_action": "={{ $json.ai_next_action }}",
+          "ai_summary": "={{ $json.ai_summary }}",
+          "note": "=n8n AI detected: {{ $json.intent }} for {{ $json.lead_name }}"
+        },
+        "options": {}
+      },
+      "id": "node-update-lead",
+      "name": "Update Lead in Django",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1500,
+        180
+      ],
+      "notes": "Updates lead status + AI fields in Django. Logs LeadActivity."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true
+          },
+          "conditions": [
+            {
+              "id": "cond-hot-lead",
+              "leftValue": "={{ $('Parse AI Response').item.json.is_hot }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "node-if-hot",
+      "name": "Is Hot Lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        180
+      ],
+      "notes": "TRUE = HOT (ADMISSION_INTEREST / FEE_ENQUIRY) → fire alert."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/api/n8n/trigger-hot-alert/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "DreamCadd_n8n_2026_SecureKey_9876"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "lead_id": "={{ $('Parse AI Response').item.json.lead_id }}",
+          "message": "=HOT LEAD ALERT!\nStudent: {{ $('Parse AI Response').item.json.lead_name }}\nPhone: {{ $('Parse AI Response').item.json.lead_phone }}\nCourse: {{ $('Parse AI Response').item.json.course_name }}\nIntent: {{ $('Parse AI Response').item.json.intent }}\nMessage: {{ $('Parse AI Response').item.json.student_message }}\nCall immediately!"
+        },
+        "options": {}
+      },
+      "id": "node-hot-alert",
+      "name": "Trigger Hot Alert Caller",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1940,
+        100
+      ],
+      "notes": "Sends HOT LEAD notification to assigned telecaller in Django dashboard."
+    }
+  ],
+  "connections": {
+    "Student Reply Webhook": {
+      "main": [
+        [
+          {
+            "node": "Find Lead by Phone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Lead by Phone": {
+      "main": [
+        [
+          {
+            "node": "Lead Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Found?": {
+      "main": [
+        [
+          {
+            "node": "Fetch Course Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Fetch Course Details": {
+      "main": [
+        [
+          {
+            "node": "AI Intent Detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Intent Detection": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Update Lead in Django",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Lead in Django": {
+      "main": [
+        [
+          {
+            "node": "Is Hot Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Hot Lead?": {
+      "main": [
+        [
+          {
+            "node": "Trigger Hot Alert Caller",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

@@ -1,0 +1,101 @@
+{% extends "leads/base.html" %}
+{% block title %}Login — DreamCadd CRM{% endblock %}
+{% block body_class %}login-page{% endblock %}
+
+{% block extra_css %}
+.login-page {
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg);
+  border-radius: 24px;
+  box-shadow: 16px 16px 32px var(--sd), -16px -16px 32px var(--sl);
+  padding: 40px 36px;
+  animation: fadeInUp .4s ease;
+}
+.login-logo {
+  width: 62px; height: 62px;
+  background: linear-gradient(135deg, #4F7FFA, #7B5FFF);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 6px 6px 14px var(--sd), -6px -6px 14px var(--sl);
+  margin: 0 auto 20px;
+}
+.login-logo i { color: #fff; font-size: 1.7rem; }
+.login-title { font-size: 1.5rem; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 4px; }
+.login-subtitle { font-size: .82rem; color: var(--text-muted); text-align: center; margin-bottom: 32px; font-weight: 500; }
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4F7FFA, #7B5FFF);
+  color: #fff;
+  font-family: var(--font);
+  font-size: .92rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(79,127,250,.4), 5px 5px 12px var(--sd);
+  transition: var(--transition);
+  letter-spacing: .3px;
+}
+.login-btn:hover { box-shadow: 0 8px 28px rgba(79,127,250,.55), 3px 3px 8px var(--sd); transform: translateY(-1px); }
+.login-btn:active { box-shadow: inset 3px 3px 8px rgba(0,0,0,.15); transform: translateY(0); }
+.login-error {
+  background: rgba(239,68,68,.08);
+  border-left: 3px solid var(--danger);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: .82rem;
+  color: #b91c1c;
+  font-weight: 500;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.login-footer { text-align: center; margin-top: 24px; font-size: .75rem; color: var(--text-light); }
+{% endblock %}
+
+{% block login_content %}
+<div style="min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 20px;">
+  <div class="login-card">
+    <div class="login-logo"><i class="bi bi-diagram-3-fill"></i></div>
+    <h1 class="login-title">DreamCadd CRM</h1>
+    <p class="login-subtitle">AI-Powered Lead Management System</p>
+
+    {% if form.errors %}
+    <div class="login-error">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      Invalid username or password. Please try again.
+    </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-person me-1"></i>Username</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-4">
+        <label class="form-label"><i class="bi bi-lock me-1"></i>Password</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="login-btn">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Dashboard
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <i class="bi bi-shield-check me-1"></i> Secure • Role-Based Access • DreamCadd © 2026
+    </div>
+  </div>
+</div>
+{% endblock %}

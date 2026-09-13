@@ -1,0 +1,76 @@
+{% extends "leads/base.html" %}
+{% block title %}Company Settings — DreamCadd CRM{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block content %}
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-building-gear text-accent me-2"></i>Company Settings</h1>
+    <div class="page-sub">Configure company profile and branch locations</div>
+  </div>
+  <a href="{% url 'md_dashboard' %}" class="btn-neu btn-neu-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+
+<div class="grid-2">
+
+  <!-- Company Settings Form -->
+  <div class="card fade-in">
+    <div class="d-flex align-center gap-2 mb-3">
+      <div style="width:32px;height:32px;border-radius:10px;background:rgba(79,127,250,.1);display:flex;align-items:center;justify-content:center;"><i class="bi bi-building text-accent"></i></div>
+      <div class="section-title" style="font-size:.95rem;">Company Profile</div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in c_form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<div style="color:var(--danger);font-size:.75rem;margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" name="update_company" value="1" class="btn-neu btn-accent w-100" style="display:flex;justify-content:center;">
+        <i class="bi bi-save"></i> Save Company Settings
+      </button>
+    </form>
+  </div>
+
+  <!-- Branches -->
+  <div>
+    <div class="card mb-3 fade-in fade-in-1">
+      <div class="d-flex align-center gap-2 mb-3">
+        <div style="width:32px;height:32px;border-radius:10px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;"><i class="bi bi-geo-alt-fill" style="color:var(--success);"></i></div>
+        <div class="section-title" style="font-size:.9rem;">Add Branch</div>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in b_form %}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endfor %}
+        <button type="submit" name="add_branch" value="1" class="btn-neu btn-neu-sm btn-success-neu w-100" style="display:flex;justify-content:center;">
+          <i class="bi bi-plus-circle"></i> Add Branch
+        </button>
+      </form>
+    </div>
+
+    <div class="card fade-in fade-in-2">
+      <div class="section-title mb-3" style="font-size:.9rem;"><i class="bi bi-buildings text-accent me-1"></i>Branch Locations</div>
+      {% for branch in branches %}
+      <div style="padding:12px 14px;border-radius:var(--radius-sm);background:var(--bg);box-shadow:3px 3px 8px var(--sd),-3px -3px 8px var(--sl);margin-bottom:8px;">
+        <div style="font-weight:700;font-size:.85rem;">{{ branch.branch_name }}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px;">
+          <i class="bi bi-geo-alt me-1"></i>{{ branch.location }}
+          {% if branch.phone %} &nbsp;·&nbsp; <i class="bi bi-telephone me-1"></i>{{ branch.phone }}{% endif %}
+        </div>
+        <span class="badge-pill {% if branch.status == 'ACTIVE' %}badge-ok{% else %}badge-muted{% endif %}" style="margin-top:6px;">{{ branch.status }}</span>
+      </div>
+      {% empty %}
+      <div style="text-align:center;color:var(--text-muted);font-size:.85rem;padding:20px 0;">No branches added yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

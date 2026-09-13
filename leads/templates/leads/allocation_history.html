@@ -1,0 +1,85 @@
+{% extends "leads/base.html" %}
+{% block title %}Allocation History — DreamCadd CRM{% endblock %}
+{% block nav_allocations %}active{% endblock %}
+
+{% block content %}
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-journal-check text-accent me-2"></i>Allocation Batch History</h1>
+    <div class="page-sub">Audit log & reports for all dataset allocations to telecallers</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'bulk_allocate' %}" class="btn-neu btn-neu-sm btn-accent"><i class="bi bi-funnel"></i> Lead Workbench</a>
+    <a href="{% url 'md_dashboard' %}" class="btn-neu btn-neu-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+  </div>
+</div>
+
+<div class="card fade-in">
+  <div class="section-title mb-3" style="font-size:1rem;"><i class="bi bi-stack text-accent me-1"></i>Allocation Batches ({{ batches|length }})</div>
+
+  {% if batches %}
+  <div style="overflow-x:auto;">
+    <table class="neu-table">
+      <thead>
+        <tr>
+          <th>Batch Code</th>
+          <th>Allocated Date</th>
+          <th>Telecaller</th>
+          <th>Leads Count</th>
+          <th>Allocated By</th>
+          <th>Notes / Source</th>
+          <th>Report Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in batches %}
+        <tr>
+          <td>
+            <div style="font-weight:700;color:var(--accent);">{{ b.batch_code }}</div>
+          </td>
+          <td style="font-size:.82rem;color:var(--text-muted);">
+            <i class="bi bi-clock-fill me-1"></i>{{ b.created_at|date:"d M Y, H:i" }}
+          </td>
+          <td>
+            <a href="{% url 'telecaller_report' b.caller.id %}" style="font-weight:700;text-decoration:none;color:var(--text);">
+              <i class="bi bi-person-badge me-1 text-accent"></i>{{ b.caller.get_full_name|default:b.caller.username }}
+            </a>
+          </td>
+          <td>
+            <span class="badge-pill badge-accent" style="font-size:.82rem;font-weight:700;">{{ b.lead_count }} leads</span>
+          </td>
+          <td style="font-size:.82rem;color:var(--text-muted);">
+            {{ b.allocated_by.get_full_name|default:b.allocated_by.username|default:"System" }}
+          </td>
+          <td style="font-size:.8rem;color:var(--text-muted);">
+            {{ b.notes|default:"—" }}
+          </td>
+          <td>
+            <div class="d-flex gap-1" style="flex-wrap:wrap;">
+              <a href="{% url 'export_allocation_report' b.id %}" class="btn-neu-sm btn-neu btn-success-neu" style="font-size:.73rem;" title="Download Report">
+                <i class="bi bi-file-earmark-arrow-down-fill"></i> CSV
+              </a>
+              <form method="post" action="{% url 'unassign_leads' %}" onsubmit="return confirm('Remove all {{ b.lead_count }} customer(s) from batch {{ b.batch_code }} and return to Unallocated Pool?');" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="batch_id" value="{{ b.id }}">
+                <button type="submit" class="btn-neu-sm btn-neu btn-danger-neu" style="font-size:.73rem;">
+                  <i class="bi bi-person-x-fill"></i> Unassign Batch
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div style="text-align:center;color:var(--text-muted);padding:48px 0;">
+    <i class="bi bi-journal-x" style="font-size:3rem;opacity:.3;display:block;margin-bottom:12px;"></i>
+    <div style="font-size:.9rem;">No allocation batches recorded yet. Allocate dataset from the Lead Workbench.</div>
+    <a href="{% url 'bulk_allocate' %}" class="btn-neu btn-neu-sm mt-3" style="display:inline-flex;"><i class="bi bi-funnel"></i> Go to Lead Allocation Workbench</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
