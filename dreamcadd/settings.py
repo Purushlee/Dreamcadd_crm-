@@ -33,8 +33,13 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
+# Railway Production & Reverse Proxy HTTPS Settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
+    'https://dreamcaddcrm-production.up.railway.app',
+    'https://*.up.railway.app',
     'http://127.0.0.1:8000', 'http://127.0.0.1:8080', 'http://127.0.0.1:8001', 'http://127.0.0.1:9000',
     'http://localhost:8000', 'http://localhost:8080', 'http://localhost:8001', 'http://localhost:9000',
     'http://127.0.0.1', 'http://localhost', 'http://*.local', 'http://*.lan',
@@ -51,6 +56,7 @@ try:
     CSRF_TRUSTED_ORIGINS.append(f"http://{local_ip}")
 except Exception:
     pass
+
 
 # Custom CSRF Failure Handler to prevent yellow 403 debug pages
 CSRF_FAILURE_VIEW = 'leads.views.custom_csrf_failure_view'

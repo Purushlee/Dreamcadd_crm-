@@ -70,7 +70,14 @@ for model_cls in [Lead, CallLog, LeadAssignment, User, Followup, ImportBatch, Al
 
 
 def is_md(user):
-    return user.is_authenticated and user.is_md
+    return (
+        user.is_authenticated
+        and (
+            user.role in [User.Role.MD, User.Role.ADMIN]
+            or user.is_superuser
+        )
+    )
+
 
 
 def is_telecaller(user):
@@ -107,7 +114,11 @@ class RoleAwareLoginView(LoginView):
 
         if user.is_md:
             return reverse_lazy("md_dashboard")
-        return reverse_lazy("telecaller_dashboard")
+        elif user.is_telecaller:
+            return reverse_lazy("telecaller_dashboard")
+        else:
+            return reverse_lazy("login")
+
 
 
 

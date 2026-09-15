@@ -600,6 +600,28 @@ class DreamCaddAuthRoleRoutingTestCase(TestCase):
         resp = self.client.get(reverse("md_dashboard"))
         self.assertNotEqual(resp.status_code, 200)
 
+    def test_authenticated_admin_session_check(self):
+        """Verify /api/session-check/ returns HTTP 200 and authenticated=True for active ADMIN session."""
+        self.client.login(username="admin_md", password="AdminPassword123!")
+        resp = self.client.get(reverse("api_session_check"))
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["authenticated"])
+        self.assertEqual(data["username"], "admin_md")
+        self.assertEqual(data["role"], "ADMIN")
+
+    def test_inactive_user_session_check_blocked(self):
+        """Verify inactive or disabled user session check is blocked with HTTP 401."""
+        inactive_user = User.objects.create_user(
+            username="inactive_user", password="InactivePassword123!", role=User.Role.ADMIN, status="INACTIVE"
+        )
+        self.client.login(username="inactive_user", password="InactivePassword123!")
+        resp = self.client.get(reverse("api_session_check"))
+        self.assertEqual(resp.status_code, 401)
+        data = resp.json()
+        self.assertFalse(data["authenticated"])
+
+
 
 
 

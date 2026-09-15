@@ -29,7 +29,8 @@ class User(AbstractUser):
 
     @property
     def is_md(self):
-        return self.role == self.Role.MD or self.role == self.Role.ADMIN or self.is_superuser
+        return self.role in [self.Role.MD, self.Role.ADMIN] or self.is_superuser
+
 
     @property
     def is_telecaller(self):
