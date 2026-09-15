@@ -207,26 +207,37 @@ def assign_lead_round_robin(lead: Lead, actor: User = None) -> User | None:
         return eligible_caller
 
 
-def render_whatsapp_template(template: WhatsAppTemplate, lead: Lead) -> str:
-    """Replaces dynamic variable placeholders in template text with actual lead & company details."""
+def render_whatsapp_text(raw_text: str, lead: Lead, caller=None) -> str:
+    """Replaces dynamic variable placeholders in any WhatsApp text string with actual lead & company details."""
     company = CompanySettings.load()
-    caller_name = lead.assignee_display
-    course_name = lead.interested_course.course_name if lead.interested_course else "Civil CAD & Revit"
+    if caller and (caller.get_full_name() or caller.username):
+        caller_name = caller.get_full_name() or caller.username
+    else:
+        caller_name = lead.assignee_display
+    course_name = lead.interested_course.course_name if lead.interested_course else "our courses"
+    branch_name = lead.preferred_branch.branch_name if lead.preferred_branch else "DreamCadd"
     course_fee = f"₹{lead.interested_course.fee}" if (lead.interested_course and lead.interested_course.fee) else "Contact for details"
 
     replacements = {
         "{{name}}": lead.name,
         "{{course}}": course_name,
+        "{{branch}}": branch_name,
         "{{caller_name}}": caller_name,
         "{{company_name}}": company.company_name,
         "{{fee}}": course_fee,
         "{{phone}}": company.main_phone,
     }
 
-    text = template.body_text
+    text = raw_text or ""
     for key, val in replacements.items():
         text = text.replace(key, str(val))
     return text
+
+
+def render_whatsapp_template(template: WhatsAppTemplate, lead: Lead) -> str:
+    """Replaces dynamic variable placeholders in template text with actual lead & company details."""
+    return render_whatsapp_text(template.body_text, lead)
+
 
 
 def send_whatsapp_text(lead: Lead, message: str) -> WhatsAppMessage:

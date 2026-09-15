@@ -216,23 +216,7 @@
 
     <!-- Inset Text Area -->
     <div class="wa-inset-box">
-      <textarea id="waPreparedText" rows="8" class="wa-textarea-custom">Hi {{ lead.name }} 👋
-
-Good day from DreamCADD!
-
-Thank you for your interest in our {% if lead.interested_course %}{{ lead.interested_course.course_name }}{% else %}courses{% endif %}.
-
-📚 Course: {% if lead.interested_course %}{{ lead.interested_course.course_name }}{% else %}Not specified{% endif %}
-🏢 Branch: {% if lead.preferred_branch %}{{ lead.preferred_branch.branch_name }}{% else %}Ambattur{% endif %}
-
-I can share the complete:
-• Course details
-• Syllabus
-• Duration
-• Fees
-• Upcoming batch details
-
-Please let me know if you would like the details. 😊</textarea>
+      <textarea id="waPreparedText" rows="9" class="wa-textarea-custom">{{ default_wa_text }}</textarea>
     </div>
 
     <!-- Action Buttons -->
@@ -355,6 +339,11 @@ function copyWaTextToClipboard() {
     console.error(err);
     alert("Could not copy message.");
   });
+}
+
+function resetWaTemplateText() {
+  document.getElementById('waPreparedText').value = `{{ default_wa_text|escapejs }}`;
+  showToast("🔄 Reset to default DreamCadd message!");
 }
 
 function sendCustomWhatsAppAjax(event, leadId) {

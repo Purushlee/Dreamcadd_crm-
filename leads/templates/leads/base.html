@@ -519,6 +519,7 @@ input[type="file"], textarea, select {
 /* ─────────────────────────────
    MODAL OVERRIDES
 ───────────────────────────── */
+.modal:not(.show) { display: none !important; }
 .modal-content {
   background: var(--bg);
   border: none;
@@ -815,7 +816,6 @@ input[type="file"], textarea, select {
     <div class="sidebar-section-label">Main</div>
     {% if user.is_md %}
       <a href="{% url 'md_dashboard' %}"       class="nav-item {% block nav_dashboard %}{% endblock %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-      <a href="{% url 'telecaller_dashboard' %}" class="nav-item {% block nav_telecaller_view %}{% endblock %}"><i class="bi bi-person-badge-fill"></i> Telecaller View</a>
       <a href="{% url 'bulk_allocate' %}"       class="nav-item {% block nav_leads %}{% endblock %}"><i class="bi bi-person-lines-fill"></i> Leads</a>
       <a href="{% url 'schedule_leads' %}"    class="nav-item {% block nav_schedules %}{% endblock %}"><i class="bi bi-calendar-check-fill"></i> Daily Schedules & Targets</a>
       <a href="{% url 'manage_callers' %}"      class="nav-item {% block nav_callers %}{% endblock %}"><i class="bi bi-headset"></i> Callers</a>

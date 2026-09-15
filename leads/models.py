@@ -92,6 +92,29 @@ class CompanySettings(models.Model):
     main_phone = models.CharField(max_length=20, blank=True, default="+91 9876543210")
     email = models.EmailField(blank=True, default="info@dreamcadd.com")
     address = models.TextField(blank=True, default="123 Tech Park, Anna Salai, Chennai, Tamil Nadu")
+    default_whatsapp_message = models.TextField(
+        blank=True,
+        default="""Hi {{name}} 👋
+
+Good day from {{company_name}}!
+
+Thank you for your interest in our {{course}}.
+
+📚 Course: {{course}}
+🏢 Branch: {{branch}}
+
+I can share the complete:
+• Course details
+• Syllabus
+• Duration
+• Fees
+• Upcoming batch details
+
+Please let me know if you would like the details. 😊
+
+Regards,
+{{caller_name}}"""
+    )
 
     def save(self, *args, **kwargs):
         self.pk = 1  # Enforce Singleton pattern

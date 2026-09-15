@@ -29,8 +29,8 @@ from .models import (
 )
 from .services import (
     assign_lead_round_robin, import_leads_from_excel, log_lead_activity,
-    process_incoming_whatsapp, render_whatsapp_template, send_new_lead_message,
-    send_whatsapp_text
+    process_incoming_whatsapp, render_whatsapp_template, render_whatsapp_text,
+    send_new_lead_message, send_whatsapp_text
 )
 
 
@@ -342,6 +342,8 @@ def manage_callers(request):
             caller_id = request.POST.get("caller_id")
             caller = get_object_or_404(User, id=caller_id, role=User.Role.TELECALLER)
             new_username = request.POST.get("new_username", "").strip()
+            first_name = request.POST.get("first_name", "").strip()
+            last_name = request.POST.get("last_name", "").strip()
             new_password = request.POST.get("new_password", "").strip()
 
             updated_fields = []
@@ -354,6 +356,14 @@ def manage_callers(request):
                 caller.username = new_username
                 updated_fields.append(f"username to '{new_username}'")
 
+            if first_name != caller.first_name:
+                caller.first_name = first_name
+                updated_fields.append(f"first name to '{first_name}'")
+
+            if last_name != caller.last_name:
+                caller.last_name = last_name
+                updated_fields.append(f"last name to '{last_name}'")
+
             if new_password:
                 if len(new_password) < 6:
                     messages.error(request, "Password must be at least 6 characters long.")
@@ -365,13 +375,13 @@ def manage_callers(request):
                 caller.save()
                 log_security_event(
                     user=request.user,
-                    action=SecurityAuditLog.Action.USERNAME_CHANGED if "username" in updated_fields[0] else SecurityAuditLog.Action.PASSWORD_CHANGED,
+                    action=SecurityAuditLog.Action.USERNAME_CHANGED if any("username" in f for f in updated_fields) else SecurityAuditLog.Action.PASSWORD_CHANGED,
                     request=request,
-                    details=f"Admin updated credentials for telecaller '{old_username}': {', '.join(updated_fields)}"
+                    details=f"Admin updated telecaller '{old_username}': {', '.join(updated_fields)}"
                 )
-                messages.success(request, f"Credentials updated for telecaller '{old_username}': {', '.join(updated_fields)}.")
+                messages.success(request, f"Telecaller '{old_username}' updated: {', '.join(updated_fields)}.")
             else:
-                messages.info(request, f"No credentials changes were submitted for telecaller '{caller.username}'.")
+                messages.info(request, f"No profile changes were submitted for telecaller '{caller.username}'.")
             return redirect("manage_callers")
 
     return render(request, "leads/manage_callers.html", {"telecallers": telecallers, "form": form})
@@ -972,21 +982,36 @@ def manage_courses(request):
 
 @user_passes_test(is_md, login_url="login")
 def whatsapp_templates_view(request):
+    company = CompanySettings.load()
     templates = WhatsAppTemplate.objects.all().order_by("-created_at")
     if request.method == "POST":
-        form = WhatsAppTemplateForm(request.POST)
-        if form.is_valid():
-            tmpl = form.save(commit=False)
-            # Detect variables in body_text
-            vars_found = re.findall(r"\{\{([a-zA-Z0-9_]+)\}\}", tmpl.body_text)
-            tmpl.variables = list(set(vars_found))
-            tmpl.save()
-            messages.success(request, f"WhatsApp Template '{tmpl.template_name}' created (Status: {tmpl.status}).")
+        if request.POST.get("action") == "save_default_wa_message":
+            default_msg = request.POST.get("default_whatsapp_message", "").strip()
+            if default_msg:
+                company.default_whatsapp_message = default_msg
+                company.save()
+                messages.success(request, "Default DreamCadd WhatsApp message updated successfully.")
+            else:
+                messages.error(request, "Default WhatsApp message cannot be empty.")
             return redirect("whatsapp_templates")
+        else:
+            form = WhatsAppTemplateForm(request.POST)
+            if form.is_valid():
+                tmpl = form.save(commit=False)
+                # Detect variables in body_text
+                vars_found = re.findall(r"\{\{([a-zA-Z0-9_]+)\}\}", tmpl.body_text)
+                tmpl.variables = list(set(vars_found))
+                tmpl.save()
+                messages.success(request, f"WhatsApp Template '{tmpl.template_name}' created (Status: {tmpl.status}).")
+                return redirect("whatsapp_templates")
     else:
         form = WhatsAppTemplateForm()
 
-    return render(request, "leads/whatsapp_templates.html", {"templates": templates, "form": form})
+    return render(request, "leads/whatsapp_templates.html", {
+        "templates": templates,
+        "form": form,
+        "default_whatsapp_message": company.default_whatsapp_message,
+    })
 
 
 @user_passes_test(is_md, login_url="login")
@@ -1327,6 +1352,9 @@ def lead_whatsapp(request, lead_id):
     if request.user.is_telecaller and lead.assigned_to_id != request.user.id:
         return HttpResponseForbidden("Access Denied: This lead is not assigned to you.")
 
+    company = CompanySettings.load()
+    default_wa_text = render_whatsapp_text(company.default_whatsapp_message, lead, caller=request.user)
+
     templates = WhatsAppTemplate.objects.filter(status=WhatsAppTemplate.Status.APPROVED)
     wa_messages = lead.whatsapp_messages.order_by("timestamp")
 
@@ -1334,6 +1362,7 @@ def lead_whatsapp(request, lead_id):
         "lead": lead,
         "templates": templates,
         "wa_messages": wa_messages,
+        "default_wa_text": default_wa_text,
         "courses": Course.objects.all(),
         "branches": Branch.objects.all(),
     })

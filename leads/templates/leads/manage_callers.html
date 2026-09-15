@@ -130,10 +130,20 @@
                 </button>
               </form>
 
-              <!-- Credentials Edit Form -->
+              <!-- Telecaller Profile & Credentials Edit Form -->
               <form method="post" class="mb-2 pt-2 border-top">
                 {% csrf_token %}
                 <input type="hidden" name="caller_id" value="{{ tc.id }}">
+                <div class="grid-2 gap-2 mb-2">
+                  <div>
+                    <label class="form-label" style="font-size:.68rem;">First Name</label>
+                    <input type="text" name="first_name" value="{{ tc.first_name }}" style="padding:4px 8px; font-size:.75rem;" placeholder="First name">
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size:.68rem;">Last Name</label>
+                    <input type="text" name="last_name" value="{{ tc.last_name }}" style="padding:4px 8px; font-size:.75rem;" placeholder="Last name">
+                  </div>
+                </div>
                 <div class="grid-2 gap-2 mb-2">
                   <div>
                     <label class="form-label" style="font-size:.68rem;">Username</label>
@@ -145,7 +155,7 @@
                   </div>
                 </div>
                 <button type="submit" name="update_caller_credentials" value="1" class="btn-neu-sm btn-neu btn-accent w-100" style="font-size:.7rem; padding:4px 8px;">
-                  <i class="bi bi-key me-1"></i> Update Credentials
+                  <i class="bi bi-person-gear me-1"></i> Update Telecaller Info
                 </button>
               </form>
 
