@@ -1,0 +1,251 @@
+{% extends "leads/base.html" %}
+{% block title %}Daily Schedules & Targets — DreamCadd CRM{% endblock %}
+{% block nav_schedules %}active{% endblock %}
+
+{% block content %}
+<div class="section-header mb-4">
+  <div>
+    <h1 class="page-title"><i class="bi bi-calendar-check text-accent me-2"></i>Advance Daily Schedules & Telecaller Targets</h1>
+    <div class="page-sub">Schedule lead allocations in advance for each day and set telecaller daily call targets</div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'bulk_allocate' %}" class="btn-neu btn-neu-sm"><i class="bi bi-diagram-3-fill"></i> Instant Allocation</a>
+    <a href="{% url 'allocation_history' %}" class="btn-neu btn-neu-sm"><i class="bi bi-journal-check"></i> Allocation History</a>
+    <a href="{% url 'md_dashboard' %}" class="btn-neu btn-neu-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+  </div>
+</div>
+
+<!-- ════ 1. ADVANCE SCHEDULING WORKBENCH CARD ════ -->
+<div class="card fade-in mb-4" style="padding:24px; border-radius:22px;">
+  <div class="section-title mb-3" style="font-size:1.05rem; font-weight:800;">
+    <i class="bi bi-plus-circle-fill text-accent me-2"></i>Schedule Lead List & Set Daily Targets
+  </div>
+
+  <form method="post" action="{% url 'schedule_leads' %}">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create_schedule">
+
+    <div class="row g-3">
+      <!-- Select Telecaller -->
+      <div class="col-md-4">
+        <label class="form-label style-label">
+          <i class="bi bi-person-badge text-accent me-1"></i> Select Telecaller <span class="text-danger">*</span>
+        </label>
+        <select name="caller_id" class="form-select style-input" required>
+          <option value="">Choose Telecaller...</option>
+          {% for t in telecallers %}
+          <option value="{{ t.id }}" {% if selected_caller == t.id|stringformat:"s" %}selected{% endif %}>
+            {{ t.get_full_name|default:t.username }} (Target: {{ t.profile.daily_call_target }} calls)
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Select Target Date -->
+      <div class="col-md-4">
+        <label class="form-label style-label">
+          <i class="bi bi-calendar-event text-accent me-1"></i> Target Date <span class="text-danger">*</span>
+        </label>
+        <div class="d-flex gap-2">
+          <input type="date" name="target_date" id="scheduleTargetDate" value="{{ tomorrow_str }}" class="form-select style-input" required>
+          <button type="button" class="btn-neu btn-neu-sm" onclick="document.getElementById('scheduleTargetDate').value='{{ today_str }}'">Today</button>
+          <button type="button" class="btn-neu btn-neu-sm" onclick="document.getElementById('scheduleTargetDate').value='{{ tomorrow_str }}'">Tomorrow</button>
+        </div>
+      </div>
+
+      <!-- Lead Pool Source & Count -->
+      <div class="col-md-4">
+        <label class="form-label style-label">
+          <i class="bi bi-stack text-accent me-1"></i> Lead Allocation Pool
+        </label>
+        <select name="allocation_mode" class="form-select style-input">
+          <option value="UNASSIGNED" selected>Unassigned Lead Pool ({{ unassigned_leads_count }} Available)</option>
+          <option value="EXISTING">Reschedule Existing Uncontacted Assigned Leads</option>
+        </select>
+      </div>
+
+      <!-- Daily Call Target -->
+      <div class="col-md-3">
+        <label class="form-label style-label">
+          <i class="bi bi-telephone-outbound text-success me-1"></i> Daily Call Target
+        </label>
+        <input type="number" name="daily_call_target" value="40" min="1" max="500" class="form-control style-input" required>
+        <div class="form-text" style="font-size:0.72rem;">Expected call attempts for the day</div>
+      </div>
+
+      <!-- Daily Conversion Target -->
+      <div class="col-md-3">
+        <label class="form-label style-label">
+          <i class="bi bi-trophy text-warning me-1"></i> Daily Conversion Target
+        </label>
+        <input type="number" name="daily_conversion_target" value="5" min="0" max="100" class="form-control style-input">
+        <div class="form-text" style="font-size:0.72rem;">Expected course enrollments</div>
+      </div>
+
+      <!-- Leads Count to Allocate -->
+      <div class="col-md-3">
+        <label class="form-label style-label">
+          <i class="bi bi-hash text-accent me-1"></i> Leads to Schedule
+        </label>
+        <input type="number" name="lead_count" value="40" min="0" max="1000" class="form-control style-input">
+        <div class="form-text" style="font-size:0.72rem;">Number of leads to assign for date</div>
+      </div>
+
+      <!-- Course Filter (Optional) -->
+      <div class="col-md-3">
+        <label class="form-label style-label">
+          <i class="bi bi-journal-bookmark text-accent me-1"></i> Course Filter (Optional)
+        </label>
+        <select name="course_id" class="form-select style-input">
+          <option value="">All Courses</option>
+          {% for c in courses %}
+          <option value="{{ c.id }}">{{ c.course_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Schedule Notes -->
+      <div class="col-12">
+        <label class="form-label style-label">
+          <i class="bi bi-card-text text-accent me-1"></i> Schedule Notes / Priority Remarks (Optional)
+        </label>
+        <input type="text" name="notes" placeholder="e.g. Focus on Ambattur branch AutoCAD leads for tomorrow morning" class="form-control style-input">
+      </div>
+    </div>
+
+    <div class="mt-4 text-end">
+      <button type="submit" class="btn-neu btn-accent px-4 py-2" style="font-weight:800; border-radius:14px;">
+        <i class="bi bi-calendar-plus me-1"></i> Save Daily Schedule & Targets
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- ════ 2. MASTER DAILY SCHEDULES & TARGETS MONITOR TABLE ════ -->
+<div class="card fade-in" style="padding:24px; border-radius:22px;">
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <div>
+      <h2 style="font-size:1.05rem; font-weight:800; color:var(--text); margin:0;">
+        <i class="bi bi-table text-accent me-2"></i>Scheduled Daily Lists & Target Performance Monitor
+      </h2>
+      <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Track daily targets set for telecallers, leads assigned, and actual calls completed</div>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="get" action="{% url 'schedule_leads' %}" class="d-flex gap-2 align-items-center flex-wrap">
+      <input type="date" name="date" value="{{ selected_date }}" class="form-select style-input style-input-sm" style="width:auto;" onchange="this.form.submit()">
+      <select name="caller" class="form-select style-input style-input-sm" style="width:auto;" onchange="this.form.submit()">
+        <option value="">All Telecallers</option>
+        {% for t in telecallers %}
+        <option value="{{ t.id }}" {% if selected_caller == t.id|stringformat:"s" %}selected{% endif %}>{{ t.get_full_name|default:t.username }}</option>
+        {% endfor %}
+      </select>
+      {% if selected_date or selected_caller %}
+      <a href="{% url 'schedule_leads' %}" class="btn-neu btn-neu-sm"><i class="bi bi-x-circle"></i> Clear Filters</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if schedules_data %}
+  <div style="overflow-x:auto;">
+    <table class="neu-table">
+      <thead>
+        <tr>
+          <th>Target Date</th>
+          <th>Telecaller</th>
+          <th>Daily Call Target</th>
+          <th>Leads Scheduled</th>
+          <th>Calls Done Today</th>
+          <th>Conversions</th>
+          <th>Target Progress</th>
+          <th>Created By / Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in schedules_data %}
+        <tr>
+          <td>
+            <div style="font-weight:800; color:var(--accent);">
+              📅 {{ item.schedule.target_date|date:"d M Y" }}
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+              {% if item.schedule.target_date|date:"Y-m-d" == today_str %}
+                <span class="badge-pill badge-hot" style="padding:2px 8px; font-size:0.68rem;">TODAY</span>
+              {% elif item.schedule.target_date|date:"Y-m-d" == tomorrow_str %}
+                <span class="badge-pill badge-warm" style="padding:2px 8px; font-size:0.68rem;">TOMORROW</span>
+              {% else %}
+                <span class="badge-pill badge-muted" style="padding:2px 8px; font-size:0.68rem;">SCHEDULED</span>
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            <a href="{% url 'telecaller_report' item.schedule.caller.id %}" style="font-weight:800; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+              <i class="bi bi-person-circle text-accent"></i> {{ item.schedule.caller.get_full_name|default:item.schedule.caller.username }}
+            </a>
+          </td>
+          <td>
+            <div style="font-size:1rem; font-weight:800; color:var(--text);">
+              📞 {{ item.schedule.daily_call_target }}
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Calls Target</div>
+          </td>
+          <td>
+            <span class="badge-pill badge-accent" style="font-weight:800; font-size:0.82rem;">
+              {{ item.scheduled_leads_count }} leads
+            </span>
+          </td>
+          <td>
+            <div style="font-size:1rem; font-weight:800; color:{% if item.is_target_met %}#10B981{% else %}var(--text){% endif %};">
+              {{ item.calls_completed }}
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Attempts logged</div>
+          </td>
+          <td>
+            <span class="badge-pill badge-ok" style="font-weight:800; font-size:0.8rem;">
+              🎉 {{ item.conversions }} / {{ item.schedule.daily_conversion_target }}
+            </span>
+          </td>
+          <td style="min-width:140px;">
+            <div class="d-flex align-items-center justify-content-between mb-1" style="font-size:0.75rem; font-weight:800;">
+              <span>{{ item.progress_pct }}%</span>
+              {% if item.is_target_met %}
+                <span class="text-success"><i class="bi bi-check-circle-fill"></i> Met</span>
+              {% else %}
+                <span class="text-muted">In Progress</span>
+              {% endif %}
+            </div>
+            <div style="height:8px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl); overflow:hidden;">
+              <div style="height:100%; width:{{ item.progress_pct }}%; background:{% if item.is_target_met %}linear-gradient(90deg,#10B981,#059669){% else %}linear-gradient(90deg,#4F7FFA,#7B5FFF){% endif %}; border-radius:10px;"></div>
+            </div>
+          </td>
+          <td style="font-size:0.78rem; color:var(--text-muted);">
+            <div>By: {{ item.schedule.created_by.get_full_name|default:item.schedule.created_by.username|default:"Admin" }}</div>
+            {% if item.schedule.notes %}
+            <div style="font-style:italic; font-size:0.74rem; color:var(--text);" class="mt-1">"{{ item.schedule.notes }}"</div>
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'schedule_leads' %}" onsubmit="return confirm('Delete this schedule for {{ item.schedule.caller.username }} on {{ item.schedule.target_date }}?');">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="delete_schedule">
+              <input type="hidden" name="schedule_id" value="{{ item.schedule.id }}">
+              <button type="submit" class="btn-neu-sm btn-neu btn-danger-neu" style="font-size:0.75rem;">
+                <i class="bi bi-trash-fill"></i> Remove
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center; color:var(--text-muted); padding:48px 0;">
+    <i class="bi bi-calendar-x" style="font-size:3rem; opacity:.3; display:block; margin-bottom:12px;"></i>
+    <div style="font-size:.9rem; font-weight:700;">No daily lead schedules recorded yet.</div>
+    <div style="font-size:0.8rem; margin-top:4px;">Use the workbench form above to schedule leads and set daily call targets for telecallers in advance.</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,432 @@
+{% extends "leads/base.html" %}
+{% block title %}WhatsApp — {{ lead.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🎨 DREAMCADD DEDICATED WHATSAPP HUB DESIGN SYSTEM */
+.wa-hub-wrapper {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+.wa-card {
+  background: var(--bg);
+  border-radius: 22px;
+  box-shadow: 10px 10px 24px var(--sd), -10px -10px 24px var(--sl);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.wa-card-header-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(90deg, #25D366, #128C7E, #4F7FFA);
+}
+
+.wa-avatar {
+  width: 62px; height: 62px;
+  font-size: 1.55rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 20px rgba(37,211,102,0.35);
+  flex-shrink: 0;
+}
+
+.wa-inset-box {
+  background: var(--bg);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);
+  margin-bottom: 16px;
+}
+
+.wa-textarea-custom {
+  width: 100%;
+  border: none !important;
+  background: transparent !important;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text);
+  resize: vertical;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.wa-reset-btn {
+  background: var(--bg);
+  border: none;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  box-shadow: 3px 3px 6px var(--sd), -3px -3px 6px var(--sl);
+  transition: var(--transition);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-wa-primary {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  background: linear-gradient(135deg, #25D366, #128C7E) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  padding: 15px 20px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 22px rgba(37,211,102,0.4) !important;
+  border: none !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+.btn-wa-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(37,211,102,0.48) !important;
+}
+
+/* Chat History Window */
+.wa-chat-window {
+  background: linear-gradient(135deg, #D6DCE4 0%, #DDE4EC 100%);
+  border-radius: 18px;
+  padding: 18px;
+  min-height: 220px;
+  max-height: 380px;
+  overflow-y: auto;
+  box-shadow: inset 4px 4px 12px var(--sd), inset -4px -4px 12px var(--sl);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Mobile Phone Frame Overrides (< 576px) */
+@media (max-width: 576px) {
+  .wa-hub-wrapper {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .wa-card {
+    padding: 16px 12px !important;
+    border-radius: 18px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .wa-customer-header {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  .btn-wa-primary {
+    font-size: 0.9rem !important;
+    padding: 13px 16px !important;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wa-hub-wrapper">
+  
+  <!-- Back Toolbar -->
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <a href="{% url 'lead_detail' lead.id %}" class="btn-neu btn-neu-sm" style="font-weight:700; display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:14px; text-decoration:none; color:var(--text);">
+      <i class="bi bi-arrow-left"></i> Back to Lead Details
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge-pill badge-accent" style="font-size:.8rem; font-weight:700;">
+        <i class="bi bi-person-check me-1"></i> {{ lead.assignee_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Customer Summary Banner Card -->
+  <div class="wa-card fade-in">
+    <div class="wa-card-header-bar"></div>
+    
+    <div class="d-flex align-items-center gap-3 wa-customer-header mb-3">
+      <div class="wa-avatar">
+        {{ lead.name|slice:":2"|upper }}
+      </div>
+      <div style="flex:1;">
+        <h1 style="font-size:1.5rem; font-weight:800; color:var(--text); margin-bottom:4px;">
+          {{ lead.name }}
+        </h1>
+        <a href="tel:{{ lead.phone }}" style="font-size:1.15rem; font-weight:800; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          <i class="bi bi-telephone-fill"></i> {{ lead.phone }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Metadata Badges -->
+    <div class="d-flex flex-wrap gap-2">
+      {% if lead.email %}
+      <div class="meta-pill"><i class="bi bi-envelope text-accent"></i> {{ lead.email }}</div>
+      {% endif %}
+      {% if lead.interested_course %}
+      <div class="meta-pill" style="color:var(--accent); font-weight:700;"><i class="bi bi-journal-bookmark-fill me-1"></i> {{ lead.interested_course.course_name }}</div>
+      {% endif %}
+      {% if lead.preferred_branch %}
+      <div class="meta-pill"><i class="bi bi-geo-alt text-accent"></i> {{ lead.preferred_branch.branch_name }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Prepared Message & Launcher Card -->
+  <div class="wa-card fade-in">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-whatsapp text-success" style="font-size:1.4rem;"></i>
+        <h2 style="font-weight:800; font-size:1.1rem; color:var(--text); margin:0;">Prepared WhatsApp Message</h2>
+      </div>
+      <button type="button" class="wa-reset-btn" onclick="resetWaTemplateText()">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset Default Message
+      </button>
+    </div>
+
+    <!-- Inset Text Area -->
+    <div class="wa-inset-box">
+      <textarea id="waPreparedText" rows="8" class="wa-textarea-custom">Hi {{ lead.name }} 👋
+
+Good day from DreamCADD!
+
+Thank you for your interest in our {% if lead.interested_course %}{{ lead.interested_course.course_name }}{% else %}courses{% endif %}.
+
+📚 Course: {% if lead.interested_course %}{{ lead.interested_course.course_name }}{% else %}Not specified{% endif %}
+🏢 Branch: {% if lead.preferred_branch %}{{ lead.preferred_branch.branch_name }}{% else %}Ambattur{% endif %}
+
+I can share the complete:
+• Course details
+• Syllabus
+• Duration
+• Fees
+• Upcoming batch details
+
+Please let me know if you would like the details. 😊</textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column gap-3 width-100">
+      <button type="button" onclick="launchWhatsAppApp('{{ lead.phone }}')" class="btn-wa-primary">
+        <i class="bi bi-whatsapp" style="font-size:1.3rem;"></i>
+        <span>💬 OPEN IN WHATSAPP APP</span>
+      </button>
+
+      <button type="button" onclick="copyWaTextToClipboard()" class="btn-neu w-100" style="padding:14px; font-weight:700; font-size:0.9rem; border-radius:16px; display:flex; align-items:center; justify-content:center; gap:8px; color:var(--text); border:none; cursor:pointer;">
+        <i class="bi bi-clipboard-check text-accent" style="font-size:1.15rem;"></i>
+        <span>Copy Message to Clipboard</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Live WhatsApp Conversation History Log Card -->
+  <div class="wa-card fade-in">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 style="font-weight:800; font-size:1.1rem; color:var(--text); margin:0;">
+        <i class="bi bi-chat-dots-fill text-accent me-2"></i> WhatsApp Message History
+      </h2>
+      <span class="badge-pill badge-muted" style="font-size:0.75rem;">Live Logs</span>
+    </div>
+
+    <!-- Scrollable Chat Bubble Window -->
+    <div class="wa-chat-window mb-3" id="waChatHistory">
+      {% for msg in wa_messages %}
+      <div style="max-width:85%; padding:10px 14px; font-size:0.85rem; border-radius:14px; margin-top:4px; {% if msg.direction == 'OUTBOUND' %}align-self:flex-end; background:linear-gradient(135deg,#25D366,#128C7E); color:#ffffff; border-radius:14px 14px 2px 14px; box-shadow:0 4px 12px rgba(37,211,102,0.35);{% else %}align-self:flex-start; background:var(--bg); color:var(--text); border-radius:14px 14px 14px 2px; box-shadow:3px 3px 7px var(--sd), -3px -3px 7px var(--sl);{% endif %}">
+        <div style="font-size:0.68rem; font-weight:700; opacity:0.9; margin-bottom:3px;">
+          {% if msg.direction == 'OUTBOUND' %}<i class="bi bi-headset me-1"></i>You (DreamCADD){% else %}<i class="bi bi-person-fill me-1"></i>{{ lead.name }}{% endif %}
+        </div>
+        <div>{{ msg.message }}</div>
+        <div style="font-size:0.65rem; opacity:0.8; text-align:right; margin-top:4px;">{{ msg.timestamp|date:"d M, H:i" }}</div>
+      </div>
+      {% empty %}
+      <div id="noWaMsgNotice" style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:30px 10px;">
+        <i class="bi bi-chat-square-text text-accent" style="font-size:1.8rem; display:block; margin-bottom:8px;"></i>
+        No WhatsApp messages logged for {{ lead.name }} yet.
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Send Custom Message Input Form -->
+    <form onsubmit="sendCustomWhatsAppAjax(event, '{{ lead.id }}')" style="display:flex; gap:10px;">
+      <input type="text" id="waMessageInput" placeholder="Type a message..." style="flex:1; padding:12px 16px; border-radius:14px; border:none; background:var(--bg); box-shadow:inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl); font-size:0.88rem; outline:none; color:var(--text);" required>
+      <button type="submit" class="btn-neu" style="background:var(--accent); color:#fff; font-weight:800; padding:12px 20px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(79,127,250,0.38);">
+        <i class="bi bi-send-fill me-1"></i> Send
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<!-- Small Confirmation Toast Notification -->
+<div id="toastNotification" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:12px 24px; border-radius:30px; font-weight:800; font-size:.88rem; display:none; z-index:9999; box-shadow:0 8px 24px rgba(16,185,129,0.4); align-items:center; gap:10px;">
+  <i class="bi bi-check-circle-fill" style="font-size:1.1rem;"></i> <span id="toastMsg">Response saved</span>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const originalWaTemplateText = `Hi {{ lead.name }} 👋\n\nGood day from DreamCADD!\n\nThank you for your interest in our {% if lead.interested_course %}{{ lead.interested_course.course_name }}{% else %}courses{% endif %}.\n\n📚 Course: {% if lead.interested_course %}{{ lead.interested_course.course_name }}{% else %}Not specified{% endif %}\n🏢 Branch: {% if lead.preferred_branch %}{{ lead.preferred_branch.branch_name }}{% else %}Ambattur{% endif %}\n\nI can share the complete:\n• Course details\n• Syllabus\n• Duration\n• Fees\n• Upcoming batch details\n\nPlease let me know if you would like the details. 😊`;
+
+function resetWaTemplateText() {
+  const textEl = document.getElementById('waPreparedText');
+  if (textEl) {
+    textEl.value = originalWaTemplateText;
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toastNotification');
+  if (toast) {
+    document.getElementById('toastMsg').innerText = msg;
+    toast.style.display = 'flex';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2500);
+  }
+}
+
+function formatPhoneForWhatsApp(phoneStr) {
+  let cleaned = (phoneStr || '').replace(/\D/g, '');
+  if (cleaned.length === 10) {
+    cleaned = '91' + cleaned;
+  }
+  return cleaned;
+}
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function launchWhatsAppApp(phoneStr) {
+  const text = (document.getElementById('waPreparedText').value || '').trim();
+  const formattedPhone = formatPhoneForWhatsApp(phoneStr);
+  const encodedText = encodeURIComponent(text);
+  const waMeUrl = `https://wa.me/${formattedPhone}?text=${encodedText}`;
+
+  showToast("🚀 Launching WhatsApp...");
+
+  if (isMobileDevice()) {
+    const nativeUrl = `whatsapp://send?phone=${formattedPhone}&text=${encodedText}`;
+    window.location.href = nativeUrl;
+    setTimeout(() => {
+      window.open(waMeUrl, '_blank');
+    }, 600);
+  } else {
+    window.open(waMeUrl, '_blank');
+  }
+}
+
+function copyWaTextToClipboard() {
+  const text = (document.getElementById('waPreparedText').value || '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast("📋 Message copied to clipboard!");
+  }).catch(err => {
+    console.error(err);
+    alert("Could not copy message.");
+  });
+}
+
+function sendCustomWhatsAppAjax(event, leadId) {
+  event.preventDefault();
+  const input = document.getElementById('waMessageInput');
+  const text = (input ? input.value : '').trim();
+  if (!text) return;
+
+  fetch(`/api/leads/${leadId}/send-whatsapp/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({ message: text })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showToast("💬 Message logged & sent!");
+      if (input) input.value = '';
+      if (data.wa_message) {
+        appendWaMessageBubble(data.wa_message);
+      }
+    } else {
+      alert("WhatsApp Error: " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Network error sending message.");
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.innerText = text || '';
+  return div.innerHTML;
+}
+
+function appendWaMessageBubble(msg) {
+  const container = document.getElementById('waChatHistory');
+  const notice = document.getElementById('noWaMsgNotice');
+  if (notice) notice.style.display = 'none';
+
+  if (container) {
+    const isOutbound = msg.direction === 'OUTBOUND';
+    const div = document.createElement('div');
+    div.style.maxWidth = '85%';
+    div.style.padding = '10px 14px';
+    div.style.fontSize = '0.85rem';
+    div.style.marginTop = '4px';
+
+    if (isOutbound) {
+      div.style.alignSelf = 'flex-end';
+      div.style.background = 'linear-gradient(135deg, #25D366, #128C7E)';
+      div.style.color = '#ffffff';
+      div.style.borderRadius = '14px 14px 2px 14px';
+      div.style.boxShadow = '0 4px 12px rgba(37,211,102,0.35)';
+      div.innerHTML = `<div style="font-size:0.68rem; font-weight:700; opacity:0.9; margin-bottom:3px;"><i class="bi bi-headset me-1"></i>You (DreamCADD)</div><div>${escapeHtml(msg.message)}</div><div style="font-size:0.65rem; opacity:0.8; text-align:right; margin-top:4px;">Just now</div>`;
+    } else {
+      div.style.alignSelf = 'flex-start';
+      div.style.background = 'var(--bg)';
+      div.style.color = 'var(--text)';
+      div.style.borderRadius = '14px 14px 14px 2px';
+      div.style.boxShadow = '3px 3px 7px var(--sd), -3px -3px 7px var(--sl)';
+      div.innerHTML = `<div style="font-size:0.68rem; font-weight:700; color:var(--accent); margin-bottom:3px;"><i class="bi bi-person-fill me-1"></i>{{ lead.name }}</div><div>${escapeHtml(msg.message)}</div><div style="font-size:0.65rem; color:var(--text-muted); text-align:right; margin-top:4px;">Just now</div>`;
+    }
+
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+}
+</script>
+{% endblock %}

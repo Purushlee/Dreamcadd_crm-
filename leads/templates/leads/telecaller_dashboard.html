@@ -224,19 +224,62 @@
   .opt-converted { color: #059669; }
 
   /* Quick Presets for Follow-up */
-  .preset-chip {
-    padding: 5px 9px;
-    border-radius: 8px;
+  .preset-chip-btn {
     background: var(--bg);
-    box-shadow: 3px 3px 6px var(--sd), -3px -3px 6px var(--sl);
-    font-size: 0.72rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
     color: var(--text);
+    box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
-  .preset-chip:active {
+  .preset-chip-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+    color: var(--accent);
+  }
+  .preset-chip-btn:active {
+    transform: translateY(0);
     box-shadow: inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl);
+  }
+
+  /* Custom Neumorphic Inputs (Date, Time, Text, Select) */
+  .neu-input-custom {
+    width: 100%;
+    background: var(--bg) !important;
+    border: 1px solid rgba(163, 177, 198, 0.35) !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+    box-shadow: inset 3px 3px 7px var(--sd), inset -3px -3px 7px var(--sl) !important;
+    outline: none !important;
+    transition: all 0.2s ease;
+    font-family: inherit !important;
+    box-sizing: border-box !important;
+  }
+  .neu-input-custom:focus {
+    border-color: var(--accent) !important;
+    box-shadow: inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl), 0 0 8px rgba(79, 127, 250, 0.25) !important;
+  }
+  input[type="date"].neu-input-custom::-webkit-calendar-picker-indicator,
+  input[type="time"].neu-input-custom::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.75;
+    filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.15));
+    transition: opacity 0.2s ease;
+  }
+  input[type="date"].neu-input-custom::-webkit-calendar-picker-indicator:hover,
+  input[type="time"].neu-input-custom::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
   }
 
   /* Filter Chips */
@@ -291,6 +334,77 @@
   </div>
 </div>
 
+<!-- ════ DAILY TARGET & SCHEDULE TRACKER WIDGET ════ -->
+<div class="card mb-3 fade-in" style="padding:18px 22px; border-radius:20px; border-left:6px solid var(--accent); background:linear-gradient(135deg, rgba(79,127,250,0.06), transparent);">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+    <div class="d-flex align-items-center gap-2">
+      <div style="width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg,#4F7FFA,#7B5FFF); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 4px 12px rgba(79,127,250,0.35);">
+        <i class="bi bi-crosshair2"></i>
+      </div>
+      <div>
+        <div style="font-size:0.95rem; font-weight:800; color:var(--text);">
+          Today's Daily Target & Schedule
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">
+          {% if today_schedule %}
+          Admin Scheduled Target for {{ today_schedule.target_date|date:"d M Y" }}
+          {% else %}
+          Standard Telecaller Profile Daily Target
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Badges -->
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      {% if target_progress_pct >= 100 %}
+      <span class="badge-pill badge-ok" style="font-weight:800; font-size:0.78rem;">🎉 Target Achieved!</span>
+      {% else %}
+      <span class="badge-pill badge-warm" style="font-weight:700; font-size:0.75rem;">⏳ {{ remaining_call_target }} calls remaining</span>
+      {% endif %}
+
+      {% if today_scheduled_leads %}
+      <span class="badge-pill badge-accent" style="font-weight:700; font-size:0.75rem;">📅 {{ today_scheduled_leads|length }} Scheduled Leads Today</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Progress Bar & Target Numbers -->
+  <div class="row align-items-center g-3 mt-1">
+    <div class="col-md-4 col-sm-6">
+      <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Calls Logged Today</div>
+      <div style="font-size:1.4rem; font-weight:800; color:var(--accent);">
+        {{ today_call_attempts }} <span style="font-size:0.9rem; font-weight:600; color:var(--text-muted);">/ {{ daily_call_target }} Target Calls</span>
+      </div>
+    </div>
+    <div class="col-md-8 col-sm-6">
+      <div class="d-flex align-items-center justify-content-between mb-1" style="font-size:0.78rem; font-weight:800;">
+        <span>Progress: {{ target_progress_pct }}%</span>
+        <span>{{ today_call_attempts }} of {{ daily_call_target }} Calls</span>
+      </div>
+      <div style="height:10px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl); overflow:hidden;">
+        <div style="height:100%; width:{{ target_progress_pct }}%; background:{% if target_progress_pct >= 100 %}linear-gradient(90deg,#10B981,#059669){% else %}linear-gradient(90deg,#4F7FFA,#7B5FFF){% endif %}; border-radius:10px; transition:width 0.4s ease;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Scheduled Days Preview -->
+  {% if upcoming_schedules %}
+  <div class="mt-3 pt-2" style="border-top: 1px dashed rgba(163,177,198,0.3);">
+    <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">
+      <i class="bi bi-calendar3 me-1"></i> Upcoming Advance Schedules:
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      {% for sched in upcoming_schedules %}
+      <div class="meta-pill" style="font-size:0.75rem; padding:4px 10px;">
+        📅 <strong>{{ sched.target_date|date:"d M" }}</strong>: {{ sched.daily_call_target }} calls target
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
 <!-- ══ Notifications Alert ══ -->
 {% if notifications %}
 <div class="card mb-3 fade-in" style="border-left:4px solid var(--warm);padding:12px;background:rgba(245,158,11,.04);">
@@ -303,57 +417,6 @@
     <strong>{{ n.title }}</strong> — {{ n.message }}
   </div>
   {% endfor %}
-</div>
-{% endif %}
-
-<!-- ══ Due Follow-ups Section ══ -->
-{% if pending_followups %}
-<div class="card mb-4 fade-in" style="border-left:4px solid var(--danger);padding:14px;">
-  <div class="d-flex align-center gap-2 mb-3">
-    <i class="bi bi-alarm-fill text-danger" style="font-size:1.2rem;"></i>
-    <div>
-      <div class="section-title" style="font-size:.92rem;color:var(--danger);">⚡ Due Follow-ups</div>
-      <div class="section-subtitle" style="font-size:.72rem;">{{ pending_followups|length }} scheduled call{{ pending_followups|length|pluralize }} pending</div>
-    </div>
-  </div>
-  
-  <div class="customer-card-grid">
-    {% for f in pending_followups %}
-    <div class="customer-card" style="border-left:3px solid var(--danger);">
-      <div>
-        <div class="customer-card-header">
-          <div>
-            <a href="{% url 'lead_detail' f.lead.id %}" class="customer-name">{{ f.lead.name }}</a>
-            <div class="customer-sub"><i class="bi bi-clock-fill text-danger me-1"></i>Due: {{ f.scheduled_date|date:"d M, H:i" }}</div>
-          </div>
-          {% if f.lead.priority == 'HOT' %}<span class="badge-pill badge-hot"><i class="bi bi-fire"></i> HOT</span>{% endif %}
-        </div>
-
-        <a href="tel:{{ f.lead.phone }}" class="customer-phone" onclick="triggerCallAndPrepareModal({{ f.lead.id }}, '{{ f.lead.name|escapejs }}', '{{ f.lead.phone|escapejs }}')">
-          <i class="bi bi-telephone-fill text-success"></i> {{ f.lead.phone }}
-        </a>
-
-        {% if f.remarks and f.remarks != 'nan' and f.remarks != 'None' %}
-        <div style="font-size:.76rem;color:var(--text-muted);background:var(--bg-deep);padding:6px 10px;border-radius:8px;margin-bottom:8px;">
-          <i class="bi bi-chat-quote me-1"></i>{{ f.remarks }}
-        </div>
-        {% endif %}
-      </div>
-
-      <div class="card-action-bar">
-        <a href="tel:{{ f.lead.phone }}" class="btn-call-direct" onclick="triggerCallAndPrepareModal({{ f.lead.id }}, '{{ f.lead.name|escapejs }}', '{{ f.lead.phone|escapejs }}')">
-          <i class="bi bi-telephone-fill me-1"></i> Call Customer
-        </a>
-        <button type="button" class="btn-response-trigger" onclick="openQuickResponseModal({{ f.lead.id }}, '{{ f.lead.name|escapejs }}', '{{ f.lead.phone|escapejs }}')">
-          <i class="bi bi-ui-checks text-accent"></i> Response
-        </button>
-        <a href="{% url 'lead_detail' f.lead.id %}" class="btn-response-trigger" style="text-decoration:none;">
-          <i class="bi bi-eye"></i>
-        </a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
 </div>
 {% endif %}
 
@@ -372,13 +435,16 @@
     </div>
   </div>
 
-  <!-- Quick Filter Chips -->
-  <div class="d-flex gap-2 mb-3" style="overflow-x:auto;padding-bottom:4px;">
-    <button type="button" class="filter-chip active" onclick="filterLeads('ALL', this)">All ({{ leads.count }})</button>
-    <button type="button" class="filter-chip" onclick="filterLeads('HOT', this)">🔥 Hot</button>
-    <button type="button" class="filter-chip" onclick="filterLeads('PENDING', this)">⏰ Pending</button>
-    <button type="button" class="filter-chip" onclick="filterLeads('INTERESTED', this)">🟢 Interested</button>
-    <button type="button" class="filter-chip" onclick="filterLeads('CONVERTED', this)">🎉 Converted</button>
+  <!-- Quick Filter Chips Row (8 Filters with dynamic counts) -->
+  <div class="d-flex gap-2 mb-3" style="overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;">
+    <button type="button" class="filter-chip active" id="chip-ALL" onclick="filterLeads('ALL', this)">All (<span id="cnt-ALL">{{ assigned_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-HOT" onclick="filterLeads('HOT', this)">🔥 Hot (<span id="cnt-HOT">{{ hot_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-PENDING" onclick="filterLeads('PENDING', this)">⏰ Pending (<span id="cnt-PENDING">{{ pending_leads_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-INTERESTED" onclick="filterLeads('INTERESTED', this)">🟢 Interested (<span id="cnt-INTERESTED">{{ interested_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-CONVERTED" onclick="filterLeads('CONVERTED', this)">🎉 Converted (<span id="cnt-CONVERTED">{{ converted_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-FOLLOWUP" onclick="filterLeads('FOLLOWUP', this)">📅 Follow-up (<span id="cnt-FOLLOWUP">{{ followup_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-CALLBACK" onclick="filterLeads('CALLBACK', this)">📞 Call Back (<span id="cnt-CALLBACK">{{ call_back_count }}</span>)</button>
+    <button type="button" class="filter-chip" id="chip-NOT_ANSWERED" onclick="filterLeads('NOT_ANSWERED', this)">📵 Not Answered (<span id="cnt-NOT_ANSWERED">{{ not_answered_count }}</span>)</button>
   </div>
 
   <!-- Customer Cards Container -->
@@ -389,12 +455,13 @@
          data-phone="{{ lead.phone }}" 
          data-status="{{ lead.status }}" 
          data-priority="{{ lead.priority }}"
+         data-has-followup="{% if lead.active_followup %}true{% else %}false{% endif %}"
+         data-followup-date="{% if lead.active_followup %}{{ lead.active_followup.scheduled_date|date:'d M, H:i' }}{% endif %}"
          id="lead-card-{{ lead.id }}">
       <div>
         <div class="customer-card-header">
           <div>
             <a href="{% url 'lead_detail' lead.id %}" class="customer-name">{{ lead.name }}</a>
-            <!-- Clean display: Hide empty / nan college -->
             {% if lead.college and lead.college.lower != 'nan' and lead.college.lower != 'none' and lead.college.lower != 'unspecified' %}
             <div class="customer-sub">{{ lead.college }}</div>
             {% endif %}
@@ -405,6 +472,18 @@
             {% else %}<span class="badge-pill badge-cold">🔵 COLD</span>{% endif %}
           </div>
         </div>
+
+        {% if lead.active_followup %}
+        <div class="badge-pill badge-warm mb-2 w-100" id="followup-banner-{{ lead.id }}" style="font-size:.72rem; display:flex; align-items:center; gap:4px; padding:4px 8px;">
+          <i class="bi bi-calendar-event-fill text-warning"></i>
+          <span>Follow-up: <strong id="followup-text-{{ lead.id }}">{{ lead.active_followup.scheduled_date|date:"d M, h:i A" }}</strong></span>
+        </div>
+        {% else %}
+        <div class="badge-pill badge-warm mb-2 w-100" id="followup-banner-{{ lead.id }}" style="font-size:.72rem; display:none; align-items:center; gap:4px; padding:4px 8px;">
+          <i class="bi bi-calendar-event-fill text-warning"></i>
+          <span id="followup-text-{{ lead.id }}"></span>
+        </div>
+        {% endif %}
 
         <!-- Phone link dials phone AND prepares response panel -->
         <a href="tel:{{ lead.phone }}" class="customer-phone" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
@@ -438,20 +517,17 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="card-action-bar" style="grid-template-columns: 1fr auto auto;">
-        <!-- Call Customer button dials AND opens response panel for return -->
-        <a href="tel:{{ lead.phone }}" class="btn-call-direct" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
+      <!-- Action Buttons: Call Customer, Record Response, View Details -->
+      <div class="card-action-bar" style="display:flex; align-items:center; gap:6px;">
+        <button type="button" class="btn-call-direct" style="flex:1; border:none;" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
           <i class="bi bi-telephone-fill me-1"></i> Call Customer
-        </a>
-        <!-- Response / Edit Response button -->
-        <button type="button" class="btn-response-trigger" onclick="openQuickResponseModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')" title="One-tap response">
-          <i class="bi bi-ui-checks text-accent"></i> Response
         </button>
-        <button type="button" class="btn-response-trigger" onclick="openEditResponseModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.current_response|escapejs }}')" title="Edit customer response">
-          <i class="bi bi-pencil-square text-accent"></i>
+
+        <button type="button" class="btn-response-trigger edit-response-btn" id="edit-resp-btn-{{ lead.id }}" onclick="openQuickResponseModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')" title="Give / Edit Response">
+          <i class="bi bi-pencil-square text-accent me-1"></i> Response
         </button>
-        <a href="{% url 'lead_detail' lead.id %}" class="btn-response-trigger" style="text-decoration:none;" title="View details & full timeline">
+
+        <a href="{% url 'lead_detail' lead.id %}" class="btn-response-trigger" style="text-decoration:none;" title="View Customer Details">
           <i class="bi bi-eye"></i>
         </a>
       </div>
@@ -463,121 +539,216 @@
       <p style="font-size:0.85rem;">You currently have zero assigned leads. Ask your MD to assign a lead batch.</p>
     </div>
     {% endfor %}
+
+    <!-- Dynamic Category Tab Empty State Container -->
+    <div id="tabEmptyStateContainer" style="grid-column: 1 / -1; text-align:center; padding:45px 20px; color:var(--text-muted); display:none;" class="neu-inset">
+      <i class="bi bi-funnel" style="font-size:2.6rem; opacity:0.4; display:block; margin-bottom:8px;"></i>
+      <h6 id="emptyStateTitle" style="font-weight:700;">No matching customers in this queue</h6>
+      <p style="font-size:0.8rem; margin:0;" class="text-muted">Customers will automatically appear here when their response or follow-up status matches this category.</p>
+    </div>
   </div>
+</div>
 </div>
 
 
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- ONE-TAP MOBILE BOTTOM SHEET RESPONSE PANEL                      -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="bottom-sheet-overlay" id="sheetOverlay" onclick="closeQuickResponseModal()"></div>
 
-<div class="bottom-sheet" id="quickResponseSheet">
+<div class="bottom-sheet" id="quickResponseSheet" style="max-width:520px; border-radius:24px; padding:22px;">
   <div class="sheet-handle"></div>
   
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <div>
-      <h5 style="margin:0; font-weight:800; font-size:1.1rem; color:var(--text);" id="modalCustomerName">Customer Name</h5>
-      <div style="font-size:0.82rem; color:var(--text-muted);" id="modalCustomerPhone"><i class="bi bi-telephone-fill text-success me-1"></i>+91 9876543210</div>
+  <!-- Header Bar -->
+  <div class="d-flex justify-content-between align-items-start mb-3" style="border-bottom:1px solid rgba(163,177,198,0.2); padding-bottom:12px;">
+    <div style="flex:1; padding-right:12px;">
+      <h5 style="margin:0; font-weight:800; font-size:1.15rem; color:var(--text);" id="modalCustomerName">Customer Name</h5>
+      <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-top:3px;" id="modalCustomerPhone">
+        <i class="bi bi-telephone-fill text-success me-1"></i>+91 9876543210
+      </div>
     </div>
-    <button type="button" class="btn-close-neu" onclick="closeQuickResponseModal()" style="border:none;background:none;font-size:1.4rem;color:var(--text-muted);cursor:pointer;">
+    <button type="button" onclick="closeQuickResponseModal()" style="border:none; background:var(--bg); width:36px; height:36px; border-radius:50%; box-shadow:3px 3px 7px var(--sd), -3px -3px 7px var(--sl); font-size:1.1rem; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
       <i class="bi bi-x-lg"></i>
     </button>
   </div>
 
-  <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:10px;">
-    Select Call Outcome (One-Tap Auto Save)
+  <!-- MODE 1: OUTCOME SELECT GRID -->
+  <div id="quickOutcomeGridSection">
+    <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin:10px 0 8px 0;">
+      Select Call Outcome (One-Tap Auto Save)
+    </div>
+
+    <div class="response-grid">
+      <button type="button" class="btn-response-opt opt-callback" onclick="openOutcomeFormPanel('CALL_BACK')">
+        <i class="bi bi-calendar-event-fill"></i>
+        <span>Call Back</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-interested" onclick="openOutcomeFormPanel('INTERESTED')">
+        <i class="bi bi-fire"></i>
+        <span>Interested</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-not-attended" onclick="saveSimpleOutcome('NOT_ANSWERED')">
+        <i class="bi bi-telephone-x-fill text-danger"></i>
+        <span>Not Answered</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-not-interested" onclick="saveSimpleOutcome('NOT_INTERESTED')">
+        <i class="bi bi-hand-thumbs-down-fill"></i>
+        <span>Not Interested</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-busy" onclick="saveSimpleOutcome('BUSY')">
+        <i class="bi bi-phone-vibrate-fill"></i>
+        <span>Busy</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-switched-off" onclick="saveSimpleOutcome('SWITCHED_OFF')">
+        <i class="bi bi-slash-circle-fill"></i>
+        <span>Switched Off</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-connected" onclick="saveSimpleOutcome('CONNECTED')">
+        <i class="bi bi-telephone-inbound-fill"></i>
+        <span>Connected</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-wrong" onclick="saveSimpleOutcome('WRONG_NUMBER')">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>Wrong Number</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-invalid" onclick="saveSimpleOutcome('INVALID_NUMBER')">
+        <i class="bi bi-x-circle-fill"></i>
+        <span>Invalid Number</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-no-response" onclick="saveSimpleOutcome('NO_RESPONSE')">
+        <i class="bi bi-hourglass-split"></i>
+        <span>No Response</span>
+      </button>
+
+      <button type="button" class="btn-response-opt opt-converted" onclick="saveSimpleOutcome('CONVERTED')">
+        <i class="bi bi-trophy-fill"></i>
+        <span>Converted</span>
+      </button>
+    </div>
+
+    <!-- Call Remarks -->
+    <div class="mt-3 mb-2">
+      <input type="text" id="callRemarks" class="neu-input" placeholder="Call notes / remarks (optional)..." style="padding:10px 14px; font-size:0.85rem;">
+    </div>
   </div>
 
-  <!-- 11 One-Tap Response Buttons -->
-  <div class="response-grid">
-    <button type="button" class="btn-response-opt opt-interested" onclick="selectOutcome('INTERESTED', this)">
-      <i class="bi bi-fire"></i>
-      <span>Interested</span>
-    </button>
+  <!-- MODE 2: DEDICATED SCHEDULE CALL BACK PANEL -->
+  <div id="quickCallbackFormPanel" style="display:none; background:rgba(79,127,250,0.06); padding:16px; border-radius:20px; border:1px solid rgba(79,127,250,0.25); margin:12px 0 16px 0;">
+    <!-- Title & Subtitle Header -->
+    <div class="mb-3">
+      <h6 style="margin:0; font-weight:800; font-size:1.05rem; color:var(--accent); display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-calendar-event-fill"></i> Schedule Call Back
+      </h6>
+      <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Set the next time to contact this customer.</div>
+    </div>
 
-    <button type="button" class="btn-response-opt opt-callback" onclick="selectOutcome('CALL_BACK', this)">
-      <i class="bi bi-calendar-event-fill"></i>
-      <span>Call Back</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-not-interested" onclick="selectOutcome('NOT_INTERESTED', this)">
-      <i class="bi bi-hand-thumbs-down-fill"></i>
-      <span>Not Interested</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-connected" onclick="selectOutcome('CONNECTED', this)">
-      <i class="bi bi-telephone-inbound-fill"></i>
-      <span>Connected</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-not-attended" onclick="selectOutcome('NOT_ANSWERED', this)">
-      <i class="bi bi-telephone-x-fill text-danger"></i>
-      <span>Not Answered 📵</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-not-attended" onclick="selectOutcome('NOT_ATTENDED', this)">
-      <i class="bi bi-telephone-minus-fill"></i>
-      <span>Not Attended</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-busy" onclick="selectOutcome('BUSY', this)">
-      <i class="bi bi-phone-vibrate-fill"></i>
-      <span>Busy</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-switched-off" onclick="selectOutcome('SWITCHED_OFF', this)">
-      <i class="bi bi-slash-circle-fill"></i>
-      <span>Switched Off</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-wrong" onclick="selectOutcome('WRONG_NUMBER', this)">
-      <i class="bi bi-exclamation-triangle-fill"></i>
-      <span>Wrong Number</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-invalid" onclick="selectOutcome('INVALID_NUMBER', this)">
-      <i class="bi bi-x-circle-fill"></i>
-      <span>Invalid Number</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-no-response" onclick="selectOutcome('NO_RESPONSE', this)">
-      <i class="bi bi-hourglass-split"></i>
-      <span>No Response</span>
-    </button>
-
-    <button type="button" class="btn-response-opt opt-converted" onclick="selectOutcome('CONVERTED', this)">
-      <i class="bi bi-trophy-fill"></i>
-      <span>Converted 🎉</span>
-    </button>
-  </div>
-
-  <!-- CONDITIONAL EXTRA FIELDS FOR INTERESTED / CALL BACK CUSTOMERS ONLY -->
-  <div id="interestedExtraFields" style="display:none; background:rgba(79,127,250,0.06); padding:14px; border-radius:16px; border:1px solid rgba(79,127,250,0.25); margin-bottom:14px;">
-    <div class="d-flex align-items-center justify-content-between mb-2">
-      <div style="font-weight:700; font-size:0.85rem; color:var(--accent);">
-        <i class="bi bi-star-fill me-1"></i> Interested Customer Details
+    <!-- Quick Date Presets (Equal 3-column grid - 100% contained) -->
+    <div class="mb-3" style="background:rgba(79,127,250,0.08); padding:10px; border-radius:14px; border:1px dashed rgba(79,127,250,0.3);">
+      <div style="font-size:0.72rem; font-weight:700; color:var(--accent); margin-bottom:6px; display:flex; align-items:center; gap:4px;">
+        <i class="bi bi-lightning-charge-fill"></i> Quick Date Presets
       </div>
-      <div class="d-flex gap-1">
-        <button type="button" class="preset-chip" onclick="setFollowupPreset('tomorrow')">Tomorrow</button>
-        <button type="button" class="preset-chip" onclick="setFollowupPreset('2days')">+2 Days</button>
-        <button type="button" class="preset-chip" onclick="setFollowupPreset('1week')">+1 Wk</button>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; width:100%;">
+        <button type="button" class="preset-chip-btn" style="justify-content:center; padding:7px 4px; font-size:0.75rem;" onclick="setFollowupPreset('tomorrow')">
+          <i class="bi bi-sun me-1"></i>Tomorrow
+        </button>
+        <button type="button" class="preset-chip-btn" style="justify-content:center; padding:7px 4px; font-size:0.75rem;" onclick="setFollowupPreset('2days')">
+          <i class="bi bi-calendar-plus me-1"></i>+2 Days
+        </button>
+        <button type="button" class="preset-chip-btn" style="justify-content:center; padding:7px 4px; font-size:0.75rem;" onclick="setFollowupPreset('1week')">
+          <i class="bi bi-calendar-week me-1"></i>+1 Wk
+        </button>
       </div>
     </div>
 
-    <div class="row g-2 mb-2">
-      <div class="col-6">
-        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Interested Course</label>
-        <select id="interestedCourse" class="neu-input" style="padding:6px 8px; font-size:0.8rem;">
+    <!-- Date & Time Grid -->
+    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:8px;" class="mb-3">
+      <div>
+        <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <i class="bi bi-calendar3 text-primary"></i> Follow-up Date
+        </label>
+        <input type="date" id="followupDate" class="neu-input-custom" style="width:100%;">
+      </div>
+      <div>
+        <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <i class="bi bi-clock-history text-danger"></i> Follow-up Time
+        </label>
+        <input type="time" id="followupTime" class="neu-input-custom" value="10:00" style="width:100%;">
+      </div>
+    </div>
+
+    <!-- Short Note Field -->
+    <div class="mb-3">
+      <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+        <i class="bi bi-pencil-square text-secondary"></i> Short Note (Optional)
+      </label>
+      <input type="text" id="callbackShortNote" class="neu-input-custom" placeholder="e.g. Customer asked to call back tomorrow">
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 justify-content-end mt-4">
+      <button type="button" class="preset-chip-btn" style="padding:10px 18px; font-weight:700; font-size:0.84rem; white-space:nowrap;" onclick="resetOutcomeModal()">Cancel</button>
+      <button type="button" style="padding:10px 20px; font-weight:700; font-size:0.85rem; white-space:nowrap; background:linear-gradient(135deg, #4F7FFA, #7B5FFF); color:#fff; border:none; border-radius:12px; box-shadow:0 4px 14px rgba(79,127,250,0.4); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="submitFormOutcome('CALL_BACK')">
+        <i class="bi bi-floppy-fill"></i> SAVE FOLLOW-UP
+      </button>
+    </div>
+  </div>
+
+  <!-- MODE 3: DEDICATED INTERESTED DETAILS PANEL -->
+  <div id="quickInterestedFormPanel" style="display:none; background:rgba(34,197,94,0.06); padding:16px; border-radius:20px; border:1px solid rgba(34,197,94,0.25); margin:12px 0 16px 0;">
+    <!-- Title & Subtitle Header -->
+    <div class="mb-3">
+      <h6 style="margin:0; font-weight:800; font-size:1.05rem; color:#16A34A; display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-fire"></i> Interested Customer Details
+      </h6>
+      <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Enter course & follow-up details for interested lead.</div>
+    </div>
+
+    <!-- Quick Date Presets (Equal 3-column grid) -->
+    <div class="mb-3" style="background:rgba(34,197,94,0.08); padding:10px; border-radius:14px; border:1px dashed rgba(34,197,94,0.3);">
+      <div style="font-size:0.72rem; font-weight:700; color:#16A34A; margin-bottom:6px; display:flex; align-items:center; gap:4px;">
+        <i class="bi bi-lightning-charge-fill"></i> Quick Date Presets
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; width:100%;">
+        <button type="button" class="preset-chip-btn" style="justify-content:center; padding:7px 4px; font-size:0.75rem;" onclick="setFollowupPreset('tomorrow')">
+          <i class="bi bi-sun me-1"></i>Tomorrow
+        </button>
+        <button type="button" class="preset-chip-btn" style="justify-content:center; padding:7px 4px; font-size:0.75rem;" onclick="setFollowupPreset('2days')">
+          <i class="bi bi-calendar-plus me-1"></i>+2 Days
+        </button>
+        <button type="button" class="preset-chip-btn" style="justify-content:center; padding:7px 4px; font-size:0.75rem;" onclick="setFollowupPreset('1week')">
+          <i class="bi bi-calendar-week me-1"></i>+1 Wk
+        </button>
+      </div>
+    </div>
+
+    <!-- Course & Branch Select Grid -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;" class="mb-3">
+      <div>
+        <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <i class="bi bi-journal-bookmark-fill text-warning"></i> Interested Course
+        </label>
+        <select id="interestedCourse" class="neu-input-custom" style="width:100%;">
           <option value="">-- Select Course --</option>
           {% for c in courses %}
           <option value="{{ c.id }}">{{ c.course_name }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-6">
-        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Preferred Branch</label>
-        <select id="preferredBranch" class="neu-input" style="padding:6px 8px; font-size:0.8rem;">
+      <div>
+        <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <i class="bi bi-building-fill text-info"></i> Preferred Branch
+        </label>
+        <select id="preferredBranch" class="neu-input-custom" style="width:100%;">
           <option value="">-- Select Branch --</option>
           {% for b in branches %}
           <option value="{{ b.id }}">{{ b.branch_name }}</option>
@@ -586,32 +757,37 @@
       </div>
     </div>
 
-    <div class="row g-2 mb-2">
-      <div class="col-6">
-        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Follow-up Date</label>
-        <input type="date" id="followupDate" class="neu-input" style="padding:6px 8px; font-size:0.8rem;">
+    <!-- Date & Time Grid -->
+    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:8px;" class="mb-3">
+      <div>
+        <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <i class="bi bi-calendar3 text-success"></i> Follow-up Date
+        </label>
+        <input type="date" id="interestedFollowupDate" class="neu-input-custom" style="width:100%;">
       </div>
-      <div class="col-6">
-        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Time</label>
-        <input type="time" id="followupTime" class="neu-input" style="padding:6px 8px; font-size:0.8rem;" value="10:00">
+      <div>
+        <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <i class="bi bi-clock-history text-danger"></i> Follow-up Time
+        </label>
+        <input type="time" id="interestedFollowupTime" class="neu-input-custom" value="10:00" style="width:100%;">
       </div>
     </div>
 
-    <div class="row g-2 mb-2">
-      <div class="col-6">
-        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Budget / Expected Fee</label>
-        <input type="text" id="interestedBudget" class="neu-input" placeholder="e.g. 15,000" style="padding:6px 8px; font-size:0.8rem;">
-      </div>
-      <div class="col-6">
-        <label style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Requirement Note</label>
-        <input type="text" id="requirementNote" class="neu-input" placeholder="e.g. Weekend Batch" style="padding:6px 8px; font-size:0.8rem;">
-      </div>
+    <!-- Requirement Note Field -->
+    <div class="mb-3">
+      <label style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+        <i class="bi bi-pencil-square text-secondary"></i> Requirement Note
+      </label>
+      <input type="text" id="requirementNote" class="neu-input-custom" placeholder="e.g. Interested in Revit Architecture Weekend batch">
     </div>
-  </div>
 
-  <!-- Call Remarks -->
-  <div class="mb-3">
-    <input type="text" id="callRemarks" class="neu-input" placeholder="Call notes / remarks..." style="padding:9px 12px; font-size:0.84rem;">
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 justify-content-end mt-4">
+      <button type="button" class="preset-chip-btn" style="padding:10px 18px; font-weight:700; font-size:0.84rem; white-space:nowrap;" onclick="resetOutcomeModal()">Cancel</button>
+      <button type="button" style="padding:10px 20px; font-weight:700; font-size:0.85rem; white-space:nowrap; background:linear-gradient(135deg, #16A34A, #059669); color:#fff; border:none; border-radius:12px; box-shadow:0 4px 14px rgba(22,163,74,0.4); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="submitFormOutcome('INTERESTED')">
+        <i class="bi bi-floppy-fill"></i> SAVE INTERESTED
+      </button>
+    </div>
   </div>
 
   <!-- Auto-saving Status indicator -->
@@ -692,12 +868,14 @@
 let currentLeadId = null;
 let selectedOutcome = null;
 
+let currentFilterCategory = 'ALL';
+
 // Search Filter
 document.getElementById('leadSearchInput').addEventListener('input', function() {
   const query = this.value.toLowerCase().trim();
   document.querySelectorAll('#leadCardsContainer .lead-item-card').forEach(function(card) {
-    const name = card.getAttribute('data-name');
-    const phone = card.getAttribute('data-phone');
+    const name = card.getAttribute('data-name') || '';
+    const phone = card.getAttribute('data-phone') || '';
     if (name.includes(query) || phone.includes(query)) {
       card.style.display = '';
     } else {
@@ -706,29 +884,113 @@ document.getElementById('leadSearchInput').addEventListener('input', function() 
   });
 });
 
-// Category Filter Chips
+// Category Filter Chips (7 Filters: ALL, HOT, PENDING, INTERESTED, CONVERTED, FOLLOWUP, NOT_ANSWERED)
 function filterLeads(category, btn) {
-  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (category) currentFilterCategory = category;
+  if (btn) {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  const query = (document.getElementById('leadSearchInput').value || '').toLowerCase().trim();
+  let visibleCount = 0;
 
   document.querySelectorAll('#leadCardsContainer .lead-item-card').forEach(function(card) {
-    const status = card.getAttribute('data-status');
-    const priority = card.getAttribute('data-priority');
+    const name = card.getAttribute('data-name') || '';
+    const phone = card.getAttribute('data-phone') || '';
+    const status = card.getAttribute('data-status') || '';
+    const priority = card.getAttribute('data-priority') || '';
+    const hasFollowup = card.getAttribute('data-has-followup') === 'true';
 
-    if (category === 'ALL') {
+    const matchesSearch = !query || name.includes(query) || phone.includes(query);
+    let matchesCategory = false;
+
+    if (currentFilterCategory === 'ALL') {
+      matchesCategory = true;
+    } else if (currentFilterCategory === 'HOT') {
+      matchesCategory = (priority === 'HOT');
+    } else if (currentFilterCategory === 'PENDING') {
+      matchesCategory = (status === 'NEW' || status === 'ASSIGNED');
+    } else if (currentFilterCategory === 'INTERESTED') {
+      matchesCategory = (status === 'INTERESTED' || status === 'CONTACTED');
+    } else if (currentFilterCategory === 'CONVERTED') {
+      matchesCategory = (status === 'CONVERTED');
+    } else if (currentFilterCategory === 'FOLLOWUP') {
+      matchesCategory = hasFollowup || status === 'CALL_BACK';
+    } else if (currentFilterCategory === 'CALLBACK') {
+      matchesCategory = (status === 'CALL_BACK' || status === 'CALLBACK');
+    } else if (currentFilterCategory === 'NOT_ANSWERED') {
+      matchesCategory = (status === 'NOT_CONNECTED' || status === 'NOT_ANSWERED' || status === 'SWITCHED_OFF' || status === 'BUSY');
+    }
+
+    if (matchesSearch && matchesCategory) {
       card.style.display = '';
-    } else if (category === 'HOT' && priority === 'HOT') {
-      card.style.display = '';
-    } else if (category === 'PENDING' && (status === 'NEW' || status === 'ASSIGNED')) {
-      card.style.display = '';
-    } else if (category === 'INTERESTED' && (status === 'INTERESTED' || status === 'CONTACTED')) {
-      card.style.display = '';
-    } else if (category === 'CONVERTED' && status === 'CONVERTED') {
-      card.style.display = '';
+      visibleCount++;
     } else {
       card.style.display = 'none';
     }
   });
+
+  const emptyDiv = document.getElementById('tabEmptyStateContainer');
+  if (emptyDiv) {
+    if (visibleCount === 0) {
+      emptyDiv.style.display = 'block';
+      const titles = {
+        'ALL': 'No assigned leads in your pool.',
+        'HOT': 'No 🔥 Hot priority leads found in your queue.',
+        'PENDING': 'No ⏰ Pending leads requiring call action.',
+        'INTERESTED': 'No 🟢 Interested customers in this queue.',
+        'CONVERTED': 'No 🎉 Converted customers yet.',
+        'FOLLOWUP': 'No 📅 Active scheduled follow-ups.',
+        'CALLBACK': 'No 📞 Call Back requests scheduled.',
+        'NOT_ANSWERED': 'No 📵 Not Answered customers in this queue.'
+      };
+      const titleEl = document.getElementById('emptyStateTitle');
+      if (titleEl) titleEl.textContent = titles[currentFilterCategory] || 'No matching customers in this queue.';
+    } else {
+      emptyDiv.style.display = 'none';
+    }
+  }
+}
+
+function recalculateFilterCounts() {
+  const cards = document.querySelectorAll('#leadCardsContainer .lead-item-card');
+  let cntAll = cards.length;
+  let cntHot = 0;
+  let cntPending = 0;
+  let cntInterested = 0;
+  let cntConverted = 0;
+  let cntFollowup = 0;
+  let cntCallback = 0;
+  let cntNotAnswered = 0;
+
+  cards.forEach(card => {
+    const status = card.getAttribute('data-status') || '';
+    const priority = card.getAttribute('data-priority') || '';
+    const hasFollowup = card.getAttribute('data-has-followup') === 'true';
+
+    if (priority === 'HOT') cntHot++;
+    if (status === 'NEW' || status === 'ASSIGNED') cntPending++;
+    if (status === 'INTERESTED' || status === 'CONTACTED') cntInterested++;
+    if (status === 'CONVERTED') cntConverted++;
+    if (hasFollowup || status === 'CALL_BACK') cntFollowup++;
+    if (status === 'CALL_BACK' || status === 'CALLBACK') cntCallback++;
+    if (status === 'NOT_CONNECTED' || status === 'NOT_ANSWERED' || status === 'SWITCHED_OFF' || status === 'BUSY') cntNotAnswered++;
+  });
+
+  const setCnt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setCnt('cnt-ALL', cntAll);
+  setCnt('cnt-HOT', cntHot);
+  setCnt('cnt-PENDING', cntPending);
+  setCnt('cnt-INTERESTED', cntInterested);
+  setCnt('cnt-CONVERTED', cntConverted);
+  setCnt('cnt-FOLLOWUP', cntFollowup);
+  setCnt('cnt-CALLBACK', cntCallback);
+  setCnt('cnt-NOT_ANSWERED', cntNotAnswered);
+
+  // Apply current active category filter
+  const activeBtn = document.querySelector('.filter-chip.active');
+  filterLeads(currentFilterCategory, activeBtn);
 }
 
 let currentCallSessionId = null;
@@ -739,7 +1001,9 @@ function triggerCallAndPrepareModal(leadId, leadName, leadPhone) {
   currentCallSessionId = "CS-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
   callStartTime = Date.now();
   openQuickResponseModal(leadId, leadName, leadPhone);
-  // Phone call proceeds naturally via tel: link
+  
+  // Launch native phone dialer
+  window.location.href = "tel:" + leadPhone;
 }
 
 // Open Bottom Sheet Modal
@@ -756,22 +1020,13 @@ function openQuickResponseModal(leadId, leadName, leadPhone) {
   const remarksEl = document.getElementById('callRemarks');
   if (remarksEl) remarksEl.value = '';
 
-  const budgetEl = document.getElementById('interestedBudget');
-  if (budgetEl) budgetEl.value = '';
+  const noteEl = document.getElementById('callbackShortNote');
+  if (noteEl) noteEl.value = '';
 
   const reqEl = document.getElementById('requirementNote');
   if (reqEl) reqEl.value = '';
 
-  const extraEl = document.getElementById('interestedExtraFields');
-  if (extraEl) extraEl.style.display = 'none';
-
-  const indicatorEl = document.getElementById('saveStatusIndicator');
-  if (indicatorEl) indicatorEl.style.display = 'none';
-
-  // Clear button selections
-  document.querySelectorAll('#quickResponseSheet .btn-response-opt').forEach(btn => btn.classList.remove('selected'));
-
-  // Pre-fill tomorrow for date picker
+  resetOutcomeModal();
   setFollowupPreset('tomorrow');
 
   const overlay = document.getElementById('sheetOverlay');
@@ -782,11 +1037,30 @@ function openQuickResponseModal(leadId, leadName, leadPhone) {
 }
 
 function closeQuickResponseModal() {
-  document.getElementById('sheetOverlay').classList.remove('active');
-  document.getElementById('quickResponseSheet').classList.remove('active');
+  const overlay = document.getElementById('sheetOverlay');
+  if (overlay) overlay.classList.remove('active');
+
+  const sheet = document.getElementById('quickResponseSheet');
+  if (sheet) sheet.classList.remove('active');
+
+  resetOutcomeModal();
 }
 
-// Preset helper for follow-up date
+function resetOutcomeModal() {
+  selectedOutcome = null;
+  const grid = document.getElementById('quickOutcomeGridSection');
+  if (grid) grid.style.display = 'block';
+
+  const cbPanel = document.getElementById('quickCallbackFormPanel');
+  if (cbPanel) cbPanel.style.display = 'none';
+
+  const intPanel = document.getElementById('quickInterestedFormPanel');
+  if (intPanel) intPanel.style.display = 'none';
+
+  const indicator = document.getElementById('saveStatusIndicator');
+  if (indicator) indicator.style.display = 'none';
+}
+
 function setFollowupPreset(preset) {
   const d = new Date();
   if (preset === 'tomorrow') {
@@ -797,60 +1071,88 @@ function setFollowupPreset(preset) {
     d.setDate(d.getDate() + 7);
   }
   const isoStr = d.toISOString().split('T')[0];
-  document.getElementById('followupDate').value = isoStr;
+  const cbDate = document.getElementById('followupDate');
+  if (cbDate) cbDate.value = isoStr;
+
+  const intDate = document.getElementById('interestedFollowupDate');
+  if (intDate) intDate.value = isoStr;
 }
 
-// Select Call Outcome
-function selectOutcome(outcome, btnElement) {
+function openOutcomeFormPanel(outcome) {
   selectedOutcome = outcome;
+  const grid = document.getElementById('quickOutcomeGridSection');
+  if (grid) grid.style.display = 'none';
 
-  document.querySelectorAll('.btn-response-opt').forEach(btn => btn.classList.remove('selected'));
-  if (btnElement) {
-    btnElement.classList.add('selected');
-  }
-
-  const extraFields = document.getElementById('interestedExtraFields');
-  if (outcome === 'INTERESTED' || outcome === 'CALL_BACK') {
-    // Reveal extra fields for interested / call back customers
-    extraFields.style.display = 'block';
-  } else {
-    // Hide extra fields for non-interested/busy/wrong number and save immediately
-    extraFields.style.display = 'none';
-    saveQuickResponse();
+  if (outcome === 'CALL_BACK') {
+    const cbPanel = document.getElementById('quickCallbackFormPanel');
+    if (cbPanel) cbPanel.style.display = 'block';
+  } else if (outcome === 'INTERESTED') {
+    const intPanel = document.getElementById('quickInterestedFormPanel');
+    if (intPanel) intPanel.style.display = 'block';
   }
 }
 
-// Automatically save when date or course/branch selected
-document.getElementById('followupDate').addEventListener('change', function() {
-  if (selectedOutcome) saveQuickResponse();
-});
+function saveSimpleOutcome(outcomeKey) {
+  selectedOutcome = outcomeKey;
+  executeResponseSave();
+}
 
-// Primary Save Logic via AJAX
-function saveQuickResponse() {
+function submitFormOutcome(outcomeKey) {
+  selectedOutcome = outcomeKey;
+  executeResponseSave();
+}
+
+function executeResponseSave() {
   if (!currentLeadId || !selectedOutcome) return;
 
   const indicator = document.getElementById('saveStatusIndicator');
-  indicator.style.display = 'block';
-  indicator.innerHTML = '<i class="bi bi-arrow-repeat spin me-1"></i> Auto-saving to CRM...';
+  if (indicator) {
+    indicator.style.display = 'block';
+    indicator.innerHTML = '<i class="bi bi-arrow-repeat spin me-1"></i> Saving response to CRM...';
+  }
 
-  const notes = document.getElementById('callRemarks').value;
-  const isInterested = (selectedOutcome === 'INTERESTED' || selectedOutcome === 'CALL_BACK');
-  
   let durationSecs = 0;
   if (callStartTime) {
     durationSecs = Math.max(0, Math.round((Date.now() - callStartTime) / 1000));
+  }
+
+  let notes = document.getElementById('callRemarks') ? document.getElementById('callRemarks').value : '';
+  let followupDateVal = '';
+  let followupTimeVal = '';
+  let courseId = '';
+  let branchId = '';
+  let reqNote = '';
+
+  if (selectedOutcome === 'CALL_BACK') {
+    const cbDate = document.getElementById('followupDate');
+    const cbTime = document.getElementById('followupTime');
+    const cbNote = document.getElementById('callbackShortNote');
+    followupDateVal = cbDate ? cbDate.value : '';
+    followupTimeVal = cbTime ? cbTime.value : '10:00';
+    if (cbNote && cbNote.value) notes = cbNote.value;
+  } else if (selectedOutcome === 'INTERESTED') {
+    const intDate = document.getElementById('interestedFollowupDate');
+    const intTime = document.getElementById('interestedFollowupTime');
+    const cEl = document.getElementById('interestedCourse');
+    const bEl = document.getElementById('preferredBranch');
+    const rEl = document.getElementById('requirementNote');
+    followupDateVal = intDate ? intDate.value : '';
+    followupTimeVal = intTime ? intTime.value : '10:00';
+    courseId = cEl ? cEl.value : '';
+    branchId = bEl ? bEl.value : '';
+    reqNote = rEl ? rEl.value : '';
+    if (reqNote) notes = reqNote;
   }
 
   const payload = {
     outcome: selectedOutcome,
     notes: notes,
     call_duration: durationSecs,
-    course_id: isInterested ? document.getElementById('interestedCourse').value : '',
-    preferred_branch_id: isInterested ? document.getElementById('preferredBranch').value : '',
-    budget: isInterested ? document.getElementById('interestedBudget').value : '',
-    requirement_note: isInterested ? document.getElementById('requirementNote').value : '',
-    followup_date: isInterested ? document.getElementById('followupDate').value : '',
-    followup_time: isInterested ? document.getElementById('followupTime').value : '',
+    course_id: courseId,
+    preferred_branch_id: branchId,
+    requirement_note: reqNote,
+    followup_date: followupDateVal,
+    followup_time: followupTimeVal,
     followup_note: notes,
     call_session_id: currentCallSessionId
   };
@@ -866,9 +1168,10 @@ function saveQuickResponse() {
   .then(res => res.json())
   .then(data => {
     if (data.status === 'success') {
-      indicator.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Saved! Status: ${data.new_status_display}`;
+      if (indicator) {
+        indicator.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> ✅ Follow-up scheduled successfully! (${data.new_status_display})`;
+      }
       
-      // Update badge on card
       const badge = document.getElementById(`status-badge-${currentLeadId}`);
       if (badge) {
         badge.textContent = data.new_status_display;
@@ -876,40 +1179,60 @@ function saveQuickResponse() {
         badge.style.color = '#16A34A';
       }
 
+      const respText = document.getElementById(`response-text-${currentLeadId}`);
+      if (respText) {
+        respText.textContent = data.new_status_display;
+      }
+
       const timeSpan = document.getElementById(`updated-time-${currentLeadId}`);
       if (timeSpan) {
         timeSpan.textContent = data.updated_at;
       }
 
-      // Update card data-status
       const card = document.getElementById(`lead-card-${currentLeadId}`);
       if (card) {
         card.setAttribute('data-status', data.new_status);
+        if (followupDateVal) {
+          card.setAttribute('data-has-followup', 'true');
+          const fuBanner = document.getElementById(`followup-banner-${currentLeadId}`);
+          if (fuBanner) {
+            fuBanner.style.display = 'flex';
+            const fuText = document.getElementById(`followup-text-${currentLeadId}`);
+            if (fuText) fuText.innerHTML = `${data.followup_date || followupDateVal}`;
+          }
+        } else {
+          card.setAttribute('data-has-followup', 'false');
+          const fuBanner = document.getElementById(`followup-banner-${currentLeadId}`);
+          if (fuBanner) fuBanner.style.display = 'none';
+        }
       }
 
-      // Update stats counters dynamically
-      const callsTodayEl = document.getElementById('callsTodayStat');
-      if (callsTodayEl) {
-        callsTodayEl.textContent = parseInt(callsTodayEl.textContent || '0') + 1;
+      const editBtn = document.getElementById(`edit-resp-btn-${currentLeadId}`);
+      if (editBtn) {
+        const notAnsList = ['NOT_ANSWERED', 'NOT_CONNECTED', 'SWITCHED_OFF', 'BUSY', 'WRONG_NUMBER', 'INVALID_NUMBER', 'NO_RESPONSE'];
+        if (notAnsList.includes(data.new_status)) {
+          editBtn.style.display = 'inline-flex';
+        } else {
+          editBtn.style.display = 'none';
+        }
       }
-      if (selectedOutcome === 'INTERESTED' || selectedOutcome === 'CONNECTED') {
-        const interestedEl = document.getElementById('interestedStat');
-        if (interestedEl) interestedEl.textContent = parseInt(interestedEl.textContent || '0') + 1;
-      } else if (selectedOutcome === 'CONVERTED') {
-        const convertedEl = document.getElementById('convertedStat');
-        if (convertedEl) convertedEl.textContent = parseInt(convertedEl.textContent || '0') + 1;
-      }
+
+      recalculateFilterCounts();
 
       setTimeout(() => {
         closeQuickResponseModal();
       }, 700);
     } else {
-      indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> ${data.message}</span>`;
+      if (indicator) {
+        indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> ${data.message}</span>`;
+      }
     }
   })
   .catch(err => {
     console.error(err);
-    indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Network error saving response</span>`;
+    if (indicator) {
+      indicator.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Network error saving response</span>`;
+    }
   });
 }
 
@@ -979,6 +1302,13 @@ function submitEditResponse(newResponseKey) {
 
       const timeSpan = document.getElementById(`updated-time-${currentEditLeadId}`);
       if (timeSpan) timeSpan.innerText = data.updated_at;
+
+      const card = document.getElementById(`lead-card-${currentEditLeadId}`);
+      if (card) {
+        card.setAttribute('data-status', data.new_status);
+      }
+
+      recalculateFilterCounts();
 
       setTimeout(() => {
         closeEditResponseModal();

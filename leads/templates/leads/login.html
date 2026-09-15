@@ -71,6 +71,21 @@
     <h1 class="login-title">DreamCadd CRM</h1>
     <p class="login-subtitle">AI-Powered Lead Management System</p>
 
+    {% if request.user.is_authenticated and not request.user.is_md %}
+    <div class="login-error" style="background: rgba(245,158,11,.1); border-left: 3px solid var(--warm); color: #92400e;">
+      <div>
+        <i class="bi bi-shield-exclamation me-1"></i>
+        Currently signed in as Telecaller <strong>{{ request.user.username }}</strong>.
+        Admin pages require an Admin/MD account. Sign in below or <a href="{% url 'telecaller_dashboard' %}" style="color:var(--accent); font-weight:700;">Return to Workspace</a>.
+      </div>
+    </div>
+    {% elif request.GET.next %}
+    <div class="login-error" style="background: rgba(79,127,250,.1); border-left: 3px solid var(--accent); color: #1d4ed8;">
+      <i class="bi bi-lock-fill me-1"></i>
+      Sign in with Admin credentials to access this page.
+    </div>
+    {% endif %}
+
     {% if form.errors %}
     <div class="login-error">
       <i class="bi bi-exclamation-circle-fill"></i>

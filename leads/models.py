@@ -245,6 +245,8 @@ class Lead(models.Model):
     ai_next_action = models.CharField(max_length=200, blank=True, default="Call to introduce course details")
     ai_summary = models.TextField(blank=True)
 
+    scheduled_date = models.DateField(blank=True, null=True, db_index=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -255,6 +257,7 @@ class Lead(models.Model):
             models.Index(fields=["assigned_to"]),
             models.Index(fields=["priority"]),
             models.Index(fields=["contacted"]),
+            models.Index(fields=["scheduled_date"]),
         ]
 
     def __str__(self):
@@ -291,6 +294,27 @@ class LeadAssignment(models.Model):
 
     def __str__(self):
         return f"{self.lead.name} -> {self.caller}"
+
+
+class DailySchedule(models.Model):
+    caller = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="daily_schedules",
+        limit_choices_to={"role": User.Role.TELECALLER}
+    )
+    target_date = models.DateField(db_index=True)
+    daily_call_target = models.IntegerField(default=30)
+    daily_conversion_target = models.IntegerField(default=5)
+    notes = models.TextField(blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_daily_schedules")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-target_date", "caller"]
+        unique_together = ("caller", "target_date")
+
+    def __str__(self):
+        return f"Schedule: {self.caller.username} on {self.target_date} (Target: {self.daily_call_target})"
 
 
 class Followup(models.Model):
@@ -434,4 +458,48 @@ class ExportHistory(models.Model):
 
     def __str__(self):
         return f"Export by {self.user.username if self.user else 'System'} ({self.record_count} records) on {self.exported_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+class SecurityAuditLog(models.Model):
+    class Action(models.TextChoices):
+        USERNAME_CHANGED = "USERNAME_CHANGED", "Username Changed"
+        PASSWORD_CHANGED = "PASSWORD_CHANGED", "Password Changed"
+        OTHER_SESSIONS_LOGGED_OUT = "OTHER_SESSIONS_LOGGED_OUT", "Other Sessions Logged Out"
+        LOGIN = "LOGIN", "User Login"
+        LOGOUT = "LOGOUT", "User Logout"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="security_audit_logs")
+    action = models.CharField(max_length=50, choices=Action.choices)
+    ip_address = models.CharField(max_length=45, blank=True)
+    user_agent = models.TextField(blank=True)
+    details = models.TextField(blank=True)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        verbose_name = "Security Audit Log"
+        verbose_name_plural = "Security Audit Logs"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_action_display()} at {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+def log_security_event(user, action, request=None, details=""):
+    ip_address = ""
+    user_agent = ""
+    if request:
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip_address = x_forwarded_for.split(",")[0].strip()
+        else:
+            ip_address = request.META.get("REMOTE_ADDR", "")
+        user_agent = request.META.get("HTTP_USER_AGENT", "")
+    return SecurityAuditLog.objects.create(
+        user=user,
+        action=action,
+        ip_address=ip_address,
+        user_agent=user_agent,
+        details=details
+    )
+
 

@@ -1,270 +1,581 @@
 {% extends "leads/base.html" %}
 {% block title %}{{ lead.name }} — Customer Details{% endblock %}
 
+{% block extra_css %}
+<style>
+/* 🎨 FLUID & FULLY RESPONSIVE CRM DESIGN SYSTEM (320px - 4K) */
+.lead-detail-wrapper {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+/* Single Vertical Stack Grid Layout (One Below The Other) */
+.lead-detail-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+.card {
+  align-self: start;
+  height: fit-content;
+  background: var(--bg);
+  border-radius: 20px;
+  box-shadow: 10px 10px 24px var(--sd), -10px -10px 24px var(--sl);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-sizing: border-box;
+  width: 100% !important;
+}
+
+/* Customer Hero Header Card */
+.hero-card {
+  background: var(--bg);
+  border-radius: 22px;
+  box-shadow: 10px 10px 24px var(--sd), -10px -10px 24px var(--sl);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  align-self: start;
+  height: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  width: 100% !important;
+}
+
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, #4F7FFA, #7B5FFF, #25D366);
+}
+
+.customer-header-box {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.customer-avatar {
+  width: 68px; height: 68px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #4F7FFA, #3b82f6);
+  color: #fff;
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 20px rgba(79,127,250,0.38);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Stat Cards & Call Summary */
+.summary-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  text-align: center;
+  width: 100%;
+}
+
+.summary-stat-box {
+  padding: 14px 12px;
+  border-radius: 16px;
+  background: var(--bg);
+  box-shadow: inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+.summary-stat-box:hover {
+  transform: translateY(-2px);
+}
+
+.summary-stat-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.summary-stat-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+/* 1-Tap Response Grid */
+.response-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.response-btn {
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 0.83rem;
+  border-radius: 14px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: var(--bg);
+  box-shadow: 4px 4px 10px var(--sd), -4px -4px 10px var(--sl);
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.response-btn:hover {
+  box-shadow: 2px 2px 6px var(--sd), -2px -2px 6px var(--sl);
+  transform: translateY(-1px);
+}
+.response-btn:active {
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+  transform: translateY(0);
+}
+
+/* Meta Pill Badges */
+.meta-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  word-break: break-word;
+}
+
+/* Primary Action CTA Group */
+.primary-actions-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+/* 📱 PHONE FRAME FIT OVERRIDES (< 576px) */
+@media (max-width: 576px) {
+  .lead-detail-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  .lead-detail-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+  .hero-card, .card {
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .customer-header-box {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .customer-header-box h1 {
+    font-size: 1.25rem !important;
+    word-break: break-word !important;
+  }
+
+  .customer-header-box a {
+    font-size: 0.95rem !important;
+    word-break: break-all !important;
+  }
+
+  .meta-pills-wrap {
+    justify-content: center !important;
+  }
+
+  .meta-pill {
+    font-size: 0.72rem !important;
+    padding: 4px 10px !important;
+  }
+
+  .primary-actions-group {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .primary-actions-group button, .primary-actions-group a {
+    font-size: 0.88rem !important;
+    padding: 12px 14px !important;
+    width: 100% !important;
+  }
+
+  .summary-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .summary-stat-box {
+    padding: 10px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .summary-stat-label {
+    font-size: 0.72rem !important;
+    text-align: left !important;
+  }
+
+  .summary-stat-val {
+    font-size: 0.95rem !important;
+    margin-top: 0 !important;
+    text-align: right !important;
+  }
+
+  .response-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .response-btn {
+    font-size: 0.8rem !important;
+    padding: 10px 12px !important;
+    width: 100% !important;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="mobile-container" style="max-width: 600px; margin: 0 auto; padding-bottom: 40px;">
+<div class="lead-detail-wrapper">
   
-  <!-- Back Button Header -->
-  <div class="d-flex align-center justify-between mb-3">
-    <a href="javascript:history.back()" class="btn-neu btn-neu-sm" style="font-weight:600; display:inline-flex; align-items:center; gap:6px;">
-      <i class="bi bi-arrow-left"></i> Back
+  <!-- Back Button & Header Toolbar -->
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <a href="javascript:history.back()" class="btn-neu btn-neu-sm" style="font-weight:700; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:14px; text-decoration:none; color:var(--text);">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
     </a>
-    <span class="badge-pill badge-accent" style="font-size:.72rem;">
-      <i class="bi bi-person-check me-1"></i> {{ lead.assignee_display }}
-    </span>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      {% if lead.priority == 'HOT' %}<span class="badge-pill badge-hot" style="box-shadow:0 4px 12px rgba(239,68,68,0.25);">🔥 Hot Lead</span>
+      {% elif lead.priority == 'WARM' %}<span class="badge-pill badge-warm" style="box-shadow:0 4px 12px rgba(245,158,11,0.25);">🟡 Warm Lead</span>
+      {% else %}<span class="badge-pill badge-cold">🔵 Cold Lead</span>{% endif %}
+
+      <span class="badge-pill badge-muted" id="leadStatusBadge">Status: {{ lead.get_status_display }}</span>
+      <span class="badge-pill badge-accent" style="font-size:.78rem; font-weight:700;">
+        <i class="bi bi-person-check me-1"></i> {{ lead.assignee_display }}
+      </span>
+    </div>
   </div>
 
-  <!-- Primary Customer Header Card -->
-  <div class="card mb-3 fade-in" style="padding: 22px; text-align: center; border-radius: 20px;">
-    <!-- Avatar Initials -->
-    <div class="avatar" style="width:64px; height:64px; font-size:1.6rem; font-weight:800; background:linear-gradient(135deg, var(--accent), #3b82f6); color:#fff; border-radius:18px; display:flex; align-items:center; justify-content:center; margin: 0 auto 12px; box-shadow:0 6px 16px rgba(79,127,250,0.35);">
-      {{ lead.name|slice:":2"|upper }}
+  <!-- SINGLE VERTICAL COLUMN FLOW (Cards Stacked One Below The Other) -->
+  <div class="lead-detail-grid">
+      
+    <!-- CARD 1: Customer Hero Card -->
+    <div class="hero-card fade-in">
+      <div class="customer-header-box mb-3">
+        <!-- Avatar Initials -->
+        <div class="customer-avatar">
+          {{ lead.name|slice:":2"|upper }}
+        </div>
+
+        <div style="flex:1; min-width:200px;">
+          <!-- Customer Name -->
+          <h1 style="font-size:1.55rem; font-weight:800; color:var(--text); margin-bottom:4px;">
+            {{ lead.name }}
+          </h1>
+          
+          <!-- Phone Link + Copy Button -->
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="tel:{{ lead.phone }}" onclick="initiateCustomerCall('{{ lead.phone }}')" style="font-size:1.2rem; font-weight:800; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="bi bi-telephone-fill"></i> {{ lead.phone }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Metadata Pills (Email, Education, College, Course, Branch) -->
+      <div class="meta-pills-wrap mb-4">
+        {% if lead.email and lead.email|lower != 'nan' and lead.email|lower != 'none' %}
+        <div class="meta-pill"><i class="bi bi-envelope text-accent"></i> {{ lead.email }}</div>
+        {% endif %}
+        {% if lead.education and lead.education|lower != 'nan' and lead.education|lower != 'none' %}
+        <div class="meta-pill"><i class="bi bi-mortarboard text-accent"></i> {{ lead.education }}</div>
+        {% endif %}
+        {% if lead.college and lead.college|lower != 'nan' and lead.college|lower != 'none' %}
+        <div class="meta-pill"><i class="bi bi-building text-accent"></i> {{ lead.college }}</div>
+        {% endif %}
+        {% if lead.interested_course %}
+        <div class="meta-pill" style="color:var(--accent); font-weight:700;"><i class="bi bi-journal-bookmark-fill me-1"></i> {{ lead.interested_course.course_name }}</div>
+        {% endif %}
+        {% if lead.preferred_branch %}
+        <div class="meta-pill"><i class="bi bi-geo-alt text-accent"></i> {{ lead.preferred_branch.branch_name }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Primary Call & WhatsApp CTAs -->
+      <div class="primary-actions-group">
+        <button type="button" onclick="initiateCustomerCall('{{ lead.phone }}')" class="btn-neu" style="background:linear-gradient(135deg,#10B981,#059669); color:#ffffff !important; font-weight:800; font-size:1.02rem; padding:13px 20px; border-radius:16px; box-shadow:0 6px 18px rgba(16,185,129,0.38); display:flex; align-items:center; justify-content:center; gap:8px; border:none; cursor:pointer; transition:transform 0.15s ease;">
+          <i class="bi bi-telephone-fill" style="font-size:1.15rem;"></i> 📞 CALL CUSTOMER
+        </button>
+        
+        <a href="{% url 'lead_whatsapp' lead.id %}" class="btn-neu" style="background:linear-gradient(135deg,#25D366,#128C7E); color:#ffffff !important; font-weight:800; font-size:1.02rem; padding:13px 20px; border-radius:16px; box-shadow:0 6px 18px rgba(37,211,102,0.38); display:flex; align-items:center; justify-content:center; gap:8px; border:none; text-decoration:none; transition:transform 0.15s ease;">
+          <i class="bi bi-whatsapp" style="font-size:1.2rem;"></i> 💬 WHATSAPP
+        </a>
+      </div>
     </div>
 
-    <!-- Customer Name -->
-    <h1 style="font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:4px;">
-      {{ lead.name }}
-    </h1>
-
-    <!-- Phone Number Link -->
-    <div style="margin-bottom:12px;">
-      <a href="tel:{{ lead.phone }}" onclick="initiateCustomerCall('{{ lead.phone }}')" style="font-size:1.15rem; font-weight:800; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-        <i class="bi bi-telephone-fill"></i> {{ lead.phone }}
-      </a>
+    <!-- CARD 2: Call Summary Card -->
+    <div class="card fade-in" style="padding:22px; border-radius:20px;">
+      <div class="section-title mb-3" style="font-size:.85rem; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:800; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+        <i class="bi bi-bar-chart-line-fill text-accent"></i>
+        <span>CALL SUMMARY</span>
+        <span style="font-size:.72rem; font-weight:600; text-transform:none; color:var(--text-muted);">(Unique Customer vs Attempts)</span>
+      </div>
+      <div class="summary-stats-grid">
+        <div class="summary-stat-box">
+          <div class="summary-stat-label">CONTACTED (UNIQUE)</div>
+          <div class="summary-stat-val" style="color:{% if lead.contacted or call_logs.exists %}#10B981{% else %}var(--text-muted){% endif %};" id="summaryContactedStatus">
+            {% if lead.contacted or call_logs.exists %}Yes{% else %}No{% endif %}
+          </div>
+        </div>
+        <div class="summary-stat-box">
+          <div class="summary-stat-label">CALL ATTEMPTS</div>
+          <div class="summary-stat-val" style="color:var(--accent);" id="summaryTotalCalls">{{ call_logs.count }}</div>
+        </div>
+        <div class="summary-stat-box">
+          <div class="summary-stat-label">CURRENT RESPONSE</div>
+          <div class="summary-stat-val" style="color:var(--text);" id="summaryLastResponse">
+            {{ lead.current_response|default:"Not Contacted" }}
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Course Badge (Only if available) -->
-    {% if lead.interested_course %}
-    <div style="margin-bottom:12px;">
-      <span class="badge-pill badge-accent" style="font-size:.85rem; padding:6px 14px; font-weight:700;">
-        <i class="bi bi-journal-bookmark-fill me-1"></i> {{ lead.interested_course.course_name }}
-      </span>
+    <!-- CARD 3: Customer Response Panel Card -->
+    <div class="card fade-in" id="customerResponseCard" style="padding:24px; border-radius:22px;">
+      <div class="mb-3">
+        <h2 style="font-weight:800; font-size:1.1rem; color:var(--text); margin:0;">CUSTOMER RESPONSE</h2>
+        <div style="font-size:.78rem; color:var(--text-muted); margin-top:2px;">Select response outcome after calling {{ lead.name }}</div>
+      </div>
+
+      <!-- 1-Tap Response Buttons Grid -->
+      <div class="response-grid mb-3">
+        <button type="button" class="response-btn" onclick="selectResponse('INTERESTED')" style="color:#10b981;">
+          <span>✅</span> Interested
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('CALL_BACK')" style="color:#d97706;">
+          <span>📅</span> Call Back
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('NOT_INTERESTED')" style="color:#ef4444;">
+          <span>❌</span> Not Interested
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('NOT_ATTENDED')" style="color:#6b7280;">
+          <span>📵</span> Not Attended
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('BUSY')" style="color:#6b7280;">
+          <span>🔕</span> Busy
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('SWITCHED_OFF')" style="color:#6b7280;">
+          <span>📴</span> Switched Off
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('WRONG_NUMBER')" style="color:#ef4444;">
+          <span>❓</span> Wrong Number
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('INVALID_NUMBER')" style="color:#ef4444;">
+          <span>🚫</span> Invalid Number
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('CONNECTED')" style="color:#3b82f6;">
+          <span>☎️</span> Connected
+        </button>
+
+        <button type="button" class="response-btn" onclick="selectResponse('CONVERTED')" style="color:#10b981;">
+          <span>🎉</span> Converted
+        </button>
+      </div>
+
+      <!-- Conditional Interested / Call Back Details Form -->
+      <div id="extraResponseDetails" style="display:none; padding:18px; border-radius:18px; background:var(--bg); box-shadow:inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);">
+        <div style="font-weight:800; font-size:.88rem; color:var(--text); margin-bottom:14px;" id="extraDetailsTitle">Additional Call Details</div>
+        
+        <div class="mb-3" id="courseFieldGroup">
+          <label class="form-label" style="font-size:.75rem; font-weight:700; color:var(--text-muted);">Interested Course</label>
+          <select id="respCourse" style="padding:10px 14px; font-size:.85rem; border-radius:12px; width:100%; border:none; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); color:var(--text); outline:none;">
+            <option value="">Select Course...</option>
+            {% for c in courses %}
+            <option value="{{ c.id }}" {% if lead.interested_course_id == c.id %}selected{% endif %}>{{ c.course_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3" id="branchFieldGroup">
+          <label class="form-label" style="font-size:.75rem; font-weight:700; color:var(--text-muted);">Preferred Branch</label>
+          <select id="respBranch" style="padding:10px 14px; font-size:.85rem; border-radius:12px; width:100%; border:none; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); color:var(--text); outline:none;">
+            <option value="">Select Branch...</option>
+            {% for b in branches %}
+            <option value="{{ b.id }}" {% if lead.preferred_branch_id == b.id %}selected{% endif %}>{{ b.branch_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid-2 gap-2 mb-3" id="followupFieldGroup" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label class="form-label" style="font-size:.75rem; font-weight:700; color:var(--text-muted);">Follow-up Date</label>
+            <input type="date" id="respFollowupDate" style="padding:10px; font-size:.82rem; border-radius:12px; width:100%; border:none; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); color:var(--text); outline:none;">
+          </div>
+          <div>
+            <label class="form-label" style="font-size:.75rem; font-weight:700; color:var(--text-muted);">Follow-up Time</label>
+            <input type="time" id="respFollowupTime" value="10:30" style="padding:10px; font-size:.82rem; border-radius:12px; width:100%; border:none; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); color:var(--text); outline:none;">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.75rem; font-weight:700; color:var(--text-muted);">Short Note</label>
+          <input type="text" id="respNotes" placeholder="Optional notes..." style="padding:10px 14px; font-size:.85rem; border-radius:12px; width:100%; border:none; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); color:var(--text); outline:none;">
+        </div>
+
+        <button type="button" onclick="submitExtraDetails()" class="btn-neu btn-accent w-100 mt-2" style="font-weight:800; font-size:.88rem; padding:12px; border-radius:14px; border:none; cursor:pointer; background:var(--accent); color:#fff; box-shadow:0 6px 16px rgba(79,127,250,0.38);">
+          <i class="bi bi-check-circle me-1"></i> Save Response Details
+        </button>
+      </div>
+    </div>
+
+    <!-- CARD 4: Next Follow-up Scheduled Card -->
+    {% if next_followup %}
+    <div class="card fade-in" id="followupCard" style="padding:20px 24px; border-radius:20px; border-left: 6px solid var(--accent); background:linear-gradient(135deg, rgba(79,127,250,0.06), transparent);">
+      <div class="section-title mb-2" style="font-size:.85rem; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:800;">
+        <i class="bi bi-calendar-event text-accent me-1"></i> Next Follow-up Scheduled
+      </div>
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+          <div style="font-size:1.2rem; font-weight:800; color:var(--text);" id="followupDisplayDate">
+            📅 {{ next_followup.scheduled_date|date:"d M Y" }}
+          </div>
+          <div style="font-size:1.1rem; font-weight:800; color:var(--accent);" id="followupDisplayTime">
+            ⏰ {{ next_followup.scheduled_date|date:"H:i" }}
+          </div>
+        </div>
+        <span class="badge-pill badge-warm" style="font-weight:700;">{{ next_followup.status }}</span>
+      </div>
+    </div>
+    {% else %}
+    <div class="card fade-in" id="followupCard" style="padding:20px 24px; border-radius:20px; display:none; border-left: 6px solid var(--accent); background:linear-gradient(135deg, rgba(79,127,250,0.06), transparent);">
+      <div class="section-title mb-2" style="font-size:.85rem; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:800;">
+        <i class="bi bi-calendar-event text-accent me-1"></i> Next Follow-up Scheduled
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size:1.2rem; font-weight:800; color:var(--text);" id="followupDisplayDate"></div>
+        <div style="font-size:1.1rem; font-weight:800; color:var(--accent);" id="followupDisplayTime"></div>
+      </div>
     </div>
     {% endif %}
 
-    <!-- Status & Priority Badges -->
-    <div class="d-flex align-center justify-center gap-2 mb-3 flex-wrap">
-      {% if lead.priority == 'HOT' %}<span class="badge-pill badge-hot">🔥 Hot</span>
-      {% elif lead.priority == 'WARM' %}<span class="badge-pill badge-warm">🟡 Warm</span>
-      {% else %}<span class="badge-pill badge-cold">🔵 Cold</span>{% endif %}
-
-      <span class="badge-pill badge-muted" id="leadStatusBadge">Status: {{ lead.get_status_display }}</span>
-      <span class="badge-pill badge-accent" style="font-size:.78rem;">Lead Score: {{ lead.lead_score }}</span>
-    </div>
-
-    <!-- Large Primary CALL CUSTOMER Button -->
-    <button type="button" onclick="initiateCustomerCall('{{ lead.phone }}')" class="btn-neu w-100" style="background:linear-gradient(135deg,#22C55E,#16A34A); color:#ffffff !important; font-weight:800; font-size:1.1rem; padding:14px; border-radius:14px; box-shadow:0 6px 18px rgba(34,197,94,0.4); display:flex; align-items:center; justify-content:center; gap:10px; border:none; margin-top:8px;">
-      <i class="bi bi-telephone-fill" style="font-size:1.3rem;"></i> 📞 CALL CUSTOMER
-    </button>
-  </div>
-
-  <!-- CALL SUMMARY CARD -->
-  <div class="card mb-3 fade-in" style="padding:16px 20px; border-radius:16px;">
-    <div class="section-title mb-2" style="font-size:.9rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
-      <i class="bi bi-bar-chart-line-fill text-accent me-1"></i> Call Summary (Unique Customer vs Attempts)
-    </div>
-    <div class="grid-3" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; text-align:center;">
-      <div style="padding:10px; border-radius:12px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl);">
-        <div style="font-size:.68rem; color:var(--text-muted); font-weight:600;">CONTACTED (UNIQUE)</div>
-        <div style="font-size:1.1rem; font-weight:800; color:{% if lead.contacted or call_logs.exists %}#16A34A{% else %}var(--text-muted){% endif %}; margin-top:2px;">
-          {% if lead.contacted or call_logs.exists %}Yes (1 Count){% else %}No (0 Count){% endif %}
+    <!-- CARD 5: Customer Call History Log Card -->
+    <div class="card fade-in" style="padding:22px; border-radius:20px;">
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div class="section-title" style="font-size:.88rem; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:800; margin:0;">
+          <i class="bi bi-telephone-history-fill text-accent me-2"></i> Customer Call History Log
         </div>
-      </div>
-      <div style="padding:10px; border-radius:12px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl);">
-        <div style="font-size:.68rem; color:var(--text-muted); font-weight:600;">CALL ATTEMPTS</div>
-        <div style="font-size:1.2rem; font-weight:800; color:var(--accent);" id="summaryTotalCalls">{{ call_logs.count }}</div>
-      </div>
-      <div style="padding:10px; border-radius:12px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl);">
-        <div style="font-size:.68rem; color:var(--text-muted); font-weight:600;">CURRENT RESPONSE</div>
-        <div style="font-size:.82rem; font-weight:700; color:var(--text); margin-top:4px;" id="summaryLastResponse">
-          {{ lead.current_response|default:"Not Contacted" }}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NEXT FOLLOW-UP CARD (Only if available) -->
-  {% if next_followup %}
-  <div class="card mb-3 fade-in" id="followupCard" style="padding:16px 20px; border-radius:16px; border-left: 4px solid var(--accent);">
-    <div class="section-title mb-2" style="font-size:.9rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
-      <i class="bi bi-calendar-event text-accent me-1"></i> Next Follow-up
-    </div>
-    <div class="d-flex align-center justify-between">
-      <div class="d-flex align-center gap-3">
-        <div style="font-size:1.1rem; font-weight:800; color:var(--text);" id="followupDisplayDate">
-          📅 {{ next_followup.scheduled_date|date:"d M Y" }}
-        </div>
-        <div style="font-size:1rem; font-weight:700; color:var(--accent);" id="followupDisplayTime">
-          ⏰ {{ next_followup.scheduled_date|date:"H:i" }}
-        </div>
-      </div>
-      <span class="badge-pill badge-warm">{{ next_followup.status }}</span>
-    </div>
-  </div>
-  {% else %}
-  <div class="card mb-3 fade-in" id="followupCard" style="padding:16px 20px; border-radius:16px; display:none; border-left: 4px solid var(--accent);">
-    <div class="section-title mb-2" style="font-size:.9rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
-      <i class="bi bi-calendar-event text-accent me-1"></i> Next Follow-up
-    </div>
-    <div class="d-flex align-center gap-3">
-      <div style="font-size:1.1rem; font-weight:800; color:var(--text);" id="followupDisplayDate"></div>
-      <div style="font-size:1rem; font-weight:700; color:var(--accent);" id="followupDisplayTime"></div>
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- RECENT ACTIVITY CARD -->
-  <div class="card mb-3 fade-in" style="padding:16px 20px; border-radius:16px;">
-    <div class="section-title mb-3" style="font-size:.9rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
-      <i class="bi bi-activity text-accent me-1"></i> Recent Activity
-    </div>
-    <div class="timeline" id="activityTimeline" style="margin-top:4px;">
-      {% for act in activities %}
-      <div class="timeline-item" style="padding-bottom:10px;">
-        <div class="timeline-dot ok"></div>
-        <div class="timeline-time" style="font-size:.72rem;">{{ act.timestamp|date:"d M, H:i" }}</div>
-        <div class="timeline-content" style="font-size:.8rem;">
-          <span style="font-weight:600;">{{ act.description }}</span>
-        </div>
-      </div>
-      {% empty %}
-      <div style="text-align:center; color:var(--text-muted); font-size:.8rem; padding:12px;">No activity logged yet.</div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- CALL HISTORY CARD -->
-  <div class="card mb-3 fade-in" style="padding:16px 20px; border-radius:16px;">
-    <div class="section-title mb-3" style="font-size:.9rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
-      <i class="bi bi-telephone-history text-accent me-1"></i> Call History
-    </div>
-    <div style="display:flex; flex-direction:column; gap:8px;" id="callHistoryList">
-      {% for c in call_logs %}
-      <div style="display:flex; align-items:center; justify-content:between; padding:8px 12px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); font-size:.82rem;">
-        <span style="color:var(--text-muted); font-size:.78rem;">{{ c.call_time|date:"d M, H:i" }}</span>
-        <span class="badge-pill badge-ok" style="font-size:.75rem;">{{ c.get_call_result_display }}</span>
-      </div>
-      {% empty %}
-      <div style="text-align:center; color:var(--text-muted); font-size:.8rem; padding:12px;">No past calls logged.</div>
-      {% endfor %}
-    </div>
-  </div>
-
-</div>
-
-<!-- ══ ONE-TAP MOBILE RESPONSE BOTTOM SHEET / MODAL ══ -->
-<div class="modal fade" id="quickResponseModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-bottom modal-dialog-centered" style="margin: bottom 0; max-width: 500px;">
-    <div class="modal-content" style="border-radius:24px 24px 0 0; padding:20px 16px; border:none; box-shadow:0 -10px 30px rgba(0,0,0,0.3);">
-      
-      <div class="modal-header border-0 pb-2">
-        <div>
-          <h5 class="modal-title" style="font-weight:800; font-size:1.1rem; color:var(--text);">CUSTOMER RESPONSE</h5>
-          <div style="font-size:.75rem; color:var(--text-muted);">Select the response after calling {{ lead.name }}</div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <span class="badge-pill badge-accent" style="font-size:.78rem; font-weight:800;">{{ call_logs.count }} Call Attempt{% if call_logs.count != 1 %}s{% endif %}</span>
       </div>
 
-      <div class="modal-body p-0 pt-2">
-        <!-- 1-Tap Response Grid (11 Options) -->
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:16px;">
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('INTERESTED')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#16a34a; display:flex; align-items:center; gap:8px;">
-            <span>✅</span> Interested
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('CALL_BACK')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#d97706; display:flex; align-items:center; gap:8px;">
-            <span>📅</span> Call Back
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('NOT_INTERESTED')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#dc2626; display:flex; align-items:center; gap:8px;">
-            <span>❌</span> Not Interested
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('NOT_ATTENDED')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#4b5563; display:flex; align-items:center; gap:8px;">
-            <span>📵</span> Not Attended
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('BUSY')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#4b5563; display:flex; align-items:center; gap:8px;">
-            <span>🔕</span> Busy
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('SWITCHED_OFF')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#4b5563; display:flex; align-items:center; gap:8px;">
-            <span>📴</span> Switched Off
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('WRONG_NUMBER')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#dc2626; display:flex; align-items:center; gap:8px;">
-            <span>❓</span> Wrong Number
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('INVALID_NUMBER')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#dc2626; display:flex; align-items:center; gap:8px;">
-            <span>🚫</span> Invalid Number
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('CONNECTED')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#2563eb; display:flex; align-items:center; gap:8px;">
-            <span>☎️</span> Connected
-          </button>
-
-          <button type="button" class="btn-neu response-btn" onclick="selectResponse('CONVERTED')" style="padding:12px; font-weight:700; font-size:.85rem; border-radius:12px; text-align:left; color:#16a34a; display:flex; align-items:center; gap:8px;">
-            <span>🎉</span> Converted
-          </button>
-        </div>
-
-        <!-- Conditional Interested / Call Back Details Form -->
-        <div id="extraResponseDetails" style="display:none; padding:14px; border-radius:14px; background:var(--bg); box-shadow:inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl); margin-bottom:14px;">
-          <div style="font-weight:700; font-size:.82rem; color:var(--text); margin-bottom:10px;" id="extraDetailsTitle">Additional Call Details</div>
-          
-          <div class="mb-2" id="courseFieldGroup">
-            <label class="form-label" style="font-size:.72rem;">Interested Course</label>
-            <select id="respCourse" style="padding:6px 10px; font-size:.8rem;">
-              <option value="">Select Course...</option>
-              {% for c in courses %}
-              <option value="{{ c.id }}" {% if lead.interested_course_id == c.id %}selected{% endif %}>{{ c.course_name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="mb-2" id="branchFieldGroup">
-            <label class="form-label" style="font-size:.72rem;">Preferred Branch</label>
-            <select id="respBranch" style="padding:6px 10px; font-size:.8rem;">
-              <option value="">Select Branch...</option>
-              {% for b in branches %}
-              <option value="{{ b.id }}" {% if lead.preferred_branch_id == b.id %}selected{% endif %}>{{ b.branch_name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="grid-2 gap-2 mb-2" id="followupFieldGroup">
-            <div>
-              <label class="form-label" style="font-size:.72rem;">Follow-up Date</label>
-              <input type="date" id="respFollowupDate" style="padding:6px 10px; font-size:.8rem;">
+      <div style="display:flex; flex-direction:column; gap:12px;" id="callHistoryList">
+        {% for c in call_logs %}
+        <div style="padding:14px 16px; border-radius:16px; background:var(--bg); box-shadow:inset 3px 3px 7px var(--sd), inset -3px -3px 7px var(--sl); font-size:.85rem; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-weight:700; color:var(--text);"><i class="bi bi-person-circle text-accent me-1"></i>{{ c.caller.get_full_name|default:c.caller.username }}</span>
+              <span style="color:var(--text-muted); font-size:.78rem; font-weight:600;"><i class="bi bi-clock me-1"></i>{{ c.call_time|date:"d M Y, h:i A" }}</span>
             </div>
-            <div>
-              <label class="form-label" style="font-size:.72rem;">Follow-up Time</label>
-              <input type="time" id="respFollowupTime" value="10:30" style="padding:6px 10px; font-size:.8rem;">
-            </div>
+            <span class="badge-pill {% if c.call_result == 'INTERESTED' or c.call_result == 'CONVERTED' %}badge-hot{% elif c.call_result == 'CALLBACK_REQUESTED' or c.call_result == 'CALL_BACK' %}badge-warm{% elif c.call_result == 'NOT_INTERESTED' or c.call_result == 'WRONG_NUMBER' or c.call_result == 'INVALID_NUMBER' %}badge-cold{% else %}badge-muted{% endif %}" style="font-size:.78rem; font-weight:800;">
+              {{ c.get_call_result_display }}
+            </span>
           </div>
-
-          <div class="mb-2">
-            <label class="form-label" style="font-size:.72rem;">Short Note</label>
-            <input type="text" id="respNotes" placeholder="Optional notes..." style="padding:6px 10px; font-size:.8rem;">
+          {% if c.duration_seconds > 0 or c.remarks %}
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:2px; font-size:.8rem; color:var(--text-muted);">
+            {% if c.duration_seconds > 0 %}
+            <span><i class="bi bi-stopwatch me-1"></i>{{ c.duration_seconds }} sec</span>
+            {% endif %}
+            {% if c.remarks %}
+            <span style="font-style:italic; color:var(--text);"><i class="bi bi-chat-left-text me-1"></i>"{{ c.remarks }}"</span>
+            {% endif %}
           </div>
-
-          <button type="button" onclick="submitExtraDetails()" class="btn-neu btn-accent w-100 mt-2" style="font-weight:700; font-size:.85rem; padding:10px;">
-            <i class="bi bi-check-circle me-1"></i> Save Response Details
-          </button>
+          {% endif %}
         </div>
-
+        {% empty %}
+        <div class="empty-log-notice" style="text-align:center; color:var(--text-muted); font-size:.85rem; padding:20px; border-radius:14px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl);">
+          <i class="bi bi-telephone-x me-1"></i> No past customer call history recorded yet.
+        </div>
+        {% endfor %}
       </div>
-
     </div>
+
+    <!-- CARD 6: Audit Activity Timeline Card -->
+    <div class="card fade-in" style="padding:22px; border-radius:20px;">
+      <div class="section-title mb-3" style="font-size:.85rem; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:800;">
+        <i class="bi bi-activity text-accent me-1"></i> Audit Activity Timeline
+      </div>
+      <div class="timeline" id="activityTimeline" style="margin-top:6px;">
+        {% for act in activities %}
+        <div class="timeline-item" style="padding-bottom:14px;">
+          <div class="timeline-dot ok"></div>
+          <div class="timeline-time" style="font-size:.76rem; font-weight:600;">{{ act.timestamp|date:"d M Y, h:i A" }}</div>
+          <div class="timeline-content" style="font-size:.85rem; font-weight:500;">
+            <span style="font-weight:700; color:var(--text);">{{ act.description }}</span>
+          </div>
+        </div>
+        {% empty %}
+        <div style="text-align:center; color:var(--text-muted); font-size:.85rem; padding:18px;">No audit activity logged yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+
   </div>
+
 </div>
 
 <!-- Small Confirmation Toast Notification -->
-<div id="toastNotification" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#16a34a; color:#fff; padding:10px 20px; border-radius:20px; font-weight:700; font-size:.85rem; display:none; z-index:9999; box-shadow:0 6px 16px rgba(0,0,0,0.25); align-items:center; gap:8px;">
-  <i class="bi bi-check-circle-fill"></i> <span id="toastMsg">Response saved</span>
+<div id="toastNotification" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:12px 24px; border-radius:30px; font-weight:800; font-size:.88rem; display:none; z-index:9999; box-shadow:0 8px 24px rgba(16,185,129,0.4); align-items:center; gap:10px;">
+  <i class="bi bi-check-circle-fill" style="font-size:1.1rem;"></i> <span id="toastMsg">Response saved</span>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -273,21 +584,21 @@ let currentCallSessionId = null;
 let selectedOutcome = null;
 let callStartTime = null;
 
+const currentUserName = "{{ request.user.get_full_name|default:request.user.username }}";
+
 // Initiates native phone dialer and generates unique idempotent call session ID
 function initiateCustomerCall(phone) {
-  // Generate idempotent session token: CS-<timestamp>-<rand>
   currentCallSessionId = "CS-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
   callStartTime = Date.now();
   
-  // Launch phone's native dialer
   window.location.href = "tel:" + phone;
   
-  // Show response bottom sheet after brief delay
   setTimeout(() => {
-    const modalEl = document.getElementById('quickResponseModal');
-    const bsModal = new bootstrap.Modal(modalEl);
-    bsModal.show();
-  }, 1000);
+    const cardEl = document.getElementById('customerResponseCard');
+    if (cardEl) {
+      cardEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, 400);
 }
 
 // Handles selection of response
@@ -298,7 +609,6 @@ function selectResponse(outcome) {
     document.getElementById('extraResponseDetails').style.display = 'block';
     document.getElementById('extraDetailsTitle').innerText = (outcome === 'INTERESTED') ? 'Interested Details' : 'Schedule Call Back';
     
-    // Show/hide course & branch fields
     if (outcome === 'CALL_BACK') {
       document.getElementById('courseFieldGroup').style.display = 'none';
       document.getElementById('branchFieldGroup').style.display = 'none';
@@ -307,7 +617,6 @@ function selectResponse(outcome) {
       document.getElementById('branchFieldGroup').style.display = 'block';
     }
     
-    // Set default follow up date to tomorrow if empty
     const dateInput = document.getElementById('respFollowupDate');
     if (!dateInput.value) {
       const tomorrow = new Date();
@@ -315,7 +624,6 @@ function selectResponse(outcome) {
       dateInput.value = tomorrow.toISOString().split('T')[0];
     }
   } else {
-    // Save immediately for all other outcomes (NOT_ATTENDED, BUSY, SWITCHED_OFF, WRONG_NUMBER, NOT_INTERESTED, etc.)
     sendQuickResponse({
       outcome: outcome,
       call_session_id: currentCallSessionId
@@ -356,32 +664,26 @@ function sendQuickResponse(payload) {
   .then(res => res.json())
   .then(data => {
     if (data.status === 'success') {
-      // Close modal
-      const modalEl = document.getElementById('quickResponseModal');
-      const bsModal = bootstrap.Modal.getInstance(modalEl);
-      if (bsModal) bsModal.hide();
+      showToast("✅ Response saved successfully");
 
-      // Show confirmation toast
-      showToast("✅ Response saved");
-
-      // Update UI dynamically
       if (data.new_status_display) {
         document.getElementById('leadStatusBadge').innerText = "Status: " + data.new_status_display;
       }
       
-      // Update Call Summary Total
       const totalEl = document.getElementById('summaryTotalCalls');
       if (totalEl && !data.idempotent) {
         totalEl.innerText = parseInt(totalEl.innerText || 0) + 1;
       }
 
-      const lastCallEl = document.getElementById('summaryLastCall');
-      if (lastCallEl) lastCallEl.innerText = "Today";
+      const contactedEl = document.getElementById('summaryContactedStatus');
+      if (contactedEl) {
+        contactedEl.innerText = "Yes";
+        contactedEl.style.color = "#10B981";
+      }
 
       const lastRespEl = document.getElementById('summaryLastResponse');
       if (lastRespEl) lastRespEl.innerText = payload.outcome.replace('_', ' ');
 
-      // Update Follow-up display if scheduled
       if (data.followup_date) {
         const fuCard = document.getElementById('followupCard');
         if (fuCard) {
@@ -394,9 +696,24 @@ function sendQuickResponse(payload) {
       // Add to Call History UI list dynamically
       const historyList = document.getElementById('callHistoryList');
       if (historyList) {
+        const emptyNotice = historyList.querySelector('.empty-log-notice');
+        if (emptyNotice) emptyNotice.remove();
+
         const newRow = document.createElement('div');
-        newRow.style.cssText = "display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-radius:10px; background:var(--bg); box-shadow:inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl); font-size:.82rem;";
-        newRow.innerHTML = `<span style="color:var(--text-muted); font-size:.78rem;">Just now</span><span class="badge-pill badge-ok" style="font-size:.75rem;">${payload.outcome.replace('_', ' ')}</span>`;
+        newRow.style.cssText = "padding:14px 16px; border-radius:16px; background:var(--bg); box-shadow:inset 3px 3px 7px var(--sd), inset -3px -3px 7px var(--sl); font-size:.85rem; display:flex; flex-direction:column; gap:6px;";
+        
+        const notesMarkup = payload.notes ? `<div style="display:flex; align-items:center; gap:12px; margin-top:2px; font-size:.8rem; color:var(--text-muted);"><span style="font-style:italic; color:var(--text);"><i class="bi bi-chat-left-text me-1"></i>"${payload.notes}"</span></div>` : '';
+
+        newRow.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-weight:700; color:var(--text);"><i class="bi bi-person-circle text-accent me-1"></i>${currentUserName}</span>
+              <span style="color:var(--text-muted); font-size:.78rem; font-weight:600;"><i class="bi bi-clock me-1"></i>Just now</span>
+            </div>
+            <span class="badge-pill badge-ok" style="font-size:.78rem; font-weight:800;">${payload.outcome.replace('_', ' ')}</span>
+          </div>
+          ${notesMarkup}
+        `;
         historyList.insertBefore(newRow, historyList.firstChild);
       }
     } else {
@@ -411,11 +728,13 @@ function sendQuickResponse(payload) {
 
 function showToast(msg) {
   const toast = document.getElementById('toastNotification');
-  document.getElementById('toastMsg').innerText = msg;
-  toast.style.display = 'flex';
-  setTimeout(() => {
-    toast.style.display = 'none';
-  }, 2500);
+  if (toast) {
+    document.getElementById('toastMsg').innerText = msg;
+    toast.style.display = 'flex';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2500);
+  }
 }
 </script>
 {% endblock %}

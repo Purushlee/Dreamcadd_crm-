@@ -63,22 +63,22 @@
           <!-- Stats Grid -->
           <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:14px; background:rgba(0,0,0,0.02); padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.04);">
             <div style="text-align:center;">
-              <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">ASSIGNED</div>
+              <div style="font-size:.65rem; color:var(--text-muted); font-weight:700;">ASSIGNED</div>
               <div style="font-size:1.1rem; font-weight:800; color:var(--accent);">{{ tc.assigned_count }}</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">WORKED</div>
-              <div style="font-size:1.1rem; font-weight:800; color:var(--success);">{{ tc.worked_count }}</div>
+              <div style="font-size:.65rem; color:var(--text-muted); font-weight:700;">CONTACTED (UNIQUE)</div>
+              <div style="font-size:1.1rem; font-weight:800; color:#16A34A;">{{ tc.unique_contacted_count }}</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:.7rem; color:var(--text-muted); font-weight:600;">PENDING</div>
+              <div style="font-size:.65rem; color:var(--text-muted); font-weight:700;">PENDING</div>
               <div style="font-size:1.1rem; font-weight:800; color:var(--warning);">{{ tc.pending_count }}</div>
             </div>
           </div>
 
           <!-- Secondary Metrics -->
           <div class="d-flex gap-2 mb-3 flex-wrap" style="font-size:.72rem;">
-            <span class="badge-pill badge-muted"><i class="bi bi-telephone me-1"></i> {{ tc.calls_count }} Calls</span>
+            <span class="badge-pill badge-muted" title="Total call attempts across all assigned leads"><i class="bi bi-telephone-out me-1"></i> {{ tc.calls_count }} Call Attempts</span>
             <span class="badge-pill badge-warm"><i class="bi bi-star me-1"></i> {{ tc.interested_count }} Interested</span>
             <span class="badge-pill badge-ok"><i class="bi bi-trophy me-1"></i> {{ tc.converted_count }} Converted</span>
           </div>
@@ -127,6 +127,25 @@
                 </div>
                 <button type="submit" name="update_caller_limits" value="1" class="btn-neu-sm btn-neu btn-accent w-100" style="font-size:.7rem; padding:4px 8px;">
                   <i class="bi bi-save me-1"></i> Save Targets
+                </button>
+              </form>
+
+              <!-- Credentials Edit Form -->
+              <form method="post" class="mb-2 pt-2 border-top">
+                {% csrf_token %}
+                <input type="hidden" name="caller_id" value="{{ tc.id }}">
+                <div class="grid-2 gap-2 mb-2">
+                  <div>
+                    <label class="form-label" style="font-size:.68rem;">Username</label>
+                    <input type="text" name="new_username" value="{{ tc.username }}" style="padding:4px 8px; font-size:.75rem;" required>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size:.68rem;">Reset Password</label>
+                    <input type="password" name="new_password" placeholder="Leave blank if unchanged" style="padding:4px 8px; font-size:.75rem;">
+                  </div>
+                </div>
+                <button type="submit" name="update_caller_credentials" value="1" class="btn-neu-sm btn-neu btn-accent w-100" style="font-size:.7rem; padding:4px 8px;">
+                  <i class="bi bi-key me-1"></i> Update Credentials
                 </button>
               </form>
 

@@ -141,3 +141,115 @@ class CallLogForm(forms.ModelForm):
             "duration_seconds": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Duration in seconds"}),
             "remarks": forms.Textarea(attrs={"class": "form-control", "rows": 2, "placeholder": "Call notes / discussion details..."}),
         }
+
+
+class ChangeUsernameForm(forms.Form):
+    current_username = forms.CharField(
+        label="Current Username",
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter your current username"})
+    )
+    current_password = forms.CharField(
+        label="Current Password",
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Enter your current password"})
+    )
+    new_username = forms.CharField(
+        label="New Username",
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter new username"})
+    )
+
+    def __init__(self, user=None, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_current_username(self):
+        current_username = self.cleaned_data.get("current_username", "").strip()
+        if self.user and current_username.lower() != self.user.username.lower():
+            raise forms.ValidationError("Current username does not match your active account username.")
+        return current_username
+
+    def clean_current_password(self):
+        current_password = self.cleaned_data.get("current_password")
+        if self.user and not self.user.check_password(current_password):
+            raise forms.ValidationError("Incorrect current password. Please try again.")
+        return current_password
+
+    def clean_new_username(self):
+        new_username = self.cleaned_data.get("new_username", "").strip()
+        if not new_username:
+            raise forms.ValidationError("New username cannot be empty.")
+        if self.user and new_username.lower() == self.user.username.lower():
+            raise forms.ValidationError("New username must be different from your current username.")
+
+        # Check uniqueness
+        if User.objects.filter(username__iexact=new_username).exclude(pk=self.user.pk if self.user else None).exists():
+            raise forms.ValidationError("This username is already taken. Please choose a different one.")
+        return new_username
+
+
+class ChangePasswordForm(forms.Form):
+    current_username = forms.CharField(
+        label="Current Username",
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter your current username"})
+    )
+    current_password = forms.CharField(
+        label="Current Password",
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Enter your current password"})
+    )
+    new_password = forms.CharField(
+        label="New Password",
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Enter new password"})
+    )
+    confirm_password = forms.CharField(
+        label="Confirm New Password",
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Confirm new password"})
+    )
+
+    def __init__(self, user=None, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_current_username(self):
+        current_username = self.cleaned_data.get("current_username", "").strip()
+        if self.user and current_username.lower() != self.user.username.lower():
+            raise forms.ValidationError("Current username does not match your active account username.")
+        return current_username
+
+    def clean_current_password(self):
+        current_password = self.cleaned_data.get("current_password")
+        if self.user and not self.user.check_password(current_password):
+            raise forms.ValidationError("Incorrect current password. Please try again.")
+        return current_password
+
+    def clean_new_password(self):
+        import re
+        new_password = self.cleaned_data.get("new_password")
+        if not new_password:
+            raise forms.ValidationError("New password cannot be empty.")
+        if len(new_password) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        if not re.search(r"[A-Z]", new_password):
+            raise forms.ValidationError("Password must contain at least one uppercase letter (A-Z).")
+        if not re.search(r"[a-z]", new_password):
+            raise forms.ValidationError("Password must contain at least one lowercase letter (a-z).")
+        if not re.search(r"[0-9]", new_password):
+            raise forms.ValidationError("Password must contain at least one number (0-9).")
+        if not re.search(r"[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]", new_password):
+            raise forms.ValidationError("Password must contain at least one special character (!@#$%^&* etc.).")
+        return new_password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+        if new_password and confirm_password and new_password != confirm_password:
+            self.add_error("confirm_password", "New passwords do not match.")
+        return cleaned_data
+

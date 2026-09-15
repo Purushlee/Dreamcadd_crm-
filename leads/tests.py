@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from leads.models import (
     CallLog, CompanySettings, Course, Followup, ImportBatch, Lead, LeadActivity,
-    TelecallerProfile, User, WhatsAppTemplate
+    TelecallerProfile, User, WhatsAppMessage, WhatsAppTemplate
 )
 from leads.services import assign_lead_round_robin, normalize_phone, process_incoming_whatsapp
 
@@ -133,6 +133,35 @@ class DreamCaddCoreTestCase(TestCase):
         self.assertEqual(lead.status, Lead.Status.INTERESTED)
         self.assertTrue(CallLog.objects.filter(lead=lead, caller=self.telecaller1, call_result=CallLog.Result.INTERESTED).exists())
         self.assertTrue(Followup.objects.filter(lead=lead, caller=self.telecaller1).exists())
+
+    def test_whatsapp_send_permission_control(self):
+        """
+        Verify security rule:
+        Telecaller 1 can send WhatsApp to their assigned lead (Kamesh),
+        but Telecaller 2 gets HTTP 403 Forbidden when trying to send WhatsApp to Kamesh.
+        """
+        kamesh = Lead.objects.create(name="Kamesh", phone="7092929658", assigned_to=self.telecaller1)
+
+        # Login as Telecaller 2 (unassigned owner)
+        self.client.login(username="caller2", password="callerpassword")
+        unauth_resp = self.client.post(
+            reverse("api_send_whatsapp", kwargs={"lead_id": kamesh.id}),
+            data={"message": "Unauthorized message"},
+            content_type="application/json"
+        )
+        self.assertEqual(unauth_resp.status_code, 403)
+        self.assertIn("Access Denied", unauth_resp.json()["message"])
+
+        # Login as Telecaller 1 (assigned owner)
+        self.client.login(username="caller1", password="callerpassword")
+        auth_resp = self.client.post(
+            reverse("api_send_whatsapp", kwargs={"lead_id": kamesh.id}),
+            data={"message": "Hello Kamesh, here are course details!"},
+            content_type="application/json"
+        )
+        self.assertEqual(auth_resp.status_code, 200)
+        self.assertEqual(auth_resp.json()["status"], "success")
+        self.assertEqual(WhatsAppMessage.objects.filter(lead=kamesh).count(), 1)
 
     def test_unassign_leads_and_export_history(self):
         """Test MD unassigning assigned leads back to unallocated pool and CSV export audit logging."""
@@ -284,6 +313,230 @@ class DreamCaddCoreTestCase(TestCase):
 
         # Verify unique count remains 1
         self.assertEqual(Lead.objects.filter(assigned_to=self.telecaller1, contacted=True).count(), 1)
+
+
+class SecurityAccountManagementTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.md_user = User.objects.create_user(
+            username="md_sec_user", password="StrongPassword123!", role=User.Role.MD, is_superuser=True
+        )
+        self.telecaller = User.objects.create_user(
+            username="caller_sec_user", password="CallerPassword123!", role=User.Role.TELECALLER
+        )
+
+    def test_account_settings_access_control(self):
+        """Test that MD can access My Account, but Telecallers receive 403 Forbidden."""
+        url = reverse("account_settings")
+
+        # Telecaller -> 403 Forbidden
+        self.client.login(username="caller_sec_user", password="CallerPassword123!")
+        resp_tele = self.client.get(url)
+        self.assertEqual(resp_tele.status_code, 403)
+
+        # MD -> 200 OK
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+        resp_md = self.client.get(url)
+        self.assertEqual(resp_md.status_code, 200)
+        self.assertIn("username_form", resp_md.context)
+
+    def test_change_username_success(self):
+        """Test changing username retains account data and creates SecurityAuditLog."""
+        from leads.models import SecurityAuditLog
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+
+        url = reverse("change_username")
+
+        # Wrong current password -> fail
+        resp_wrong_pass = self.client.post(url, {
+            "current_username": "md_sec_user",
+            "current_password": "WrongPassword!",
+            "new_username": "md_renamed_user"
+        })
+        self.assertEqual(resp_wrong_pass.status_code, 200)
+
+        # Wrong current username -> fail
+        resp_wrong_user = self.client.post(url, {
+            "current_username": "wrong_username",
+            "current_password": "StrongPassword123!",
+            "new_username": "md_renamed_user"
+        })
+        self.assertEqual(resp_wrong_user.status_code, 200)
+
+        # Valid payload -> success
+        resp = self.client.post(url, {
+            "current_username": "md_sec_user",
+            "current_password": "StrongPassword123!",
+            "new_username": "md_renamed_user"
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        self.md_user.refresh_from_db()
+        self.assertEqual(self.md_user.username, "md_renamed_user")
+        self.assertEqual(self.md_user.role, User.Role.MD)
+
+        # Audit log verification
+        audit_log = SecurityAuditLog.objects.filter(user=self.md_user, action=SecurityAuditLog.Action.USERNAME_CHANGED).first()
+        self.assertIsNotNone(audit_log)
+        self.assertIn("md_renamed_user", audit_log.details)
+
+    def test_change_username_duplicate_rejected(self):
+        """Test that attempting to rename to an existing username fails."""
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+
+        url = reverse("change_username")
+        resp = self.client.post(url, {
+            "current_username": "md_sec_user",
+            "current_password": "StrongPassword123!",
+            "new_username": "caller_sec_user"
+        })
+        self.assertEqual(resp.status_code, 200) # Form invalid, re-renders form
+
+        self.md_user.refresh_from_db()
+        self.assertEqual(self.md_user.username, "md_sec_user")
+
+    def test_change_password_complexity_and_logout(self):
+        """Test password change enforces current credentials verification, complexity rules, hashes password, and logs user out."""
+        from leads.models import SecurityAuditLog
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+
+        url = reverse("change_password")
+
+        # Wrong current username -> fail
+        resp_wrong_user = self.client.post(url, {
+            "current_username": "wrong_username",
+            "current_password": "StrongPassword123!",
+            "new_password": "NewStrongPass999!",
+            "confirm_password": "NewStrongPass999!"
+        })
+        self.assertEqual(resp_wrong_user.status_code, 200)
+
+        # Weak password (no special char, no uppercase) -> fail
+        resp_weak = self.client.post(url, {
+            "current_username": "md_sec_user",
+            "current_password": "StrongPassword123!",
+            "new_password": "simple",
+            "confirm_password": "simple"
+        })
+        self.assertEqual(resp_weak.status_code, 200)
+
+        # Valid strong password -> success & logout
+        resp_strong = self.client.post(url, {
+            "current_username": "md_sec_user",
+            "current_password": "StrongPassword123!",
+            "new_password": "NewStrongPass999!",
+            "confirm_password": "NewStrongPass999!"
+        })
+        self.assertEqual(resp_strong.status_code, 302)
+
+        self.md_user.refresh_from_db()
+        self.assertTrue(self.md_user.check_password("NewStrongPass999!"))
+
+        # Audit log verification
+        self.assertTrue(SecurityAuditLog.objects.filter(user=self.md_user, action=SecurityAuditLog.Action.PASSWORD_CHANGED).exists())
+
+    def test_logout_other_sessions(self):
+        """Test logout other sessions invalidates extra active sessions for the user."""
+        from django.contrib.sessions.models import Session
+        from leads.models import SecurityAuditLog
+
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+        current_session_key = self.client.session.session_key
+
+        url = reverse("logout_other_sessions")
+        resp = self.client.post(url)
+        self.assertEqual(resp.status_code, 302)
+
+        self.assertTrue(SecurityAuditLog.objects.filter(user=self.md_user, action=SecurityAuditLog.Action.OTHER_SESSIONS_LOGGED_OUT).exists())
+
+    def test_security_audit_log_view(self):
+        """Test security audit log page renders for MD user."""
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+        url = reverse("security_audit_log")
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("audit_logs", resp.context)
+
+    def test_admin_update_telecaller_credentials(self):
+        """Test Admin/MD updating a telecaller's username and password from manage_callers."""
+        self.client.login(username="md_sec_user", password="StrongPassword123!")
+        url = reverse("manage_callers")
+
+        payload = {
+            "update_caller_credentials": "1",
+            "caller_id": self.telecaller.id,
+            "new_username": "caller_renamed",
+            "new_password": "NewCallerPassword123!"
+        }
+        resp = self.client.post(url, payload)
+        self.assertEqual(resp.status_code, 302)
+
+        self.telecaller.refresh_from_db()
+        self.assertEqual(self.telecaller.username, "caller_renamed")
+        self.assertTrue(self.telecaller.check_password("NewCallerPassword123!"))
+
+    def test_telecaller_filters_and_not_answered_response_transition(self):
+        """Test telecaller dashboard context filter counts and Not Answered status transitions."""
+        l1 = Lead.objects.create(name="Lead Hot", phone="9111111111", assigned_to=self.telecaller, priority=Lead.Priority.HOT, status=Lead.Status.NEW)
+        l2 = Lead.objects.create(name="Lead Not Answered", phone="9222222222", assigned_to=self.telecaller, status=Lead.Status.NOT_CONNECTED, contacted=True)
+        l3 = Lead.objects.create(name="Lead Interested", phone="9333333333", assigned_to=self.telecaller, status=Lead.Status.INTERESTED, contacted=True)
+
+        Followup.objects.create(lead=l3, caller=self.telecaller, scheduled_date=timezone.now() + timezone.timedelta(days=1))
+
+        self.client.login(username="caller_sec_user", password="CallerPassword123!")
+        url = reverse("telecaller_dashboard")
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        # Context filter counts assertion
+        self.assertEqual(resp.context["hot_count"], 1)
+        self.assertEqual(resp.context["pending_leads_count"], 1)
+        self.assertEqual(resp.context["interested_count"], 1)
+        self.assertEqual(resp.context["followup_count"], 1)
+        self.assertEqual(resp.context["not_answered_count"], 1)
+
+        # Edit Not Answered lead to INTERESTED
+        edit_url = reverse("api_edit_response", kwargs={"lead_id": l2.id})
+        edit_resp = self.client.post(edit_url, data={"new_response": "INTERESTED", "notes": "Customer called back"}, content_type="application/json")
+        self.assertEqual(edit_resp.status_code, 200)
+
+        l2.refresh_from_db()
+        self.assertEqual(l2.status, Lead.Status.INTERESTED)
+        self.assertEqual(l2.current_response, "Interested 🟢")
+        self.assertTrue(l2.contacted)
+
+        # Re-query dashboard to verify updated counts
+        resp_updated = self.client.get(url)
+        self.assertEqual(resp_updated.context["interested_count"], 2)
+        self.assertEqual(resp_updated.context["not_answered_count"], 0)
+
+    def test_unique_contacted_count_vs_total_call_attempts(self):
+        """
+        Verify the exact metric rule:
+        5 call attempts to 1 customer (e.g. Kamesh) = 5 CallLogs (5 Call Attempts) but Unique Customers Contacted = 1.
+        """
+        lead = Lead.objects.create(name="Kamesh", phone="7092929658", assigned_to=self.telecaller)
+        self.client.login(username="caller_sec_user", password="CallerPassword123!")
+
+        outcomes = ["NOT_ANSWERED", "BUSY", "NOT_ANSWERED", "CONNECTED", "INTERESTED"]
+        for idx, outcome in enumerate(outcomes):
+            self.client.post(
+                reverse("api_quick_call_log", kwargs={"lead_id": lead.id}),
+                content_type="application/json",
+                data={"outcome": outcome, "call_duration": 10, "call_session_id": f"SESS-{idx}"}
+            )
+
+        lead.refresh_from_db()
+        self.assertEqual(CallLog.objects.filter(lead=lead).count(), 5)
+        self.assertTrue(lead.contacted)
+
+        resp = self.client.get(reverse("telecaller_dashboard"))
+        # 1 unique customer contacted despite 5 call attempts
+        self.assertEqual(resp.context["unique_contacted_count"], 1)
+        self.assertEqual(resp.context["total_call_attempts"], 5)
+
+
+
 
 
 

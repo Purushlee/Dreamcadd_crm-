@@ -730,12 +730,45 @@ input[type="file"], textarea, select {
 }
 
 @media (max-width: 576px) {
+  html, body {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  .topbar {
+    left: 0 !important;
+    right: 0 !important;
+    padding: 0 10px !important;
+  }
+  .topbar-greeting {
+    font-size: 0.75rem !important;
+    max-width: 130px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .topbar-actions {
+    gap: 6px !important;
+  }
+  .main-content {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  .page-body {
+    padding: 12px 8px 32px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .card {
+    padding: 14px 10px !important;
+    border-radius: 14px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
   .grid-stat { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
   .stat-card { padding: 12px 14px; }
   .stat-card-value { font-size: 1.35rem; }
   .stat-card-label { font-size: .68rem; }
   .stat-card-icon { width: 36px; height: 36px; font-size: 1rem; margin-bottom: 8px; }
-  .topbar-greeting { font-size: .8rem; }
   .btn-neu { padding: 8px 14px; font-size: .8rem; }
   .btn-neu-sm { padding: 6px 10px; font-size: .73rem; }
   .badge-pill { font-size: .65rem; padding: 3px 8px; }
@@ -766,7 +799,7 @@ input[type="file"], textarea, select {
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
-{% if user.is_authenticated %}
+{% if user.is_authenticated and request.resolver_match.url_name != 'login' %}
 
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar" id="sidebar">
@@ -784,12 +817,15 @@ input[type="file"], textarea, select {
       <a href="{% url 'md_dashboard' %}"       class="nav-item {% block nav_dashboard %}{% endblock %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
       <a href="{% url 'telecaller_dashboard' %}" class="nav-item {% block nav_telecaller_view %}{% endblock %}"><i class="bi bi-person-badge-fill"></i> Telecaller View</a>
       <a href="{% url 'bulk_allocate' %}"       class="nav-item {% block nav_leads %}{% endblock %}"><i class="bi bi-person-lines-fill"></i> Leads</a>
+      <a href="{% url 'schedule_leads' %}"    class="nav-item {% block nav_schedules %}{% endblock %}"><i class="bi bi-calendar-check-fill"></i> Daily Schedules & Targets</a>
       <a href="{% url 'manage_callers' %}"      class="nav-item {% block nav_callers %}{% endblock %}"><i class="bi bi-headset"></i> Callers</a>
       <a href="{% url 'manage_courses' %}"      class="nav-item {% block nav_courses %}{% endblock %}"><i class="bi bi-journal-bookmark-fill"></i> Courses</a>
       <div class="sidebar-section-label">Automation</div>
       <a href="{% url 'whatsapp_templates' %}"  class="nav-item {% block nav_whatsapp %}{% endblock %}"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-      <div class="sidebar-section-label">Settings & Logs</div>
+      <div class="sidebar-section-label">Settings & Security</div>
+      <a href="{% url 'account_settings' %}"    class="nav-item {% block nav_account %}{% endblock %}"><i class="bi bi-person-gear"></i> My Account</a>
       <a href="{% url 'company_settings' %}"    class="nav-item {% block nav_settings %}{% endblock %}"><i class="bi bi-building-gear"></i> Company</a>
+      <a href="{% url 'security_audit_log' %}"  class="nav-item {% block nav_audit %}{% endblock %}"><i class="bi bi-shield-lock"></i> Security Audit Log</a>
       <a href="{% url 'allocation_history' %}"  class="nav-item {% block nav_allocations %}{% endblock %}"><i class="bi bi-journal-check"></i> Allocations</a>
       <a href="{% url 'export_history' %}"      class="nav-item {% block nav_exports %}{% endblock %}"><i class="bi bi-file-earmark-bar-graph"></i> Export Logs</a>
       <a href="{% url 'import_history' %}"      class="nav-item {% block nav_imports %}{% endblock %}"><i class="bi bi-clock-history"></i> Imports</a>
@@ -799,13 +835,23 @@ input[type="file"], textarea, select {
   </nav>
 
   <div class="sidebar-footer">
+    {% if user.is_md %}
+    <a href="{% url 'account_settings' %}" class="sidebar-user text-decoration-none" style="display: flex;">
+      <div class="sidebar-avatar">{{ user.username|slice:":2"|upper }}</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="sidebar-user-role"><i class="bi bi-gear-fill me-1"></i>{{ user.role }} Account</div>
+      </div>
+    </a>
+    {% else %}
     <div class="sidebar-user">
-      <div class="sidebar-avatar">{{ user.get_full_name|default:user.username|slice:":2"|upper }}</div>
+      <div class="sidebar-avatar">{{ user.username|slice:":2"|upper }}</div>
       <div class="sidebar-user-info">
         <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
         <div class="sidebar-user-role">{{ user.role }}</div>
       </div>
     </div>
+    {% endif %}
   </div>
 </aside>
 
@@ -817,8 +863,8 @@ input[type="file"], textarea, select {
     </div>
   </div>
   <div class="topbar-actions">
-    <!-- Mobile menu toggle -->
-    <button class="topbar-btn d-md-none" onclick="document.getElementById('sidebar').classList.toggle('open')" id="menu-toggle">
+    <!-- Mobile & Tablet menu toggle -->
+    <button class="topbar-btn d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('open')" id="menu-toggle">
       <i class="bi bi-list"></i>
     </button>
 
@@ -828,6 +874,12 @@ input[type="file"], textarea, select {
       <i class="bi bi-bell-fill"></i>
       <span class="topbar-notif-dot"></span>
     </div>
+    {% endif %}
+
+    {% if user.is_md %}
+    <a href="{% url 'account_settings' %}" class="topbar-btn text-decoration-none" title="My Account Settings">
+      <i class="bi bi-person-gear"></i>
+    </a>
     {% endif %}
 
     <!-- Logout -->

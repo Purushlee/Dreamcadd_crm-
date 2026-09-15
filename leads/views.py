@@ -1,11 +1,13 @@
 import csv
 import re
 import json
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView
+from django.contrib.sessions.models import Session
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,14 +18,14 @@ from django.views.decorators.http import require_POST
 
 from .api_security import verify_meta_webhook_signature
 from .forms import (
-    BranchForm, CallLogForm, CompanySettingsForm, CourseForm, ExcelUploadForm,
-    FollowupForm, LeadForm, StyledAuthenticationForm, TelecallerCreateForm,
-    WhatsAppTemplateForm
+    BranchForm, CallLogForm, ChangePasswordForm, ChangeUsernameForm,
+    CompanySettingsForm, CourseForm, ExcelUploadForm, FollowupForm, LeadForm,
+    StyledAuthenticationForm, TelecallerCreateForm, WhatsAppTemplateForm
 )
 from .models import (
-    AllocationBatch, Branch, CallLog, CompanySettings, Course, ExportHistory, Followup, ImportBatch, Lead,
-    LeadActivity, LeadAssignment, LeadSource, Notification, TelecallerProfile,
-    User, UserSessionLog, WhatsAppMessage, WhatsAppTemplate
+    AllocationBatch, Branch, CallLog, CompanySettings, Course, DailySchedule, ExportHistory, Followup, ImportBatch, Lead,
+    LeadActivity, LeadAssignment, LeadSource, Notification, SecurityAuditLog,
+    TelecallerProfile, User, UserSessionLog, WhatsAppMessage, WhatsAppTemplate, log_security_event
 )
 from .services import (
     assign_lead_round_robin, import_leads_from_excel, log_lead_activity,
@@ -79,7 +81,15 @@ class RoleAwareLoginView(LoginView):
     template_name = "leads/login.html"
     authentication_form = StyledAuthenticationForm
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        log_security_event(self.request.user, SecurityAuditLog.Action.LOGIN, self.request, details="User logged in successfully")
+        return response
+
     def get_success_url(self):
+        redirect_to = self.get_redirect_url()
+        if redirect_to and not redirect_to.startswith('/login'):
+            return redirect_to
         user = self.request.user
         if user.is_md:
             return reverse_lazy("md_dashboard")
@@ -91,6 +101,12 @@ def home_redirect(request):
     if request.user.is_md:
         return redirect("md_dashboard")
     return redirect("telecaller_dashboard")
+
+
+def custom_csrf_failure_view(request, reason=""):
+    """Handle CSRF failure gracefully by redirecting back to login with a friendly message."""
+    messages.warning(request, "Your security token or session expired. Please sign in again.")
+    return redirect("login")
 
 
 # ---------------------------------------------------------------------------
@@ -230,6 +246,7 @@ def upload_excel(request):
 def manage_callers(request):
     telecallers = User.objects.filter(role=User.Role.TELECALLER).select_related("profile").annotate(
         assigned_count=Count("assigned_leads"),
+        unique_contacted_count=Count("assigned_leads", filter=Q(assigned_leads__contacted=True), distinct=True),
         worked_count=Count("assigned_leads", filter=~Q(assigned_leads__status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED])),
         pending_count=Count("assigned_leads", filter=Q(assigned_leads__status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED])),
         calls_count=Count("call_logs"),
@@ -281,6 +298,41 @@ def manage_callers(request):
                 messages.success(request, f"Limits updated for '{caller.username}': Max Capacity={profile.max_leads}, Daily Target={profile.daily_call_target}.")
             except ValueError:
                 messages.error(request, "Invalid number provided for limits.")
+            return redirect("manage_callers")
+        elif "update_caller_credentials" in request.POST:
+            caller_id = request.POST.get("caller_id")
+            caller = get_object_or_404(User, id=caller_id, role=User.Role.TELECALLER)
+            new_username = request.POST.get("new_username", "").strip()
+            new_password = request.POST.get("new_password", "").strip()
+
+            updated_fields = []
+            old_username = caller.username
+
+            if new_username and new_username.lower() != old_username.lower():
+                if User.objects.filter(username__iexact=new_username).exclude(pk=caller.pk).exists():
+                    messages.error(request, f"Username '{new_username}' is already taken by another account.")
+                    return redirect("manage_callers")
+                caller.username = new_username
+                updated_fields.append(f"username to '{new_username}'")
+
+            if new_password:
+                if len(new_password) < 6:
+                    messages.error(request, "Password must be at least 6 characters long.")
+                    return redirect("manage_callers")
+                caller.set_password(new_password)
+                updated_fields.append("password")
+
+            if updated_fields:
+                caller.save()
+                log_security_event(
+                    user=request.user,
+                    action=SecurityAuditLog.Action.USERNAME_CHANGED if "username" in updated_fields[0] else SecurityAuditLog.Action.PASSWORD_CHANGED,
+                    request=request,
+                    details=f"Admin updated credentials for telecaller '{old_username}': {', '.join(updated_fields)}"
+                )
+                messages.success(request, f"Credentials updated for telecaller '{old_username}': {', '.join(updated_fields)}.")
+            else:
+                messages.info(request, f"No credentials changes were submitted for telecaller '{caller.username}'.")
             return redirect("manage_callers")
 
     form = TelecallerCreateForm()
@@ -402,6 +454,163 @@ def bulk_allocate(request):
 
 
 @user_passes_test(is_md, login_url="login")
+def schedule_leads_view(request):
+    """Admin / MD Workbench to schedule lead lists in advance for each telecaller per day & define daily call targets."""
+    telecallers = User.objects.filter(role=User.Role.TELECALLER, status="ACTIVE").select_related("profile")
+    courses = Course.objects.all()
+
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+
+        if action == "create_schedule":
+            caller_id = request.POST.get("caller_id")
+            target_date_str = request.POST.get("target_date")
+            call_target_str = request.POST.get("daily_call_target", "30")
+            conversion_target_str = request.POST.get("daily_conversion_target", "5")
+            lead_count_str = request.POST.get("lead_count", "30")
+            allocation_mode = request.POST.get("allocation_mode", "UNASSIGNED")
+            course_id = request.POST.get("course_id", "")
+            notes = request.POST.get("notes", "").strip()
+
+            if not caller_id or not target_date_str:
+                messages.error(request, "Please select both a Telecaller and a Target Date.")
+                return redirect("schedule_leads")
+
+            try:
+                target_date = datetime.strptime(target_date_str, "%Y-%m-%d").date()
+                call_target = max(1, int(call_target_str))
+                conversion_target = max(0, int(conversion_target_str))
+                lead_count = max(0, int(lead_count_str))
+            except ValueError:
+                messages.error(request, "Invalid input numbers or date format.")
+                return redirect("schedule_leads")
+
+            caller = get_object_or_404(User, id=caller_id, role=User.Role.TELECALLER)
+
+            # Create or update DailySchedule
+            schedule, created = DailySchedule.objects.update_or_create(
+                caller=caller,
+                target_date=target_date,
+                defaults={
+                    "daily_call_target": call_target,
+                    "daily_conversion_target": conversion_target,
+                    "notes": notes,
+                    "created_by": request.user,
+                }
+            )
+
+            # Update TelecallerProfile default target
+            profile = caller.telecaller_profile
+            profile.daily_call_target = call_target
+            profile.save(update_fields=["daily_call_target"])
+
+            scheduled_leads_count = 0
+            if lead_count > 0:
+                if allocation_mode == "UNASSIGNED":
+                    qs = Lead.objects.filter(assigned_to__isnull=True)
+                    if course_id:
+                        qs = qs.filter(interested_course_id=course_id)
+                    leads_to_assign = list(qs[:lead_count])
+                    if leads_to_assign:
+                        batch_code = f"SCHED-{target_date.strftime('%Y%m%d')}-{caller.username[:10].upper()}"
+                        alloc_batch = AllocationBatch.objects.create(
+                            batch_code=batch_code,
+                            caller=caller,
+                            allocated_by=request.user,
+                            lead_count=len(leads_to_assign),
+                            notes=f"Scheduled allocation for {target_date.strftime('%d-%b-%Y')}"
+                        )
+                        for l in leads_to_assign:
+                            l.assigned_to = caller
+                            l.scheduled_date = target_date
+                            l.allocation_batch = alloc_batch
+                            l.assigned_at = timezone.now()
+                            if l.status == Lead.Status.NEW:
+                                l.status = Lead.Status.ASSIGNED
+                            l.save(update_fields=["assigned_to", "scheduled_date", "allocation_batch", "assigned_at", "status", "updated_at"])
+                            LeadAssignment.objects.create(lead=l, caller=caller)
+                            log_lead_activity(l, "SCHEDULED", f"Scheduled for {caller.username} on {target_date.strftime('%d-%b-%Y')}", actor=request.user)
+                            scheduled_leads_count += 1
+                else:  # EXISTING assigned leads of caller
+                    qs = Lead.objects.filter(assigned_to=caller, contacted=False)
+                    if course_id:
+                        qs = qs.filter(interested_course_id=course_id)
+                    leads_to_assign = list(qs[:lead_count])
+                    for l in leads_to_assign:
+                        l.scheduled_date = target_date
+                        l.save(update_fields=["scheduled_date", "updated_at"])
+                        log_lead_activity(l, "RESCHEDULED", f"Rescheduled call date to {target_date.strftime('%d-%b-%Y')}", actor=request.user)
+                        scheduled_leads_count += 1
+
+            messages.success(
+                request,
+                f"Schedule saved for '{caller.get_full_name() or caller.username}' on {target_date.strftime('%d-%b-%Y')}. "
+                f"Daily Target set to {call_target} calls. {scheduled_leads_count} lead(s) scheduled for this date."
+            )
+            return redirect("schedule_leads")
+
+        elif action == "delete_schedule":
+            sched_id = request.POST.get("schedule_id")
+            if sched_id:
+                sched = DailySchedule.objects.filter(id=sched_id).first()
+                if sched:
+                    sched_date = sched.target_date
+                    caller_name = sched.caller.username
+                    sched.delete()
+                    messages.success(request, f"Daily schedule for {caller_name} on {sched_date.strftime('%d-%b-%Y')} deleted.")
+            return redirect("schedule_leads")
+
+    # GET: Load master schedule list with call progress statistics
+    schedules_qs = DailySchedule.objects.select_related("caller", "created_by").order_by("-target_date", "caller")
+
+    # Filter parameters
+    selected_date_str = request.GET.get("date", "")
+    selected_caller_id = request.GET.get("caller", "")
+
+    if selected_date_str:
+        try:
+            sel_d = datetime.strptime(selected_date_str, "%Y-%m-%d").date()
+            schedules_qs = schedules_qs.filter(target_date=sel_d)
+        except ValueError:
+            pass
+
+    if selected_caller_id:
+        schedules_qs = schedules_qs.filter(caller_id=selected_caller_id)
+
+    schedules_data = []
+    for sched in schedules_qs[:100]:
+        scheduled_leads_count = Lead.objects.filter(assigned_to=sched.caller, scheduled_date=sched.target_date).count()
+        calls_completed = CallLog.objects.filter(caller=sched.caller, created_at__date=sched.target_date).count()
+        conversions = Lead.objects.filter(assigned_to=sched.caller, scheduled_date=sched.target_date, status=Lead.Status.CONVERTED).count()
+
+        progress_pct = min(100, int((calls_completed / sched.daily_call_target) * 100)) if sched.daily_call_target > 0 else 0
+
+        schedules_data.append({
+            "schedule": sched,
+            "scheduled_leads_count": scheduled_leads_count,
+            "calls_completed": calls_completed,
+            "conversions": conversions,
+            "progress_pct": progress_pct,
+            "is_target_met": calls_completed >= sched.daily_call_target,
+        })
+
+    unassigned_leads_count = Lead.objects.filter(assigned_to__isnull=True).count()
+    today_str = timezone.now().date().strftime("%Y-%m-%d")
+    tomorrow_str = (timezone.now().date() + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    return render(request, "leads/schedule_leads.html", {
+        "telecallers": telecallers,
+        "courses": courses,
+        "schedules_data": schedules_data,
+        "unassigned_leads_count": unassigned_leads_count,
+        "today_str": today_str,
+        "tomorrow_str": tomorrow_str,
+        "selected_date": selected_date_str,
+        "selected_caller": selected_caller_id,
+    })
+
+
+@user_passes_test(is_md, login_url="login")
 def allocation_history_view(request):
     batches = AllocationBatch.objects.select_related("caller", "allocated_by", "import_batch").order_by("-created_at")
     return render(request, "leads/allocation_history.html", {"batches": batches})
@@ -455,6 +664,7 @@ def telecaller_report_view(request, caller_id):
         call_logs = call_logs.filter(call_time__gte=now - timedelta(days=30))
 
     total_assigned = leads.count()
+    unique_contacted_count = leads.filter(contacted=True).count()
     completed_count = leads.exclude(status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED]).count()
     pending_count = leads.filter(status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED]).count()
 
@@ -480,9 +690,11 @@ def telecaller_report_view(request, caller_id):
 
     metrics = {
         "total_assigned": total_assigned,
+        "unique_contacted_count": unique_contacted_count,
         "completed_count": completed_count,
         "pending_count": pending_count,
         "calls_made": calls_made,
+        "total_call_attempts": calls_made,
         "connected_calls": connected_calls,
         "not_connected_calls": not_connected_calls,
         "busy_calls": busy_calls,
@@ -886,24 +1098,55 @@ def export_history_view(request):
 # ---------------------------------------------------------------------------
 
 @user_passes_test(is_telecaller, login_url="login")
+@login_required
 def telecaller_dashboard(request):
-    leads = Lead.objects.filter(assigned_to=request.user).select_related("interested_course").order_by("-updated_at")
+    leads_qs = Lead.objects.filter(assigned_to=request.user).select_related("interested_course").order_by("-updated_at")
     pending_followups = Followup.objects.filter(caller=request.user, status=Followup.Status.PENDING).select_related("lead").order_by("scheduled_date")
     notifications = Notification.objects.filter(user=request.user, is_read=False)[:10]
 
+    followup_map = {}
+    for f in pending_followups:
+        if f.lead_id not in followup_map:
+            followup_map[f.lead_id] = f
+
+    active_followup_lead_ids = set(followup_map.keys())
+
+    leads_list = list(leads_qs)
+    for lead in leads_list:
+        lead.active_followup = followup_map.get(lead.id)
+
     today = timezone.now().date()
-    assigned_count = leads.count()
-    unique_contacted_count = leads.filter(contacted=True).count()
+    assigned_count = len(leads_list)
+    unique_contacted_count = sum(1 for l in leads_list if l.contacted)
     total_call_attempts = CallLog.objects.filter(caller=request.user).count()
     today_call_attempts = CallLog.objects.filter(caller=request.user, created_at__date=today).count()
 
-    interested_count = leads.filter(status=Lead.Status.INTERESTED).count()
-    converted_count = leads.filter(status=Lead.Status.CONVERTED).count()
-    not_answered_count = leads.filter(status__in=[Lead.Status.NOT_ANSWERED, Lead.Status.NOT_CONNECTED]).count()
-    call_back_count = leads.filter(status=Lead.Status.CALL_BACK).count()
+    # Daily Schedule & Daily Target Calculations
+    today_schedule = DailySchedule.objects.filter(caller=request.user, target_date=today).first()
+    if today_schedule:
+        daily_call_target = today_schedule.daily_call_target
+        daily_conversion_target = today_schedule.daily_conversion_target
+    else:
+        daily_call_target = request.user.telecaller_profile.daily_call_target
+        daily_conversion_target = 5
+
+    remaining_call_target = max(0, daily_call_target - today_call_attempts)
+    target_progress_pct = min(100, int((today_call_attempts / daily_call_target) * 100)) if daily_call_target > 0 else 0
+
+    # Today's Scheduled Leads Queue & Upcoming Schedules
+    today_scheduled_leads = [l for l in leads_list if l.scheduled_date == today]
+    upcoming_schedules = DailySchedule.objects.filter(caller=request.user, target_date__gt=today).order_by("target_date")[:5]
+
+    hot_count = sum(1 for l in leads_list if l.priority == Lead.Priority.HOT)
+    pending_leads_count = sum(1 for l in leads_list if l.status in [Lead.Status.NEW, Lead.Status.ASSIGNED])
+    interested_count = sum(1 for l in leads_list if l.status == Lead.Status.INTERESTED)
+    converted_count = sum(1 for l in leads_list if l.status == Lead.Status.CONVERTED)
+    followup_count = len(active_followup_lead_ids)
+    not_answered_count = sum(1 for l in leads_list if l.status in [Lead.Status.NOT_CONNECTED, Lead.Status.NOT_ANSWERED, Lead.Status.SWITCHED_OFF, Lead.Status.BUSY])
+    call_back_count = sum(1 for l in leads_list if l.status == Lead.Status.CALL_BACK)
 
     return render(request, "leads/telecaller_dashboard.html", {
-        "leads": leads,
+        "leads": leads_list,
         "pending_followups": pending_followups,
         "notifications": notifications,
         "assigned_count": assigned_count,
@@ -913,10 +1156,20 @@ def telecaller_dashboard(request):
         "today_calls": today_call_attempts,
         "total_calls": total_call_attempts,
         "connected_count": unique_contacted_count,
-        "converted_count": converted_count,
+        "hot_count": hot_count,
+        "pending_leads_count": pending_leads_count,
         "interested_count": interested_count,
+        "converted_count": converted_count,
+        "followup_count": followup_count,
         "not_answered_count": not_answered_count,
         "call_back_count": call_back_count,
+        "today_schedule": today_schedule,
+        "daily_call_target": daily_call_target,
+        "daily_conversion_target": daily_conversion_target,
+        "remaining_call_target": remaining_call_target,
+        "target_progress_pct": target_progress_pct,
+        "today_scheduled_leads": today_scheduled_leads,
+        "upcoming_schedules": upcoming_schedules,
     })
 
 
@@ -1026,6 +1279,27 @@ def lead_detail(request, lead_id):
         "followup_form": FollowupForm(),
         "lead_form": LeadForm(instance=lead),
     })
+
+
+@login_required
+def lead_whatsapp(request, lead_id):
+    """Dedicated WhatsApp Hub page for a lead with high-converting prepared messages & live chat history."""
+    lead = get_object_or_404(Lead, id=lead_id)
+
+    if request.user.is_telecaller and lead.assigned_to_id != request.user.id:
+        return HttpResponseForbidden("Access Denied: This lead is not assigned to you.")
+
+    templates = WhatsAppTemplate.objects.filter(status=WhatsAppTemplate.Status.APPROVED)
+    wa_messages = lead.whatsapp_messages.order_by("timestamp")
+
+    return render(request, "leads/lead_whatsapp.html", {
+        "lead": lead,
+        "templates": templates,
+        "wa_messages": wa_messages,
+        "courses": Course.objects.all(),
+        "branches": Branch.objects.all(),
+    })
+
 
 
 # ---------------------------------------------------------------------------
@@ -1334,4 +1608,215 @@ def api_edit_response(request, lead_id):
         "new_response": display_name,
         "updated_at": lead.updated_at.strftime("%d %b %Y, %H:%M")
     })
+
+
+@login_required
+@require_POST
+def api_send_whatsapp(request, lead_id):
+    """
+    Sends outbound WhatsApp message (template or custom text) for a lead.
+    Strict Permission Enforcement: Telecallers can ONLY send WhatsApp to leads assigned to them.
+    """
+    lead = get_object_or_404(Lead, id=lead_id)
+
+    # Permission check: Telecaller can ONLY access & send WhatsApp for assigned leads
+    if request.user.is_telecaller and lead.assigned_to_id != request.user.id:
+        return JsonResponse({
+            "status": "error",
+            "message": "Access Denied: You can only send WhatsApp messages to your assigned customers."
+        }, status=403)
+
+    try:
+        data = json.loads(request.body.decode("utf-8")) if request.content_type == "application/json" else request.POST
+        template_id = data.get("template_id")
+        custom_message = data.get("message", "").strip()
+
+        if template_id:
+            tmpl = get_object_or_404(WhatsAppTemplate, id=template_id, status=WhatsAppTemplate.Status.APPROVED)
+            message_text = render_whatsapp_template(tmpl, lead)
+        elif custom_message:
+            message_text = custom_message
+        else:
+            return JsonResponse({"status": "error", "message": "Message text or approved template ID required."}, status=400)
+
+        record = send_whatsapp_text(lead, message_text)
+
+        return JsonResponse({
+            "status": "success",
+            "message": "WhatsApp message dispatched successfully.",
+            "wa_message": {
+                "id": record.id,
+                "message": record.message,
+                "direction": record.direction,
+                "status": record.status,
+                "timestamp": record.timestamp.strftime("%d %b, %H:%M"),
+            }
+        })
+    except Exception as exc:
+        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+
+
+# ---------------------------------------------------------------------------
+# Secure Admin/MD Account Management Views
+# ---------------------------------------------------------------------------
+
+def _get_active_user_sessions_count(user):
+    now = timezone.now()
+    count = 0
+    for session in Session.objects.filter(expire_date__gte=now):
+        try:
+            data = session.get_decoded()
+            if str(data.get("_auth_user_id")) == str(user.pk):
+                count += 1
+        except Exception:
+            pass
+    return max(count, 1)
+
+
+def _logout_other_user_sessions(user, current_session_key):
+    now = timezone.now()
+    count = 0
+    for session in Session.objects.filter(expire_date__gte=now):
+        if session.session_key != current_session_key:
+            try:
+                data = session.get_decoded()
+                if str(data.get("_auth_user_id")) == str(user.pk):
+                    session.delete()
+                    count += 1
+            except Exception:
+                pass
+    return count
+
+
+@login_required
+def account_settings(request):
+    """
+    Renders the MD/Admin My Account page.
+    Telecallers are blocked with 403 Forbidden.
+    """
+    if not request.user.is_md:
+        return HttpResponseForbidden("Access denied. Only MD/Admin can access account settings.")
+
+    username_form = ChangeUsernameForm(user=request.user)
+    password_form = ChangePasswordForm(user=request.user)
+    active_sessions_count = _get_active_user_sessions_count(request.user)
+
+    context = {
+        "username_form": username_form,
+        "password_form": password_form,
+        "active_sessions_count": active_sessions_count,
+    }
+    return render(request, "leads/my_account.html", context)
+
+
+@login_required
+@require_POST
+def change_username_view(request):
+    """
+    Updates the authenticated MD/Admin username securely.
+    """
+    if not request.user.is_md:
+        return HttpResponseForbidden("Access denied. Only MD/Admin can change username.")
+
+    username_form = ChangeUsernameForm(user=request.user, data=request.POST)
+    password_form = ChangePasswordForm(user=request.user)
+    active_sessions_count = _get_active_user_sessions_count(request.user)
+
+    if username_form.is_valid():
+        old_username = request.user.username
+        new_username = username_form.cleaned_data["new_username"]
+        request.user.username = new_username
+        request.user.save(update_fields=["username"])
+
+        log_security_event(
+            user=request.user,
+            action=SecurityAuditLog.Action.USERNAME_CHANGED,
+            request=request,
+            details=f"Username updated from '{old_username}' to '{new_username}'"
+        )
+        messages.success(request, f"Username updated successfully to '{new_username}'. Please use your new username on your next login.")
+        return redirect("account_settings")
+
+    context = {
+        "username_form": username_form,
+        "password_form": password_form,
+        "active_sessions_count": active_sessions_count,
+    }
+    return render(request, "leads/my_account.html", context)
+
+
+@login_required
+@require_POST
+def change_password_view(request):
+    """
+    Updates the authenticated MD/Admin password securely using Django password hashing.
+    Invalidates session and requires re-login after password change.
+    """
+    if not request.user.is_md:
+        return HttpResponseForbidden("Access denied. Only MD/Admin can change password.")
+
+    password_form = ChangePasswordForm(user=request.user, data=request.POST)
+    username_form = ChangeUsernameForm(user=request.user)
+    active_sessions_count = _get_active_user_sessions_count(request.user)
+
+    if password_form.is_valid():
+        user = request.user
+        new_password = password_form.cleaned_data["new_password"]
+        user.set_password(new_password)
+        user.save()
+
+        log_security_event(
+            user=user,
+            action=SecurityAuditLog.Action.PASSWORD_CHANGED,
+            request=request,
+            details="Password changed successfully"
+        )
+        logout(request)
+        messages.success(request, "Password changed successfully. For maximum security, please log in again with your new password.")
+        return redirect("login")
+
+    context = {
+        "username_form": username_form,
+        "password_form": password_form,
+        "active_sessions_count": active_sessions_count,
+    }
+    return render(request, "leads/my_account.html", context)
+
+
+@login_required
+@require_POST
+def logout_other_sessions_view(request):
+    """
+    Invalidates all other active sessions for the authenticated user across devices.
+    """
+    if not request.user.is_md:
+        return HttpResponseForbidden("Access denied. Only MD/Admin can manage active sessions.")
+
+    current_session_key = request.session.session_key
+    logged_out_count = _logout_other_user_sessions(request.user, current_session_key)
+
+    log_security_event(
+        user=request.user,
+        action=SecurityAuditLog.Action.OTHER_SESSIONS_LOGGED_OUT,
+        request=request,
+        details=f"Invalidated {logged_out_count} other active session(s)"
+    )
+    messages.success(request, f"Logged out from {logged_out_count} other device session(s) successfully.")
+    return redirect("account_settings")
+
+
+@login_required
+def security_audit_log_view(request):
+    """
+    Renders the security audit log trail for MD/Admin.
+    """
+    if not request.user.is_md:
+        return HttpResponseForbidden("Access denied. Only MD/Admin can view security audit logs.")
+
+    audit_logs = SecurityAuditLog.objects.filter(user=request.user).order_by("-timestamp")
+    context = {
+        "audit_logs": audit_logs
+    }
+    return render(request, "leads/security_audit_log.html", context)
+
 

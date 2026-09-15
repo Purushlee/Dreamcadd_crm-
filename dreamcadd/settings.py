@@ -52,6 +52,9 @@ try:
 except Exception:
     pass
 
+# Custom CSRF Failure Handler to prevent yellow 403 debug pages
+CSRF_FAILURE_VIEW = 'leads.views.custom_csrf_failure_view'
+
 
 # Application definition
 

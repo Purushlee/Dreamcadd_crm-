@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Branch, CallLog, CompanySettings, Course, CourseCategory, Followup,
     ImportBatch, Lead, LeadActivity, LeadAssignment, LeadSource, Notification,
-    TelecallerProfile, User, WhatsAppMessage, WhatsAppTemplate
+    SecurityAuditLog, TelecallerProfile, User, WhatsAppMessage, WhatsAppTemplate
 )
 
 
@@ -106,3 +106,11 @@ class WhatsAppMessageAdmin(admin.ModelAdmin):
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ("user", "title", "is_read", "created_at")
     list_filter = ("is_read",)
+
+
+@admin.register(SecurityAuditLog)
+class SecurityAuditLogAdmin(admin.ModelAdmin):
+    list_display = ("user", "action", "ip_address", "timestamp")
+    list_filter = ("action", "timestamp")
+    search_fields = ("user__username", "ip_address", "details")
+

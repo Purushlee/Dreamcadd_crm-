@@ -13,7 +13,13 @@ urlpatterns = [
     path("md/upload-excel/", views.upload_excel, name="upload_excel"),
     path("md/callers/", views.manage_callers, name="manage_callers"),
     path("md/bulk-allocate/", views.bulk_allocate, name="bulk_allocate"),
+    path("md/schedule-leads/", views.schedule_leads_view, name="schedule_leads"),
     path("md/company-settings/", views.company_settings_view, name="company_settings"),
+    path("md/account/", views.account_settings, name="account_settings"),
+    path("md/account/change-username/", views.change_username_view, name="change_username"),
+    path("md/account/change-password/", views.change_password_view, name="change_password"),
+    path("md/account/logout-other-sessions/", views.logout_other_sessions_view, name="logout_other_sessions"),
+    path("md/account/audit-log/", views.security_audit_log_view, name="security_audit_log"),
     path("md/courses/", views.manage_courses, name="manage_courses"),
     path("md/templates/", views.whatsapp_templates_view, name="whatsapp_templates"),
     path("md/import-history/", views.import_history_view, name="import_history"),
@@ -31,8 +37,10 @@ urlpatterns = [
     # Telecaller & Lead Detail Views
     path("telecaller/", views.telecaller_dashboard, name="telecaller_dashboard"),
     path("leads/<int:lead_id>/", views.lead_detail, name="lead_detail"),
+    path("leads/<int:lead_id>/whatsapp/", views.lead_whatsapp, name="lead_whatsapp"),
     path("api/leads/<int:lead_id>/quick-call-log/", views.api_quick_call_log, name="api_quick_call_log"),
     path("api/leads/<int:lead_id>/edit-response/", views.api_edit_response, name="api_edit_response"),
+    path("api/leads/<int:lead_id>/send-whatsapp/", views.api_send_whatsapp, name="api_send_whatsapp"),
     path("api/session-check/", views.api_session_check, name="api_session_check"),
 
     # Meta WhatsApp Webhook Direct
