@@ -79,12 +79,18 @@
         Admin pages require an Admin/MD account. Sign in below or <a href="{% url 'telecaller_dashboard' %}" style="color:var(--accent); font-weight:700;">Return to Workspace</a>.
       </div>
     </div>
-    {% elif request.GET.next %}
+    {% elif request.GET.next and '/md' in request.GET.next %}
     <div class="login-error" style="background: rgba(79,127,250,.1); border-left: 3px solid var(--accent); color: #1d4ed8;">
       <i class="bi bi-lock-fill me-1"></i>
       Sign in with Admin credentials to access this page.
     </div>
+    {% elif request.GET.next and request.GET.next != '/' and request.GET.next != '/login/' %}
+    <div class="login-error" style="background: rgba(79,127,250,.1); border-left: 3px solid var(--accent); color: #1d4ed8;">
+      <i class="bi bi-lock-fill me-1"></i>
+      Please sign in to access your workspace.
+    </div>
     {% endif %}
+
 
     {% if form.errors %}
     <div class="login-error">
