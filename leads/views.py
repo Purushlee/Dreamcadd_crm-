@@ -74,7 +74,7 @@ def is_md(user):
 
 
 def is_telecaller(user):
-    return user.is_authenticated and (user.role == User.Role.TELECALLER or user.is_md or user.is_superuser)
+    return user.is_authenticated and user.role == User.Role.TELECALLER
 
 
 class RoleAwareLoginView(LoginView):
@@ -86,14 +86,29 @@ class RoleAwareLoginView(LoginView):
         log_security_event(self.request.user, SecurityAuditLog.Action.LOGIN, self.request, details="User logged in successfully")
         return response
 
+    def form_invalid(self, form):
+        import logging
+        logger = logging.getLogger(__name__)
+        username = form.cleaned_data.get('username', 'unknown') if hasattr(form, 'cleaned_data') and form.cleaned_data else 'unknown'
+        logger.warning(f"Login failed for user '{username}': {form.errors.as_text()}")
+        messages.error(self.request, "Invalid username or password. Please try again.")
+        return super().form_invalid(form)
+
     def get_success_url(self):
         redirect_to = self.get_redirect_url()
-        if redirect_to and not redirect_to.startswith('/login'):
-            return redirect_to
         user = self.request.user
+
+        if redirect_to and not redirect_to.startswith('/login'):
+            if user.is_md and '/telecaller' in redirect_to:
+                return reverse_lazy("md_dashboard")
+            if not user.is_md and '/md' in redirect_to:
+                return reverse_lazy("telecaller_dashboard")
+            return redirect_to
+
         if user.is_md:
             return reverse_lazy("md_dashboard")
         return reverse_lazy("telecaller_dashboard")
+
 
 
 @login_required

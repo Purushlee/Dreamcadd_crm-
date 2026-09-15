@@ -536,6 +536,72 @@ class SecurityAccountManagementTestCase(TestCase):
         self.assertEqual(resp.context["total_call_attempts"], 5)
 
 
+class DreamCaddAuthRoleRoutingTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        # ADMIN role user (represents MD)
+        self.admin_user = User.objects.create_user(
+            username="admin_md", password="AdminPassword123!", role=User.Role.ADMIN
+        )
+        # MD role user
+        self.md_user = User.objects.create_user(
+            username="pure_md", password="MdPassword123!", role=User.Role.MD
+        )
+        # TELECALLER role user
+        self.telecaller_user = User.objects.create_user(
+            username="telecaller_user", password="CallerPassword123!", role=User.Role.TELECALLER
+        )
+
+    def test_admin_role_login_redirects_to_md_dashboard(self):
+        """Verify ADMIN role (represented as MD) logs in and redirects to MD/Admin dashboard."""
+        login_url = reverse("login")
+        resp = self.client.post(login_url, {"username": "admin_md", "password": "AdminPassword123!"})
+        self.assertRedirects(resp, reverse("md_dashboard"))
+
+    def test_md_role_login_redirects_to_md_dashboard(self):
+        """Verify MD role logs in and redirects to MD/Admin dashboard."""
+        login_url = reverse("login")
+        resp = self.client.post(login_url, {"username": "pure_md", "password": "MdPassword123!"})
+        self.assertRedirects(resp, reverse("md_dashboard"))
+
+    def test_telecaller_role_login_redirects_to_telecaller_dashboard(self):
+        """Verify TELECALLER role logs in and redirects strictly to Telecaller dashboard."""
+        login_url = reverse("login")
+        resp = self.client.post(login_url, {"username": "telecaller_user", "password": "CallerPassword123!"})
+        self.assertRedirects(resp, reverse("telecaller_dashboard"))
+
+    def test_invalid_login_credentials_stays_on_login_page_with_error(self):
+        """Verify invalid username/password stays on login page with HTTP 200 and error message."""
+        login_url = reverse("login")
+        resp = self.client.post(login_url, {"username": "admin_md", "password": "WrongPassword!"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Invalid username or password")
+
+    def test_unauthenticated_user_access_redirects_to_login(self):
+        """Verify unauthenticated access to MD or Telecaller pages redirects to login."""
+        resp_md = self.client.get(reverse("md_dashboard"))
+        self.assertEqual(resp_md.status_code, 302)
+        self.assertIn(reverse("login"), resp_md.url)
+
+        resp_tc = self.client.get(reverse("telecaller_dashboard"))
+        self.assertEqual(resp_tc.status_code, 302)
+        self.assertIn(reverse("login"), resp_tc.url)
+
+    def test_admin_cannot_access_telecaller_only_dashboard(self):
+        """Verify ADMIN role user cannot access telecaller-only dashboard."""
+        self.client.login(username="admin_md", password="AdminPassword123!")
+        resp = self.client.get(reverse("telecaller_dashboard"))
+        # Should be redirected back to login or forbidden
+        self.assertNotEqual(resp.status_code, 200)
+
+    def test_telecaller_cannot_access_md_dashboard(self):
+        """Verify TELECALLER role user cannot access MD/Admin dashboard."""
+        self.client.login(username="telecaller_user", password="CallerPassword123!")
+        resp = self.client.get(reverse("md_dashboard"))
+        self.assertNotEqual(resp.status_code, 200)
+
+
+
 
 
 
