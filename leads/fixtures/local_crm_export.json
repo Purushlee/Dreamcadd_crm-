@@ -1,0 +1,3204 @@
+[
+{
+  "model": "leads.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$agiSiNilr8k5DG6DJE3wcU$Q/mW/HJfAWQ290hcNqLfFXnmKqvI7NXEqxvjvn/ugn0=",
+    "last_login": "2026-09-15T07:42:39.120Z",
+    "is_superuser": true,
+    "username": "DREAMCADD",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@dreamcadd.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-09-12T10:01:30.639Z",
+    "role": "MD",
+    "phone": null,
+    "status": "ACTIVE",
+    "last_activity": "2026-09-15T08:55:11.080Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "leads.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$ib88V0ggkgzFiQf1doqhGG$lLvORZ0akGZ7PF+FOAEMrPHG71NME7LHFEGowk70v4o=",
+    "last_login": "2026-09-13T10:45:19.872Z",
+    "is_superuser": false,
+    "username": "manjula@12",
+    "first_name": "MANJULA",
+    "last_name": "S",
+    "email": "purushothamanspanimalar@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-12T10:37:32.804Z",
+    "role": "TELECALLER",
+    "phone": "7604874641",
+    "status": "ACTIVE",
+    "last_activity": "2026-09-14T05:43:01.421Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "leads.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$Gk8Jt25K3tdFQ8MXcMQJXG$cofLudziMSqfnIzvx+dLkJD6bKTbUDkG2y4xvYfCyC4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "purush@123",
+    "first_name": "Purushothamans",
+    "last_name": "s",
+    "email": "purushothamanspanimalar@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-12T21:57:09.668Z",
+    "role": "TELECALLER",
+    "phone": "7604874641",
+    "status": "INACTIVE",
+    "last_activity": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "leads.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$ruiS1IQg0ibyD0T8dVhovT$r25SMtLnCxomg/Lfd6DtXnv5InFsryldJHjFbEpGp3k=",
+    "last_login": "2026-09-14T15:54:35.027Z",
+    "is_superuser": false,
+    "username": "bharath@123",
+    "first_name": "bharath",
+    "last_name": "4",
+    "email": "just@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-12T21:57:55.246Z",
+    "role": "TELECALLER",
+    "phone": "34567890-",
+    "status": "ACTIVE",
+    "last_activity": "2026-09-14T15:58:46.119Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "leads.user",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$UwFa9eLQAZT1ujspa8aMwn$6j8N8BZEWLAJwXb94f7De29K4kt1DjKoBgKDLQTemeI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "BALAJI",
+    "first_name": "BALAJI",
+    "last_name": "ANNA",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-13T12:49:38.896Z",
+    "role": "TELECALLER",
+    "phone": "1234567890",
+    "status": "ACTIVE",
+    "last_activity": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "leads.user",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$A4WhEEAkO3jT1UnZsbJlCq$F3jTUjSmrbO05zbyJ/7XZ/JqG5AGiVCvH3+h2RQRWm4=",
+    "last_login": "2026-09-15T08:55:11.795Z",
+    "is_superuser": false,
+    "username": "pawan",
+    "first_name": "pawan",
+    "last_name": "kuamr",
+    "email": "2345678@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-14T16:09:16.506Z",
+    "role": "TELECALLER",
+    "phone": "234567890",
+    "status": "ACTIVE",
+    "last_activity": "2026-09-15T09:04:14.857Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "login_time": "2026-09-13T10:21:31.749Z",
+    "logout_time": null,
+    "last_activity": "2026-09-13T14:04:41.950Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 2,
+  "fields": {
+    "user": 4,
+    "login_time": "2026-09-13T10:28:05.097Z",
+    "logout_time": null,
+    "last_activity": "2026-09-13T11:01:36.315Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 3,
+  "fields": {
+    "user": 6,
+    "login_time": "2026-09-13T10:42:40.763Z",
+    "logout_time": null,
+    "last_activity": "2026-09-13T14:04:28.629Z",
+    "ip_address": "10.161.224.192"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 4,
+  "fields": {
+    "user": 4,
+    "login_time": "2026-09-14T05:42:07.128Z",
+    "logout_time": null,
+    "last_activity": "2026-09-14T05:43:01.421Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "login_time": "2026-09-14T05:43:09.845Z",
+    "logout_time": null,
+    "last_activity": "2026-09-14T21:53:49.128Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 6,
+  "fields": {
+    "user": 6,
+    "login_time": "2026-09-14T05:58:49.612Z",
+    "logout_time": null,
+    "last_activity": "2026-09-14T15:58:46.119Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 7,
+  "fields": {
+    "user": 8,
+    "login_time": "2026-09-14T16:10:02.208Z",
+    "logout_time": null,
+    "last_activity": "2026-09-14T21:24:41.881Z",
+    "ip_address": "192.168.29.138"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 8,
+  "fields": {
+    "user": 1,
+    "login_time": "2026-09-15T04:55:03.543Z",
+    "logout_time": null,
+    "last_activity": "2026-09-15T08:55:11.080Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.usersessionlog",
+  "pk": 9,
+  "fields": {
+    "user": 8,
+    "login_time": "2026-09-15T08:55:11.861Z",
+    "logout_time": null,
+    "last_activity": "2026-09-15T09:04:14.857Z",
+    "ip_address": "127.0.0.1"
+  }
+},
+{
+  "model": "leads.telecallerprofile",
+  "pk": 1,
+  "fields": {
+    "user": 4,
+    "max_leads": 10,
+    "daily_call_target": 100,
+    "specialization": null
+  }
+},
+{
+  "model": "leads.telecallerprofile",
+  "pk": 2,
+  "fields": {
+    "user": 5,
+    "max_leads": 100,
+    "daily_call_target": 30,
+    "specialization": null
+  }
+},
+{
+  "model": "leads.telecallerprofile",
+  "pk": 3,
+  "fields": {
+    "user": 6,
+    "max_leads": 100,
+    "daily_call_target": 30,
+    "specialization": null
+  }
+},
+{
+  "model": "leads.telecallerprofile",
+  "pk": 4,
+  "fields": {
+    "user": 7,
+    "max_leads": 100,
+    "daily_call_target": 40,
+    "specialization": null
+  }
+},
+{
+  "model": "leads.telecallerprofile",
+  "pk": 5,
+  "fields": {
+    "user": 8,
+    "max_leads": 100,
+    "daily_call_target": 30,
+    "specialization": null
+  }
+},
+{
+  "model": "leads.telecallerprofile",
+  "pk": 6,
+  "fields": {
+    "user": 1,
+    "max_leads": 100,
+    "daily_call_target": 30,
+    "specialization": null
+  }
+},
+{
+  "model": "leads.companysettings",
+  "pk": 1,
+  "fields": {
+    "company_name": "DreamCadd",
+    "website": "https://dreamcadd.com",
+    "main_phone": "+91 9876543210",
+    "email": "info@dreamcadd.com",
+    "address": "123 Tech Park, Anna Salai, Chennai, Tamil Nadu"
+  }
+},
+{
+  "model": "leads.branch",
+  "pk": 1,
+  "fields": {
+    "branch_name": "raj center",
+    "location": "padi",
+    "address": "padi center",
+    "phone": "1234567890",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadsource",
+  "pk": 1,
+  "fields": {
+    "name": "Excel Upload",
+    "active": true
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 1,
+  "fields": {
+    "category": null,
+    "course_name": "CSE",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:02:58.402Z",
+    "updated_at": "2026-09-12T11:02:58.403Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 2,
+  "fields": {
+    "category": null,
+    "course_name": "ECE",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:03:09.397Z",
+    "updated_at": "2026-09-12T11:03:09.397Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 3,
+  "fields": {
+    "category": null,
+    "course_name": "EEE",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:03:10.411Z",
+    "updated_at": "2026-09-12T11:03:10.411Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 4,
+  "fields": {
+    "category": null,
+    "course_name": "IT",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:03:13.964Z",
+    "updated_at": "2026-09-12T11:03:13.965Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 5,
+  "fields": {
+    "category": null,
+    "course_name": "AI & DS",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:03:17.750Z",
+    "updated_at": "2026-09-12T11:03:17.751Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 6,
+  "fields": {
+    "category": null,
+    "course_name": "EIE",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:03:21.781Z",
+    "updated_at": "2026-09-12T11:03:21.781Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 7,
+  "fields": {
+    "category": null,
+    "course_name": "Computer Applications",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:03:24.377Z",
+    "updated_at": "2026-09-12T11:03:24.378Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 8,
+  "fields": {
+    "category": null,
+    "course_name": "Cyber Security",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:04:11.374Z",
+    "updated_at": "2026-09-12T11:04:11.374Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 9,
+  "fields": {
+    "category": null,
+    "course_name": "AI & ML",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:04:15.136Z",
+    "updated_at": "2026-09-12T11:04:15.136Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 10,
+  "fields": {
+    "category": null,
+    "course_name": "Artificial Intelligence",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:04:36.440Z",
+    "updated_at": "2026-09-12T11:04:36.441Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 11,
+  "fields": {
+    "category": null,
+    "course_name": "CSBS",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:04:36.693Z",
+    "updated_at": "2026-09-12T11:04:36.693Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 12,
+  "fields": {
+    "category": null,
+    "course_name": "Automobile",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:10.997Z",
+    "updated_at": "2026-09-12T11:05:10.997Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 13,
+  "fields": {
+    "category": null,
+    "course_name": "Biomedical",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:14.120Z",
+    "updated_at": "2026-09-12T11:05:14.120Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 14,
+  "fields": {
+    "category": null,
+    "course_name": "Bio-Tech",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:15.039Z",
+    "updated_at": "2026-09-12T11:05:15.039Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 15,
+  "fields": {
+    "category": null,
+    "course_name": "Civil",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:17.000Z",
+    "updated_at": "2026-09-12T11:05:17.000Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 16,
+  "fields": {
+    "category": null,
+    "course_name": "Mechanical",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:25.360Z",
+    "updated_at": "2026-09-12T11:05:25.360Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 17,
+  "fields": {
+    "category": null,
+    "course_name": "Robotics & Automation",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:25.927Z",
+    "updated_at": "2026-09-12T11:05:25.928Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 18,
+  "fields": {
+    "category": null,
+    "course_name": "Manufacturing",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:27.073Z",
+    "updated_at": "2026-09-12T11:05:27.073Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 19,
+  "fields": {
+    "category": null,
+    "course_name": "Business Administration",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:05:30.211Z",
+    "updated_at": "2026-09-12T11:05:30.211Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 20,
+  "fields": {
+    "category": null,
+    "course_name": "B.E- Electronics And Communicationengineering",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:06:00.124Z",
+    "updated_at": "2026-09-12T11:06:00.124Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 21,
+  "fields": {
+    "category": null,
+    "course_name": "Agriculture",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:06:09.609Z",
+    "updated_at": "2026-09-12T11:06:09.609Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 22,
+  "fields": {
+    "category": null,
+    "course_name": "CSD",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:06:10.137Z",
+    "updated_at": "2026-09-12T11:06:10.137Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 23,
+  "fields": {
+    "category": null,
+    "course_name": "Big Data Analytics",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:09:19.610Z",
+    "updated_at": "2026-09-12T11:09:19.610Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 24,
+  "fields": {
+    "category": null,
+    "course_name": "Cloud Computing",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:09:33.938Z",
+    "updated_at": "2026-09-12T11:09:33.938Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 25,
+  "fields": {
+    "category": null,
+    "course_name": "IoT",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:10:15.426Z",
+    "updated_at": "2026-09-12T11:10:15.426Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 26,
+  "fields": {
+    "category": null,
+    "course_name": "Blockchain Technology",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:10:35.116Z",
+    "updated_at": "2026-09-12T11:10:35.116Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 27,
+  "fields": {
+    "category": null,
+    "course_name": "Gaming Technology",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:10:38.824Z",
+    "updated_at": "2026-09-12T11:10:38.824Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 28,
+  "fields": {
+    "category": null,
+    "course_name": "Data Science",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:10:44.215Z",
+    "updated_at": "2026-09-12T11:10:44.216Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 29,
+  "fields": {
+    "category": null,
+    "course_name": "B.Tech. Electronics And Computer Engineering",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:11:23.655Z",
+    "updated_at": "2026-09-12T11:11:23.655Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 30,
+  "fields": {
+    "category": null,
+    "course_name": "Electronics",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:11:31.158Z",
+    "updated_at": "2026-09-12T11:11:31.158Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 31,
+  "fields": {
+    "category": null,
+    "course_name": "Aeronautical",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:14:27.321Z",
+    "updated_at": "2026-09-12T11:14:27.321Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 32,
+  "fields": {
+    "category": null,
+    "course_name": "Biotechnology",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:14:30.274Z",
+    "updated_at": "2026-09-12T11:14:30.274Z"
+  }
+},
+{
+  "model": "leads.course",
+  "pk": 33,
+  "fields": {
+    "category": null,
+    "course_name": "Chemical Engineering",
+    "duration": "",
+    "fee": null,
+    "description": "",
+    "eligibility": "",
+    "syllabus_file": "",
+    "status": "ACTIVE",
+    "created_at": "2026-09-12T11:14:30.802Z",
+    "updated_at": "2026-09-12T11:14:30.802Z"
+  }
+},
+{
+  "model": "leads.importbatch",
+  "pk": 6,
+  "fields": {
+    "batch_code": "BATCH-20260913121407-DREAMCADD.xlsx (admin)",
+    "file_name": "DREAMCADD.xlsx",
+    "uploaded_by": 1,
+    "uploaded_at": "2026-09-13T12:14:07.711Z",
+    "total_rows": 7,
+    "new_leads": 7,
+    "updated_leads": 0,
+    "duplicates": 0,
+    "errors": []
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 1,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913103852-BHARATH@12",
+    "import_batch": null,
+    "caller": 6,
+    "allocated_by": 1,
+    "lead_count": 3,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T10:38:52.367Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 2,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913104534-MANJULA@12",
+    "import_batch": null,
+    "caller": 4,
+    "allocated_by": 1,
+    "lead_count": 3,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T10:45:34.452Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 3,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913110222-BHARATH@12",
+    "import_batch": null,
+    "caller": 6,
+    "allocated_by": 1,
+    "lead_count": 3,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T11:02:22.637Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 4,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913113725-MANJULA@12",
+    "import_batch": null,
+    "caller": 4,
+    "allocated_by": 1,
+    "lead_count": 1,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T11:37:25.726Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 5,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913113733-PURUSH@123",
+    "import_batch": null,
+    "caller": 5,
+    "allocated_by": 1,
+    "lead_count": 1,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T11:37:33.410Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 6,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913113742-PURUSH@123",
+    "import_batch": null,
+    "caller": 5,
+    "allocated_by": 1,
+    "lead_count": 1,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T11:37:42.463Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 7,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913122118-BHARATH@12",
+    "import_batch": null,
+    "caller": 6,
+    "allocated_by": 1,
+    "lead_count": 4,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T12:21:18.137Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 8,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913123022-BHARATH@12",
+    "import_batch": null,
+    "caller": 6,
+    "allocated_by": 1,
+    "lead_count": 1,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T12:30:22.145Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 9,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260913123048-BHARATH@12",
+    "import_batch": null,
+    "caller": 6,
+    "allocated_by": 1,
+    "lead_count": 1,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-13T12:30:48.973Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 10,
+  "fields": {
+    "batch_code": "ALLOC-20260913125923-MANJULA@12",
+    "import_batch": null,
+    "caller": 4,
+    "allocated_by": 1,
+    "lead_count": 3,
+    "notes": "Auto batch allocation of 3 leads",
+    "created_at": "2026-09-13T12:59:23.128Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 11,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260914065504-BHARATH@12",
+    "import_batch": null,
+    "caller": 6,
+    "allocated_by": 1,
+    "lead_count": 1,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-14T06:55:04.368Z"
+  }
+},
+{
+  "model": "leads.allocationbatch",
+  "pk": 12,
+  "fields": {
+    "batch_code": "ALLOC-MANUAL-20260914161020-PAWAN",
+    "import_batch": null,
+    "caller": 8,
+    "allocated_by": 1,
+    "lead_count": 5,
+    "notes": "Manual selection allocation",
+    "created_at": "2026-09-14T16:10:20.546Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20730,
+  "fields": {
+    "name": "PURUSHOTHAMAN",
+    "phone": "7604874641",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "NOT_INTERESTED",
+    "assigned_to": 8,
+    "assigned_at": "2026-09-14T16:10:20.562Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 12,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": true,
+    "first_contacted_at": null,
+    "last_call_at": "2026-09-14T16:11:04.594Z",
+    "current_response": "Not Interested",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.730Z",
+    "updated_at": "2026-09-14T16:11:04.594Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20731,
+  "fields": {
+    "name": "KUBERAN",
+    "phone": "8838842045",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "ASSIGNED",
+    "assigned_to": 4,
+    "assigned_at": "2026-09-13T12:59:23.134Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 10,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": false,
+    "first_contacted_at": null,
+    "last_call_at": null,
+    "current_response": "Not Contacted",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.751Z",
+    "updated_at": "2026-09-13T12:59:23.134Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20732,
+  "fields": {
+    "name": "BALAJI",
+    "phone": "8056605144",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "ASSIGNED",
+    "assigned_to": 4,
+    "assigned_at": "2026-09-13T12:59:23.156Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 10,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": false,
+    "first_contacted_at": null,
+    "last_call_at": null,
+    "current_response": "Not Contacted",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.770Z",
+    "updated_at": "2026-09-13T12:59:23.157Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20733,
+  "fields": {
+    "name": "kamesh",
+    "phone": "7092929658",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "NOT_CONNECTED",
+    "assigned_to": 8,
+    "assigned_at": "2026-09-14T16:10:20.581Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 12,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": true,
+    "first_contacted_at": null,
+    "last_call_at": "2026-09-14T06:49:08.524Z",
+    "current_response": "No Response",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.797Z",
+    "updated_at": "2026-09-14T16:10:20.581Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20734,
+  "fields": {
+    "name": "bharth",
+    "phone": "7305761397",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "CALL_BACK",
+    "assigned_to": 8,
+    "assigned_at": "2026-09-14T16:10:20.601Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 12,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": true,
+    "first_contacted_at": "2026-09-14T06:55:45.875Z",
+    "last_call_at": "2026-09-14T06:55:45.875Z",
+    "current_response": "Call Back 📞",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.816Z",
+    "updated_at": "2026-09-14T16:10:20.601Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20735,
+  "fields": {
+    "name": "manjula",
+    "phone": "7092535571",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "BUSY",
+    "assigned_to": 8,
+    "assigned_at": "2026-09-14T16:10:20.620Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 12,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": true,
+    "first_contacted_at": null,
+    "last_call_at": null,
+    "current_response": "Not Contacted",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.832Z",
+    "updated_at": "2026-09-14T16:10:20.620Z"
+  }
+},
+{
+  "model": "leads.lead",
+  "pk": 20736,
+  "fields": {
+    "name": "raj",
+    "phone": "8778833412",
+    "email": "nan",
+    "education": "nan",
+    "college": "nan",
+    "interested_course": null,
+    "preferred_branch": null,
+    "budget": "",
+    "requirement_note": "",
+    "status": "CALL_BACK",
+    "assigned_to": 8,
+    "assigned_at": "2026-09-14T16:10:20.646Z",
+    "source_batch": "DREAMCADD.xlsx (admin)",
+    "import_batch": 6,
+    "allocation_batch": 12,
+    "lead_source": 1,
+    "lead_score": 50,
+    "priority": "WARM",
+    "contacted": true,
+    "first_contacted_at": null,
+    "last_call_at": "2026-09-14T06:48:58.433Z",
+    "current_response": "Call Back 📞",
+    "ai_intent": "General Enquiry",
+    "ai_suggested_response": "",
+    "ai_next_action": "Call to introduce course details",
+    "ai_summary": "",
+    "scheduled_date": null,
+    "created_at": "2026-09-13T12:14:07.849Z",
+    "updated_at": "2026-09-14T16:10:20.646Z"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 123,
+  "fields": {
+    "lead": 20730,
+    "caller": 4,
+    "assigned_date": "2026-09-13T12:14:07.882Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 124,
+  "fields": {
+    "lead": 20731,
+    "caller": 5,
+    "assigned_date": "2026-09-13T12:14:07.927Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 125,
+  "fields": {
+    "lead": 20732,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:14:08.002Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 126,
+  "fields": {
+    "lead": 20733,
+    "caller": 4,
+    "assigned_date": "2026-09-13T12:14:08.123Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 127,
+  "fields": {
+    "lead": 20734,
+    "caller": 5,
+    "assigned_date": "2026-09-13T12:14:08.191Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 128,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:14:08.264Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 129,
+  "fields": {
+    "lead": 20736,
+    "caller": 4,
+    "assigned_date": "2026-09-13T12:14:08.331Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 130,
+  "fields": {
+    "lead": 20730,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:21:18.148Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 131,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:21:18.161Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 132,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:21:18.175Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 133,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:21:18.189Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 134,
+  "fields": {
+    "lead": 20734,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:30:22.158Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 135,
+  "fields": {
+    "lead": 20734,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:30:36.635Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 136,
+  "fields": {
+    "lead": 20731,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:30:48.985Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 137,
+  "fields": {
+    "lead": 20731,
+    "caller": 6,
+    "assigned_date": "2026-09-13T12:31:13.640Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 138,
+  "fields": {
+    "lead": 20731,
+    "caller": 4,
+    "assigned_date": "2026-09-13T12:59:23.143Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 139,
+  "fields": {
+    "lead": 20732,
+    "caller": 4,
+    "assigned_date": "2026-09-13T12:59:23.163Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 140,
+  "fields": {
+    "lead": 20734,
+    "caller": 4,
+    "assigned_date": "2026-09-13T12:59:23.180Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 141,
+  "fields": {
+    "lead": 20734,
+    "caller": 4,
+    "assigned_date": "2026-09-14T06:52:16.933Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 142,
+  "fields": {
+    "lead": 20734,
+    "caller": 6,
+    "assigned_date": "2026-09-14T06:55:04.377Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 143,
+  "fields": {
+    "lead": 20730,
+    "caller": 6,
+    "assigned_date": "2026-09-14T16:09:50.945Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 144,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "assigned_date": "2026-09-14T16:09:50.974Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 145,
+  "fields": {
+    "lead": 20734,
+    "caller": 6,
+    "assigned_date": "2026-09-14T16:09:50.997Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 146,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "assigned_date": "2026-09-14T16:09:51.031Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 147,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "assigned_date": "2026-09-14T16:09:51.056Z",
+    "status": "CLOSED"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 148,
+  "fields": {
+    "lead": 20730,
+    "caller": 8,
+    "assigned_date": "2026-09-14T16:10:20.569Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 149,
+  "fields": {
+    "lead": 20733,
+    "caller": 8,
+    "assigned_date": "2026-09-14T16:10:20.589Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 150,
+  "fields": {
+    "lead": 20734,
+    "caller": 8,
+    "assigned_date": "2026-09-14T16:10:20.606Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 151,
+  "fields": {
+    "lead": 20735,
+    "caller": 8,
+    "assigned_date": "2026-09-14T16:10:20.631Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.leadassignment",
+  "pk": 152,
+  "fields": {
+    "lead": 20736,
+    "caller": 8,
+    "assigned_date": "2026-09-14T16:10:20.652Z",
+    "status": "ACTIVE"
+  }
+},
+{
+  "model": "leads.dailyschedule",
+  "pk": 1,
+  "fields": {
+    "caller": 7,
+    "target_date": "2026-09-15",
+    "daily_call_target": 40,
+    "daily_conversion_target": 10,
+    "notes": "",
+    "created_by": 1,
+    "created_at": "2026-09-14T21:27:08.348Z",
+    "updated_at": "2026-09-14T21:27:08.349Z"
+  }
+},
+{
+  "model": "leads.followup",
+  "pk": 2,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "scheduled_date": "2026-09-16T04:30:00Z",
+    "completed_at": null,
+    "completed_by": null,
+    "status": "PENDING",
+    "remarks": "Scheduled via mobile quick-response (Call Back Requested 📞)",
+    "created_at": "2026-09-13T12:46:30.723Z",
+    "updated_at": "2026-09-13T12:46:30.723Z"
+  }
+},
+{
+  "model": "leads.followup",
+  "pk": 3,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "scheduled_date": "2026-09-16T04:30:00Z",
+    "completed_at": null,
+    "completed_by": null,
+    "status": "PENDING",
+    "remarks": "Scheduled via mobile quick-response (Interested)",
+    "created_at": "2026-09-13T12:54:54.424Z",
+    "updated_at": "2026-09-13T12:54:54.424Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 7,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-13T12:35:05.037Z",
+    "duration_seconds": 0,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789302714652-8316",
+    "created_at": "2026-09-13T12:35:05.038Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 8,
+  "fields": {
+    "lead": 20730,
+    "caller": 6,
+    "call_time": "2026-09-13T12:40:25.774Z",
+    "duration_seconds": 0,
+    "call_result": "NOT_CONNECTED",
+    "remarks": "Quick response logged: NOT_CONNECTED",
+    "call_session_id": "CS-1789303203002-4010",
+    "created_at": "2026-09-13T12:40:25.774Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 9,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "call_time": "2026-09-13T12:46:30.700Z",
+    "duration_seconds": 0,
+    "call_result": "CALLBACK_REQUESTED",
+    "remarks": "Quick response logged: CALLBACK_REQUESTED",
+    "call_session_id": "CS-1789303429694-8924",
+    "created_at": "2026-09-13T12:46:30.701Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 10,
+  "fields": {
+    "lead": 20730,
+    "caller": 6,
+    "call_time": "2026-09-13T12:54:00.190Z",
+    "duration_seconds": 0,
+    "call_result": "BUSY",
+    "remarks": "Quick response logged: BUSY",
+    "call_session_id": "CS-1789304010614-9728",
+    "created_at": "2026-09-13T12:54:00.201Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 11,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-13T12:54:54.377Z",
+    "duration_seconds": 0,
+    "call_result": "INTERESTED",
+    "remarks": "Quick response logged: INTERESTED",
+    "call_session_id": "CS-1789304071527-7809",
+    "created_at": "2026-09-13T12:54:54.377Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 12,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "call_time": "2026-09-13T12:59:15.798Z",
+    "duration_seconds": 0,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789304345935-9374",
+    "created_at": "2026-09-13T12:59:15.800Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 13,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "call_time": "2026-09-13T13:01:10.125Z",
+    "duration_seconds": 0,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789304463795-1698",
+    "created_at": "2026-09-13T13:01:10.125Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 14,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "call_time": "2026-09-13T13:13:16.843Z",
+    "duration_seconds": 7,
+    "call_result": "NOT_CONNECTED",
+    "remarks": "Quick response logged: NOT_CONNECTED",
+    "call_session_id": "CS-1789305189969-4355",
+    "created_at": "2026-09-13T13:13:16.843Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 15,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "call_time": "2026-09-13T13:16:04.593Z",
+    "duration_seconds": 10,
+    "call_result": "NOT_CONNECTED",
+    "remarks": "Quick response logged: NOT_CONNECTED",
+    "call_session_id": "CS-1789305354875-4941",
+    "created_at": "2026-09-13T13:16:04.596Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 16,
+  "fields": {
+    "lead": 20730,
+    "caller": 6,
+    "call_time": "2026-09-13T13:19:20.526Z",
+    "duration_seconds": 39,
+    "call_result": "NOT_CONNECTED",
+    "remarks": "Quick response logged: NOT_CONNECTED",
+    "call_session_id": "CS-1789305522238-980",
+    "created_at": "2026-09-13T13:19:20.527Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 17,
+  "fields": {
+    "lead": 20735,
+    "caller": 6,
+    "call_time": "2026-09-13T13:19:57.755Z",
+    "duration_seconds": 7,
+    "call_result": "BUSY",
+    "remarks": "Quick response logged: BUSY",
+    "call_session_id": "CS-1789305590928-215",
+    "created_at": "2026-09-13T13:19:57.757Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 18,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "call_time": "2026-09-13T13:20:40.800Z",
+    "duration_seconds": 39,
+    "call_result": "NOT_CONNECTED",
+    "remarks": "Quick response logged: NOT_CONNECTED",
+    "call_session_id": "CS-1789305602297-8021",
+    "created_at": "2026-09-13T13:20:40.801Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 19,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-13T13:21:26.888Z",
+    "duration_seconds": 27,
+    "call_result": "BUSY",
+    "remarks": "Quick response logged: BUSY",
+    "call_session_id": "CS-1789305660328-9057",
+    "created_at": "2026-09-13T13:21:26.889Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 20,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-13T13:41:19.451Z",
+    "duration_seconds": 15,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789306865141-4290",
+    "created_at": "2026-09-13T13:41:19.452Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 21,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-13T13:41:41.409Z",
+    "duration_seconds": 10,
+    "call_result": "NOT_CONNECTED",
+    "remarks": "Quick response logged: NOT_CONNECTED",
+    "call_session_id": "CS-1789306891762-4198",
+    "created_at": "2026-09-13T13:41:41.409Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 22,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-14T06:33:52.210Z",
+    "duration_seconds": 13,
+    "call_result": "NOT_ANSWERED",
+    "remarks": "Quick response logged: NOT_ANSWERED",
+    "call_session_id": "CS-1789367620409-7538",
+    "created_at": "2026-09-14T06:33:52.212Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 23,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-14T06:33:59.790Z",
+    "duration_seconds": 4,
+    "call_result": "BUSY",
+    "remarks": "Quick response logged: BUSY",
+    "call_session_id": "CS-1789367636442-997",
+    "created_at": "2026-09-14T06:33:59.790Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 24,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-14T06:34:34.453Z",
+    "duration_seconds": 7,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789367668794-9713",
+    "created_at": "2026-09-14T06:34:34.454Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 25,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-14T06:34:44.076Z",
+    "duration_seconds": 3,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789367681919-6095",
+    "created_at": "2026-09-14T06:34:44.076Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 26,
+  "fields": {
+    "lead": 20736,
+    "caller": 6,
+    "call_time": "2026-09-14T06:48:58.429Z",
+    "duration_seconds": 6,
+    "call_result": "SWITCHED_OFF",
+    "remarks": "Quick response logged: SWITCHED_OFF",
+    "call_session_id": "CS-1789368532681-1659",
+    "created_at": "2026-09-14T06:48:58.429Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 27,
+  "fields": {
+    "lead": 20733,
+    "caller": 6,
+    "call_time": "2026-09-14T06:49:08.517Z",
+    "duration_seconds": 3,
+    "call_result": "NO_RESPONSE",
+    "remarks": "Quick response logged: NO_RESPONSE",
+    "call_session_id": "CS-1789368545713-2010",
+    "created_at": "2026-09-14T06:49:08.518Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 28,
+  "fields": {
+    "lead": 20734,
+    "caller": 6,
+    "call_time": "2026-09-14T06:55:45.867Z",
+    "duration_seconds": 26,
+    "call_result": "CONVERTED",
+    "remarks": "Quick response logged: CONVERTED",
+    "call_session_id": "CS-1789368919701-6490",
+    "created_at": "2026-09-14T06:55:45.872Z"
+  }
+},
+{
+  "model": "leads.calllog",
+  "pk": 29,
+  "fields": {
+    "lead": 20730,
+    "caller": 8,
+    "call_time": "2026-09-14T16:11:04.588Z",
+    "duration_seconds": 21,
+    "call_result": "NOT_INTERESTED",
+    "remarks": "Quick response logged: NOT_INTERESTED",
+    "call_session_id": "CS-1789402242621-5293",
+    "created_at": "2026-09-14T16:11:04.588Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20913,
+  "fields": {
+    "lead": 20730,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.738Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20914,
+  "fields": {
+    "lead": 20731,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.756Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20915,
+  "fields": {
+    "lead": 20732,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.782Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20916,
+  "fields": {
+    "lead": 20733,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.803Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20917,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.822Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20918,
+  "fields": {
+    "lead": 20735,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.839Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20919,
+  "fields": {
+    "lead": 20736,
+    "actor": 1,
+    "activity_type": "IMPORTED",
+    "description": "Imported via Excel batch DREAMCADD.xlsx (admin)",
+    "timestamp": "2026-09-13T12:14:07.855Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20920,
+  "fields": {
+    "lead": 20730,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller MANJULA S",
+    "timestamp": "2026-09-13T12:14:07.884Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20921,
+  "fields": {
+    "lead": 20730,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:07.916Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20922,
+  "fields": {
+    "lead": 20731,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller Purushothamans s",
+    "timestamp": "2026-09-13T12:14:07.928Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20923,
+  "fields": {
+    "lead": 20731,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:07.974Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20924,
+  "fields": {
+    "lead": 20732,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller bharath 4",
+    "timestamp": "2026-09-13T12:14:08.008Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20925,
+  "fields": {
+    "lead": 20732,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:08.083Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20926,
+  "fields": {
+    "lead": 20733,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller MANJULA S",
+    "timestamp": "2026-09-13T12:14:08.126Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20927,
+  "fields": {
+    "lead": 20733,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:08.173Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20928,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller Purushothamans s",
+    "timestamp": "2026-09-13T12:14:08.195Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20929,
+  "fields": {
+    "lead": 20734,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:08.247Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20930,
+  "fields": {
+    "lead": 20735,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller bharath 4",
+    "timestamp": "2026-09-13T12:14:08.265Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20931,
+  "fields": {
+    "lead": 20735,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:08.304Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20932,
+  "fields": {
+    "lead": 20736,
+    "actor": 1,
+    "activity_type": "ASSIGNED",
+    "description": "Assigned to telecaller MANJULA S",
+    "timestamp": "2026-09-13T12:14:08.335Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20933,
+  "fields": {
+    "lead": 20736,
+    "actor": null,
+    "activity_type": "WA_FAILED",
+    "description": "WhatsApp message failed to send: credentials missing.",
+    "timestamp": "2026-09-13T12:14:08.385Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20934,
+  "fields": {
+    "lead": 20730,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260913122118-BHARATH@12)",
+    "timestamp": "2026-09-13T12:21:18.153Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20935,
+  "fields": {
+    "lead": 20733,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260913122118-BHARATH@12)",
+    "timestamp": "2026-09-13T12:21:18.165Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20936,
+  "fields": {
+    "lead": 20735,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260913122118-BHARATH@12)",
+    "timestamp": "2026-09-13T12:21:18.180Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20937,
+  "fields": {
+    "lead": 20736,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260913122118-BHARATH@12)",
+    "timestamp": "2026-09-13T12:21:18.193Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20938,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260913123022-BHARATH@12)",
+    "timestamp": "2026-09-13T12:30:22.162Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20939,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-13T12:30:36.639Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20940,
+  "fields": {
+    "lead": 20731,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260913123048-BHARATH@12)",
+    "timestamp": "2026-09-13T12:30:48.990Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20941,
+  "fields": {
+    "lead": 20731,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-13T12:31:13.645Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20942,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-13T12:35:05.049Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20943,
+  "fields": {
+    "lead": 20730,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Connected",
+    "timestamp": "2026-09-13T12:40:25.787Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20944,
+  "fields": {
+    "lead": 20735,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Call Back Requested 📞 | Follow-up set for 16 Sep 2026, 10:00",
+    "timestamp": "2026-09-13T12:46:30.729Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20945,
+  "fields": {
+    "lead": 20730,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Busy",
+    "timestamp": "2026-09-13T12:54:00.244Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20946,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Interested | Follow-up set for 16 Sep 2026, 10:00",
+    "timestamp": "2026-09-13T12:54:54.440Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20947,
+  "fields": {
+    "lead": 20735,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-13T12:59:15.812Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20948,
+  "fields": {
+    "lead": 20731,
+    "actor": 1,
+    "activity_type": "AUTO_ASSIGNED",
+    "description": "Batch assigned to manjula@12 (Batch ALLOC-20260913125923-MANJULA@12)",
+    "timestamp": "2026-09-13T12:59:23.151Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20949,
+  "fields": {
+    "lead": 20732,
+    "actor": 1,
+    "activity_type": "AUTO_ASSIGNED",
+    "description": "Batch assigned to manjula@12 (Batch ALLOC-20260913125923-MANJULA@12)",
+    "timestamp": "2026-09-13T12:59:23.170Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20950,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "AUTO_ASSIGNED",
+    "description": "Batch assigned to manjula@12 (Batch ALLOC-20260913125923-MANJULA@12)",
+    "timestamp": "2026-09-13T12:59:23.221Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20951,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-13T13:01:10.138Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20952,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Connected",
+    "timestamp": "2026-09-13T13:13:16.849Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20953,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Connected",
+    "timestamp": "2026-09-13T13:16:04.605Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20954,
+  "fields": {
+    "lead": 20730,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Connected",
+    "timestamp": "2026-09-13T13:19:20.544Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20955,
+  "fields": {
+    "lead": 20735,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Busy",
+    "timestamp": "2026-09-13T13:19:57.773Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20956,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Connected",
+    "timestamp": "2026-09-13T13:20:40.810Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20957,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Busy",
+    "timestamp": "2026-09-13T13:21:26.904Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20958,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-13T13:41:19.473Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20959,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Connected",
+    "timestamp": "2026-09-13T13:41:41.415Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20960,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "RESPONSE_UPDATED",
+    "description": "Response updated from 'Not Contacted' to 'Not Answered 📵'.",
+    "timestamp": "2026-09-14T06:10:11.922Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20961,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Answered 📵",
+    "timestamp": "2026-09-14T06:33:52.218Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20962,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Busy",
+    "timestamp": "2026-09-14T06:33:59.799Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20963,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-14T06:34:34.463Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20964,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-14T06:34:44.082Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20965,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Switched Off",
+    "timestamp": "2026-09-14T06:48:58.439Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20966,
+  "fields": {
+    "lead": 20733,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: No Response",
+    "timestamp": "2026-09-14T06:49:08.531Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20967,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from manjula@12 by MD",
+    "timestamp": "2026-09-14T06:52:16.937Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20968,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to bharath@123 (Batch ALLOC-MANUAL-20260914065504-BHARATH@12)",
+    "timestamp": "2026-09-14T06:55:04.382Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20969,
+  "fields": {
+    "lead": 20734,
+    "actor": 6,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Converted 🎉",
+    "timestamp": "2026-09-14T06:55:45.880Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20970,
+  "fields": {
+    "lead": 20734,
+    "actor": 6,
+    "activity_type": "RESPONSE_UPDATED",
+    "description": "Response updated from 'Converted 🎉' to 'Call Back 📞'.",
+    "timestamp": "2026-09-14T06:57:07.851Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20971,
+  "fields": {
+    "lead": 20734,
+    "actor": 6,
+    "activity_type": "RESPONSE_UPDATED",
+    "description": "Response updated from 'Call Back 📞' to 'Call Back 📞'.",
+    "timestamp": "2026-09-14T06:57:11.298Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20972,
+  "fields": {
+    "lead": 20734,
+    "actor": 6,
+    "activity_type": "RESPONSE_UPDATED",
+    "description": "Response updated from 'Call Back 📞' to 'Call Back 📞'.",
+    "timestamp": "2026-09-14T07:10:13.431Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20973,
+  "fields": {
+    "lead": 20734,
+    "actor": 6,
+    "activity_type": "RESPONSE_UPDATED",
+    "description": "Response updated from 'Call Back 📞' to 'Call Back 📞'.",
+    "timestamp": "2026-09-14T07:35:32.745Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20974,
+  "fields": {
+    "lead": 20736,
+    "actor": 6,
+    "activity_type": "RESPONSE_UPDATED",
+    "description": "Response updated from 'Switched Off' to 'Call Back 📞'.",
+    "timestamp": "2026-09-14T07:38:26.256Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20975,
+  "fields": {
+    "lead": 20730,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-14T16:09:50.953Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20976,
+  "fields": {
+    "lead": 20733,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-14T16:09:50.980Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20977,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-14T16:09:51.005Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20978,
+  "fields": {
+    "lead": 20735,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-14T16:09:51.039Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20979,
+  "fields": {
+    "lead": 20736,
+    "actor": 1,
+    "activity_type": "UNASSIGNED",
+    "description": "Unassigned from bharath@123 by MD",
+    "timestamp": "2026-09-14T16:09:51.062Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20980,
+  "fields": {
+    "lead": 20730,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to pawan (Batch ALLOC-MANUAL-20260914161020-PAWAN)",
+    "timestamp": "2026-09-14T16:10:20.575Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20981,
+  "fields": {
+    "lead": 20733,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to pawan (Batch ALLOC-MANUAL-20260914161020-PAWAN)",
+    "timestamp": "2026-09-14T16:10:20.596Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20982,
+  "fields": {
+    "lead": 20734,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to pawan (Batch ALLOC-MANUAL-20260914161020-PAWAN)",
+    "timestamp": "2026-09-14T16:10:20.613Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20983,
+  "fields": {
+    "lead": 20735,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to pawan (Batch ALLOC-MANUAL-20260914161020-PAWAN)",
+    "timestamp": "2026-09-14T16:10:20.639Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20984,
+  "fields": {
+    "lead": 20736,
+    "actor": 1,
+    "activity_type": "REASSIGNED",
+    "description": "Manually assigned to pawan (Batch ALLOC-MANUAL-20260914161020-PAWAN)",
+    "timestamp": "2026-09-14T16:10:20.659Z"
+  }
+},
+{
+  "model": "leads.leadactivity",
+  "pk": 20985,
+  "fields": {
+    "lead": 20730,
+    "actor": 8,
+    "activity_type": "QUICK_CALL_LOG",
+    "description": "Call logged: Not Interested",
+    "timestamp": "2026-09-14T16:11:04.602Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 6,
+  "fields": {
+    "lead": 20730,
+    "message": "Hi PURUSHOTHAMAN, welcome to DreamCadd! Our counselor MANJULA S will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:07.903Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 7,
+  "fields": {
+    "lead": 20731,
+    "message": "Hi KUBERAN, welcome to DreamCadd! Our counselor Purushothamans s will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:07.945Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 8,
+  "fields": {
+    "lead": 20732,
+    "message": "Hi BALAJI, welcome to DreamCadd! Our counselor bharath 4 will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:08.048Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 9,
+  "fields": {
+    "lead": 20733,
+    "message": "Hi kamesh, welcome to DreamCadd! Our counselor MANJULA S will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:08.147Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 10,
+  "fields": {
+    "lead": 20734,
+    "message": "Hi bharth, welcome to DreamCadd! Our counselor Purushothamans s will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:08.234Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 11,
+  "fields": {
+    "lead": 20735,
+    "message": "Hi manjula, welcome to DreamCadd! Our counselor bharath 4 will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:08.287Z"
+  }
+},
+{
+  "model": "leads.whatsappmessage",
+  "pk": 12,
+  "fields": {
+    "lead": 20736,
+    "message": "Hi raj, welcome to DreamCadd! Our counselor MANJULA S will contact you shortly.",
+    "direction": "OUTBOUND",
+    "status": "FAILED",
+    "timestamp": "2026-09-13T12:14:08.360Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 1,
+  "fields": {
+    "user": 4,
+    "title": "New Lead Assigned",
+    "message": "Lead 'PURUSHOTHAMAN' (917604874641) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-12T11:49:23.107Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 2,
+  "fields": {
+    "user": 4,
+    "title": "New Lead Assigned",
+    "message": "Lead 'KUBERAN' (918838842045) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-12T11:49:23.167Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 3,
+  "fields": {
+    "user": 4,
+    "title": "New Lead Assigned",
+    "message": "Lead 'BALAJI' (919875643120) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-12T11:49:23.235Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 4,
+  "fields": {
+    "user": 4,
+    "title": "New Lead Assigned",
+    "message": "Lead 'PURUSHOTHAMAN' (7604874641) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:07.885Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 5,
+  "fields": {
+    "user": 5,
+    "title": "New Lead Assigned",
+    "message": "Lead 'KUBERAN' (8838842045) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:07.929Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 6,
+  "fields": {
+    "user": 6,
+    "title": "New Lead Assigned",
+    "message": "Lead 'BALAJI' (8056605144) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:08.014Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 7,
+  "fields": {
+    "user": 4,
+    "title": "New Lead Assigned",
+    "message": "Lead 'kamesh' (7092929658) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:08.130Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 8,
+  "fields": {
+    "user": 5,
+    "title": "New Lead Assigned",
+    "message": "Lead 'bharth' (7305761397) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:08.198Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 9,
+  "fields": {
+    "user": 6,
+    "title": "New Lead Assigned",
+    "message": "Lead 'manjula' (7092535571) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:08.266Z"
+  }
+},
+{
+  "model": "leads.notification",
+  "pk": 10,
+  "fields": {
+    "user": 4,
+    "title": "New Lead Assigned",
+    "message": "Lead 'raj' (8778833412) has been assigned to you.",
+    "is_read": false,
+    "created_at": "2026-09-13T12:14:08.337Z"
+  }
+},
+{
+  "model": "leads.exporthistory",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "export_type": "Telecaller Work Export (bharath@123)",
+    "filters_applied": {
+      "caller": "bharath@123"
+    },
+    "record_count": 4,
+    "exported_at": "2026-09-13T12:23:51.476Z"
+  }
+},
+{
+  "model": "leads.exporthistory",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "export_type": "Telecaller Work Export (bharath@123)",
+    "filters_applied": {
+      "caller": "bharath@123"
+    },
+    "record_count": 4,
+    "exported_at": "2026-09-13T12:59:42.987Z"
+  }
+},
+{
+  "model": "leads.exporthistory",
+  "pk": 3,
+  "fields": {
+    "user": 1,
+    "export_type": "Telecaller Work Export (bharath@123)",
+    "filters_applied": {
+      "caller": "bharath@123"
+    },
+    "record_count": 4,
+    "exported_at": "2026-09-13T13:01:34.464Z"
+  }
+},
+{
+  "model": "leads.exporthistory",
+  "pk": 4,
+  "fields": {
+    "user": 1,
+    "export_type": "Full Call History Log CSV",
+    "filters_applied": {
+      "all_calls": true
+    },
+    "record_count": 13,
+    "exported_at": "2026-09-13T13:39:09.643Z"
+  }
+},
+{
+  "model": "leads.exporthistory",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "export_type": "Follow-up Schedule Report CSV",
+    "filters_applied": {
+      "all_followups": true
+    },
+    "record_count": 2,
+    "exported_at": "2026-09-13T13:39:27.635Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T05:50:53.728Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "action": "USERNAME_CHANGED",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "Username updated from 'admin' to 'DREAMCADD'",
+    "timestamp": "2026-09-14T05:51:42.856Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 3,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T05:57:30.333Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 4,
+  "fields": {
+    "user": 6,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T05:58:49.569Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 5,
+  "fields": {
+    "user": 6,
+    "action": "LOGIN",
+    "ip_address": "192.168.29.236",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T06:33:29.445Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 6,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T06:51:50.489Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 7,
+  "fields": {
+    "user": 6,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T07:25:20.473Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 8,
+  "fields": {
+    "user": 6,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T07:29:14.060Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 9,
+  "fields": {
+    "user": 6,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T08:29:33.909Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 10,
+  "fields": {
+    "user": 6,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T15:54:35.037Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 11,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T15:57:39.753Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 12,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T16:04:19.538Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 13,
+  "fields": {
+    "user": 8,
+    "action": "LOGIN",
+    "ip_address": "192.168.29.138",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T16:10:02.122Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 14,
+  "fields": {
+    "user": 8,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T16:25:46.825Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 15,
+  "fields": {
+    "user": 8,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T19:35:48.392Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 16,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-14T21:25:36.069Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 17,
+  "fields": {
+    "user": 1,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-15T07:42:39.150Z"
+  }
+},
+{
+  "model": "leads.securityauditlog",
+  "pk": 18,
+  "fields": {
+    "user": 8,
+    "action": "LOGIN",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "details": "User logged in successfully",
+    "timestamp": "2026-09-15T08:55:11.800Z"
+  }
+}
+]

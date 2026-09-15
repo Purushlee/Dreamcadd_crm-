@@ -621,6 +621,41 @@ class DreamCaddAuthRoleRoutingTestCase(TestCase):
         data = resp.json()
         self.assertFalse(data["authenticated"])
 
+    def test_admin_can_create_telecaller_via_manage_callers(self):
+        """Verify ADMIN/MD can create a new TELECALLER from manage_callers UI."""
+        self.client.login(username="admin_md", password="AdminPassword123!")
+        url = reverse("manage_callers")
+        post_data = {
+            "create_caller": "1",
+            "username": "new_telecaller_test",
+            "password": "NewCallerPassword123!",
+            "first_name": "Test",
+            "last_name": "Caller",
+            "email": "caller@example.com",
+            "phone": "9876543210",
+            "max_leads": "50",
+            "daily_call_target": "20",
+        }
+        resp = self.client.post(url, post_data)
+        self.assertRedirects(resp, url)
+
+        created_user = User.objects.filter(username="new_telecaller_test").first()
+        self.assertIsNotNone(created_user)
+        self.assertEqual(created_user.role, User.Role.TELECALLER)
+        self.assertEqual(created_user.status, "ACTIVE")
+        self.assertTrue(created_user.check_password("NewCallerPassword123!"))
+        self.assertEqual(created_user.telecaller_profile.max_leads, 50)
+
+    def test_newly_created_telecaller_can_login(self):
+        """Verify newly created telecaller can authenticate and reach telecaller dashboard."""
+        User.objects.create_user(
+            username="created_caller", password="CreatedCallerPass123!", role=User.Role.TELECALLER, status="ACTIVE"
+        )
+        login_url = reverse("login")
+        resp = self.client.post(login_url, {"username": "created_caller", "password": "CreatedCallerPass123!"})
+        self.assertRedirects(resp, reverse("telecaller_dashboard"))
+
+
 
 
 

@@ -28,9 +28,11 @@ class ExcelUploadForm(forms.Form):
 
 
 class TelecallerCreateForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}))
-    first_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
-    last_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), min_length=6)
+    first_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), required=False)
+    last_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), required=False)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-control"}), required=False)
+    phone = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), required=False)
     max_leads = forms.IntegerField(initial=100, widget=forms.NumberInput(attrs={"class": "form-control"}))
     daily_call_target = forms.IntegerField(initial=30, widget=forms.NumberInput(attrs={"class": "form-control"}))
 
@@ -39,9 +41,13 @@ class TelecallerCreateForm(forms.ModelForm):
         fields = ["username", "first_name", "last_name", "email", "phone"]
         widgets = {
             "username": forms.TextInput(attrs={"class": "form-control"}),
-            "email": forms.EmailInput(attrs={"class": "form-control"}),
-            "phone": forms.TextInput(attrs={"class": "form-control"}),
         }
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username", "").strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError(f"Username '{username}' is already taken.")
+        return username
 
 
 class CompanySettingsForm(forms.ModelForm):

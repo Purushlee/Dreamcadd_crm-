@@ -1,5 +1,7 @@
+import sys
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
+from django.core.management import call_command
 
 
 def auto_seed_default_users(sender, **kwargs):
@@ -25,17 +27,11 @@ def auto_seed_default_users(sender, **kwargs):
                 status="ACTIVE"
             )
 
-        # Ensure default TELECALLER user pawan exists
-        pawan_user = User.objects.filter(username="pawan").first()
-        if not pawan_user:
-            User.objects.create_user(
-                username="pawan",
-                password="callerpassword",
-                role=User.Role.TELECALLER,
-                status="ACTIVE"
-            )
-    except Exception:
-        pass
+        # Import all local CRM fixture data in non-test environments
+        if "test" not in sys.argv:
+            call_command("import_crm_data")
+    except Exception as e:
+        print(f"Auto-seed error: {e}")
 
 
 class LeadsConfig(AppConfig):

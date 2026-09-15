@@ -465,6 +465,7 @@ class SecurityAuditLog(models.Model):
     class Action(models.TextChoices):
         USERNAME_CHANGED = "USERNAME_CHANGED", "Username Changed"
         PASSWORD_CHANGED = "PASSWORD_CHANGED", "Password Changed"
+        TELECALLER_CREATED = "TELECALLER_CREATED", "Telecaller Created"
         OTHER_SESSIONS_LOGGED_OUT = "OTHER_SESSIONS_LOGGED_OUT", "Other Sessions Logged Out"
         LOGIN = "LOGIN", "User Login"
         LOGOUT = "LOGOUT", "User Logout"

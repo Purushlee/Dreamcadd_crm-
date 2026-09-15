@@ -281,12 +281,14 @@ def manage_callers(request):
         converted_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CONVERTED))
     ).order_by("username")
 
+    form = TelecallerCreateForm()
     if request.method == "POST":
         if "create_caller" in request.POST:
             form = TelecallerCreateForm(request.POST)
             if form.is_valid():
                 user = form.save(commit=False)
                 user.role = User.Role.TELECALLER
+                user.status = "ACTIVE"
                 user.set_password(form.cleaned_data["password"])
                 user.save()
 
@@ -295,8 +297,19 @@ def manage_callers(request):
                 profile.daily_call_target = form.cleaned_data["daily_call_target"]
                 profile.save()
 
+                log_security_event(
+                    user=request.user,
+                    action=SecurityAuditLog.Action.TELECALLER_CREATED,
+                    request=request,
+                    details=f"Admin created new telecaller '{user.username}'"
+                )
+
                 messages.success(request, f"Telecaller '{user.username}' created successfully.")
                 return redirect("manage_callers")
+            else:
+                for field, errors in form.errors.items():
+                    for err in errors:
+                        messages.error(request, f"{field.replace('_', ' ').title()}: {err}")
         elif "toggle_status" in request.POST:
             caller_id = request.POST.get("caller_id")
             caller = get_object_or_404(User, id=caller_id, role=User.Role.TELECALLER)
@@ -361,7 +374,6 @@ def manage_callers(request):
                 messages.info(request, f"No credentials changes were submitted for telecaller '{caller.username}'.")
             return redirect("manage_callers")
 
-    form = TelecallerCreateForm()
     return render(request, "leads/manage_callers.html", {"telecallers": telecallers, "form": form})
 
 
