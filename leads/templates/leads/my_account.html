@@ -102,7 +102,7 @@
           </div>
         </div>
 
-        <form action="{% url 'change_username' %}" method="post">
+        <form action="{% url 'change_username' %}" method="post" autocomplete="off">
           {% csrf_token %}
           
           {% if username_form.non_field_errors %}
@@ -116,7 +116,7 @@
               <label class="form-label fw-6 text-dark small">Current Username <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-person-badge text-muted"></i></span>
-                <input type="text" name="current_username" class="form-control neu-inset {% if username_form.current_username.errors %}is-invalid{% endif %}" placeholder="Enter your current username" value="{{ username_form.current_username.value|default:'' }}" required>
+                <input type="text" name="current_username" class="form-control neu-inset {% if username_form.current_username.errors %}is-invalid{% endif %}" placeholder="Enter your current username" value="{{ username_form.current_username.value|default:'' }}" autocomplete="off" required>
               </div>
               {% if username_form.current_username.errors %}
                 <div class="text-danger small mt-1">{% for err in username_form.current_username.errors %}{{ err }}{% endfor %}</div>
@@ -127,7 +127,7 @@
               <label class="form-label fw-6 text-dark small">Current Password <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-lock text-muted"></i></span>
-                <input type="password" name="current_password" class="form-control neu-inset {% if username_form.current_password.errors %}is-invalid{% endif %}" placeholder="Enter your current password" required>
+                <input type="password" name="current_password" class="form-control neu-inset {% if username_form.current_password.errors %}is-invalid{% endif %}" placeholder="Enter your current password" autocomplete="new-password" required>
               </div>
               {% if username_form.current_password.errors %}
                 <div class="text-danger small mt-1">{% for err in username_form.current_password.errors %}{{ err }}{% endfor %}</div>
@@ -139,7 +139,7 @@
             <label class="form-label fw-6 text-dark small">New Username <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-person-plus text-accent"></i></span>
-              <input type="text" name="new_username" class="form-control neu-inset {% if username_form.new_username.errors %}is-invalid{% endif %}" placeholder="Enter new username" value="{{ username_form.new_username.value|default:'' }}" required>
+              <input type="text" name="new_username" class="form-control neu-inset {% if username_form.new_username.errors %}is-invalid{% endif %}" placeholder="Enter new username" value="{{ username_form.new_username.value|default:'' }}" autocomplete="off" required>
             </div>
             {% if username_form.new_username.errors %}
               <div class="text-danger small mt-1">{% for err in username_form.new_username.errors %}{{ err }}{% endfor %}</div>
@@ -166,7 +166,7 @@
           </div>
         </div>
 
-        <form action="{% url 'change_password' %}" method="post">
+        <form action="{% url 'change_password' %}" method="post" autocomplete="off">
           {% csrf_token %}
 
           {% if password_form.non_field_errors %}
@@ -180,7 +180,7 @@
               <label class="form-label fw-6 text-dark small">Current Username <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-person-badge text-muted"></i></span>
-                <input type="text" name="current_username" class="form-control neu-inset {% if password_form.current_username.errors %}is-invalid{% endif %}" placeholder="Enter your current username" value="{{ password_form.current_username.value|default:'' }}" required>
+                <input type="text" name="current_username" class="form-control neu-inset {% if password_form.current_username.errors %}is-invalid{% endif %}" placeholder="Enter your current username" value="{{ password_form.current_username.value|default:'' }}" autocomplete="off" required>
               </div>
               {% if password_form.current_username.errors %}
                 <div class="text-danger small mt-1">{% for err in password_form.current_username.errors %}{{ err }}{% endfor %}</div>
@@ -191,7 +191,7 @@
               <label class="form-label fw-6 text-dark small">Current Password <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-lock text-muted"></i></span>
-                <input type="password" name="current_password" class="form-control neu-inset {% if password_form.current_password.errors %}is-invalid{% endif %}" placeholder="Enter your current password" required>
+                <input type="password" name="current_password" class="form-control neu-inset {% if password_form.current_password.errors %}is-invalid{% endif %}" placeholder="Enter your current password" autocomplete="new-password" required>
               </div>
               {% if password_form.current_password.errors %}
                 <div class="text-danger small mt-1">{% for err in password_form.current_password.errors %}{{ err }}{% endfor %}</div>
@@ -204,7 +204,7 @@
               <label class="form-label fw-6 text-dark small">New Password <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-shield-lock text-accent"></i></span>
-                <input type="password" name="new_password" class="form-control neu-inset {% if password_form.new_password.errors %}is-invalid{% endif %}" placeholder="Enter new password" required>
+                <input type="password" name="new_password" class="form-control neu-inset {% if password_form.new_password.errors %}is-invalid{% endif %}" placeholder="Enter new password" autocomplete="new-password" required>
               </div>
               {% if password_form.new_password.errors %}
                 <div class="text-danger small mt-1">{% for err in password_form.new_password.errors %}{{ err }}{% endfor %}</div>
@@ -215,7 +215,7 @@
               <label class="form-label fw-6 text-dark small">Confirm New Password <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-shield-check text-accent"></i></span>
-                <input type="password" name="confirm_password" class="form-control neu-inset {% if password_form.confirm_password.errors %}is-invalid{% endif %}" placeholder="Confirm new password" required>
+                <input type="password" name="confirm_password" class="form-control neu-inset {% if password_form.confirm_password.errors %}is-invalid{% endif %}" placeholder="Confirm new password" autocomplete="new-password" required>
               </div>
               {% if password_form.confirm_password.errors %}
                 <div class="text-danger small mt-1">{% for err in password_form.confirm_password.errors %}{{ err }}{% endfor %}</div>
@@ -275,5 +275,27 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Clear autofilled credentials by browser password manager unless form was re-rendered with validation errors
+  setTimeout(function() {
+    const usernameForm = document.querySelector('form[action*="change_username"]');
+    const passwordForm = document.querySelector('form[action*="change_password"]');
+    
+    [usernameForm, passwordForm].forEach(function(form) {
+      if (!form) return;
+      const hasErrors = form.querySelector('.is-invalid') !== null || form.querySelector('.alert-danger') !== null;
+      if (!hasErrors) {
+        const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
+        inputs.forEach(function(input) {
+          input.value = '';
+        });
+      }
+    });
+  }, 100);
+});
+</script>
+
 
 {% endblock %}

@@ -62,6 +62,36 @@
   gap: 8px;
 }
 .login-footer { text-align: center; margin-top: 24px; font-size: .75rem; color: var(--text-light); }
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+.password-wrapper input {
+  padding-right: 42px !important;
+}
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color .2s ease;
+  font-size: 1.1rem;
+  line-height: 1;
+  z-index: 5;
+}
+.password-toggle-btn:hover,
+.password-toggle-btn:focus-visible {
+  color: var(--accent);
+}
 {% endblock %}
 
 {% block login_content %}
@@ -107,7 +137,12 @@
       </div>
       <div class="mb-4">
         <label class="form-label"><i class="bi bi-lock me-1"></i>Password</label>
-        {{ form.password }}
+        <div class="password-wrapper">
+          {{ form.password }}
+          <button type="button" id="togglePasswordBtn" class="password-toggle-btn" aria-label="Show password" aria-pressed="false">
+            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+          </button>
+        </div>
       </div>
       <button type="submit" class="login-btn">
         <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Dashboard
@@ -119,4 +154,36 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const toggleBtn = document.getElementById("togglePasswordBtn");
+  const passwordInput = document.querySelector('.password-wrapper input');
+  const toggleIcon = document.getElementById("togglePasswordIcon");
+
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      const isPassword = passwordInput.getAttribute("type") === "password";
+      
+      if (isPassword) {
+        passwordInput.setAttribute("type", "text");
+        toggleBtn.setAttribute("aria-label", "Hide password");
+        toggleBtn.setAttribute("aria-pressed", "true");
+        if (toggleIcon) {
+          toggleIcon.className = "bi bi-eye-slash";
+        }
+      } else {
+        passwordInput.setAttribute("type", "password");
+        toggleBtn.setAttribute("aria-label", "Show password");
+        toggleBtn.setAttribute("aria-pressed", "false");
+        if (toggleIcon) {
+          toggleIcon.className = "bi bi-eye";
+        }
+      }
+      passwordInput.focus();
+    });
+  }
+});
+</script>
 {% endblock %}
