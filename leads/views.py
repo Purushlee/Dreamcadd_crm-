@@ -172,11 +172,11 @@ def md_dashboard(request):
 
     # Telecallers with presence & session monitoring
     telecallers_qs = User.objects.filter(role=User.Role.TELECALLER).select_related("profile").annotate(
-        assigned_count=Count("assigned_leads"),
+        assigned_count=Count("assigned_leads", distinct=True),
         unique_contacted_count=Count("assigned_leads", filter=Q(assigned_leads__contacted=True), distinct=True),
-        converted_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CONVERTED)),
-        calls_count=Count("call_logs"),
-        today_calls=Count("call_logs", filter=Q(call_logs__created_at__gte=today_start))
+        converted_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CONVERTED), distinct=True),
+        calls_count=Count("call_logs", distinct=True),
+        today_calls=Count("call_logs", filter=Q(call_logs__created_at__gte=today_start), distinct=True)
     )
 
     telecaller_list = []
@@ -271,14 +271,14 @@ def upload_excel(request):
 @user_passes_test(is_md, login_url="login")
 def manage_callers(request):
     telecallers = User.objects.filter(role=User.Role.TELECALLER).select_related("profile").annotate(
-        assigned_count=Count("assigned_leads"),
+        assigned_count=Count("assigned_leads", distinct=True),
         unique_contacted_count=Count("assigned_leads", filter=Q(assigned_leads__contacted=True), distinct=True),
-        worked_count=Count("assigned_leads", filter=~Q(assigned_leads__status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED])),
-        pending_count=Count("assigned_leads", filter=Q(assigned_leads__status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED])),
-        calls_count=Count("call_logs"),
-        interested_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.INTERESTED)),
-        followup_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CALL_BACK)),
-        converted_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CONVERTED))
+        worked_count=Count("assigned_leads", filter=~Q(assigned_leads__status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED]), distinct=True),
+        pending_count=Count("assigned_leads", filter=Q(assigned_leads__status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED]), distinct=True),
+        calls_count=Count("call_logs", distinct=True),
+        interested_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.INTERESTED), distinct=True),
+        followup_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CALL_BACK), distinct=True),
+        converted_count=Count("assigned_leads", filter=Q(assigned_leads__status=Lead.Status.CONVERTED), distinct=True)
     ).order_by("username")
 
     form = TelecallerCreateForm()
