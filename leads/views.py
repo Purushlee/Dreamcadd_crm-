@@ -241,6 +241,19 @@ def md_dashboard(request):
 
     upload_form = ExcelUploadForm()
     recent_activities = LeadActivity.objects.select_related("lead", "actor").all()[:15]
+    
+    from django.db.models import Count, Q
+    import_batches = ImportBatch.objects.annotate(
+        total_leads_count=Count('leads', distinct=True),
+        assigned_count=Count('leads', filter=Q(leads__assigned_to__isnull=False), distinct=True),
+        pending_count=Count('leads', filter=Q(leads__assigned_to__isnull=True), distinct=True)
+    ).order_by('-uploaded_at')
+    
+    import_batches = ImportBatch.objects.annotate(
+        total_leads_count=Count('leads', distinct=True),
+        assigned_count=Count('leads', filter=Q(leads__assigned_to__isnull=False), distinct=True),
+        pending_count=Count('leads', filter=Q(leads__assigned_to__isnull=True), distinct=True)
+    ).order_by('-uploaded_at')
 
     return render(request, "leads/md_dashboard.html", {
         "stats": stats,
@@ -248,6 +261,7 @@ def md_dashboard(request):
         "upload_form": upload_form,
         "recent_leads": leads.select_related("assigned_to", "interested_course").order_by("-created_at")[:20],
         "recent_activities": recent_activities,
+        "import_batches": import_batches,
         "chart_calls_labels": json.dumps(calls_chart_labels),
         "chart_calls_data": json.dumps(calls_chart_data),
         "chart_conversions_data": json.dumps(conversions_chart_data),
@@ -1426,6 +1440,22 @@ def clear_database(request):
     return redirect("md_dashboard")
 
 
+@user_passes_test(is_md, login_url="login")
+@require_POST
+def delete_dataset(request, batch_id):
+    """Permanently deletes an entire dataset (ImportBatch) and all associated leads."""
+    batch = get_object_or_404(ImportBatch, id=batch_id)
+    
+    with transaction.atomic():
+        leads = batch.leads.all()
+        count = leads.count()
+        leads.delete()  # This will cascade delete related activities, assignments, etc.
+        batch.delete()
+        
+    messages.success(request, f"Dataset '{batch.file_name}' deleted successfully. {count} leads removed.")
+    return redirect("md_dashboard")
+
+
 # ---------------------------------------------------------------------------
 # Direct Meta WhatsApp Webhook
 # ---------------------------------------------------------------------------
@@ -1916,3 +1946,25 @@ def security_audit_log_view(request):
     return render(request, "leads/security_audit_log.html", context)
 
 
+
+
+@user_passes_test(is_md, login_url="login")
+@require_POST
+def delete_dataset(request, batch_id):
+    """Permanently deletes an entire dataset (ImportBatch) and all associated leads."""
+    batch = get_object_or_404(ImportBatch, id=batch_id)
+    
+    with transaction.atomic():
+        leads = batch.leads.all()
+        count = leads.count()
+        leads.delete()  # This will cascade delete related activities, assignments, etc.
+        batch.delete()
+        
+    messages.success(request, f"Dataset '{batch.file_name}' deleted successfully. {count} leads removed.")
+    return redirect("md_dashboard")
+
+@user_passes_test(is_md, login_url="login")
+def dataset_leads(request, batch_id):
+    batch = get_object_or_404(ImportBatch, id=batch_id)
+    leads = batch.leads.select_related("assigned_to", "interested_course", "lead_source").all()
+    return render(request, "leads/dataset_leads.html", {"batch": batch, "leads": leads})
