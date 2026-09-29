@@ -173,15 +173,19 @@ def md_dashboard(request):
     from django.db.models import OuterRef, Subquery, IntegerField, Value
     from django.db.models.functions import Coalesce
 
+    from django.db.models import F
     leads_sub = Lead.objects.filter(assigned_to=OuterRef("pk"))
     calls_sub = CallLog.objects.filter(caller=OuterRef("pk"))
+    calls_on_assigned_sub = CallLog.objects.filter(caller=OuterRef("pk"), lead__assigned_to=OuterRef("pk"))
 
     telecallers_qs = User.objects.filter(role=User.Role.TELECALLER).select_related("profile").annotate(
         assigned_count=Coalesce(Subquery(leads_sub.values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
-        unique_contacted_count=Coalesce(Subquery(leads_sub.filter(contacted=True).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
+        unique_contacted_count=Coalesce(Subquery(calls_on_assigned_sub.values("caller").annotate(c=Count("lead_id", distinct=True)).values("c"), output_field=IntegerField()), Value(0)),
         converted_count=Coalesce(Subquery(leads_sub.filter(status=Lead.Status.CONVERTED).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
         calls_count=Coalesce(Subquery(calls_sub.values("caller").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
         today_calls=Coalesce(Subquery(calls_sub.filter(created_at__gte=today_start).values("caller").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0))
+    ).annotate(
+        pending_count=F("assigned_count") - F("unique_contacted_count")
     )
 
     telecaller_list = []
@@ -278,18 +282,21 @@ def manage_callers(request):
     from django.db.models import OuterRef, Subquery, IntegerField, Value
     from django.db.models.functions import Coalesce
 
+    from django.db.models import F
     leads_sub = Lead.objects.filter(assigned_to=OuterRef("pk"))
     calls_sub = CallLog.objects.filter(caller=OuterRef("pk"))
+    calls_on_assigned_sub = CallLog.objects.filter(caller=OuterRef("pk"), lead__assigned_to=OuterRef("pk"))
 
     telecallers = User.objects.filter(role=User.Role.TELECALLER).select_related("profile").annotate(
         assigned_count=Coalesce(Subquery(leads_sub.values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
-        unique_contacted_count=Coalesce(Subquery(leads_sub.filter(contacted=True).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
+        unique_contacted_count=Coalesce(Subquery(calls_on_assigned_sub.values("caller").annotate(c=Count("lead_id", distinct=True)).values("c"), output_field=IntegerField()), Value(0)),
         worked_count=Coalesce(Subquery(leads_sub.exclude(status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED]).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
-        pending_count=Coalesce(Subquery(leads_sub.filter(contacted=False).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
         calls_count=Coalesce(Subquery(calls_sub.values("caller").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
         interested_count=Coalesce(Subquery(leads_sub.filter(status=Lead.Status.INTERESTED).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
         followup_count=Coalesce(Subquery(leads_sub.filter(status=Lead.Status.CALL_BACK).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0)),
         converted_count=Coalesce(Subquery(leads_sub.filter(status=Lead.Status.CONVERTED).values("assigned_to").annotate(c=Count("id")).values("c"), output_field=IntegerField()), Value(0))
+    ).annotate(
+        pending_count=F("assigned_count") - F("unique_contacted_count")
     ).order_by("username")
 
     form = TelecallerCreateForm()
@@ -723,7 +730,7 @@ def telecaller_report_view(request, caller_id):
         call_logs = call_logs.filter(call_time__gte=now - timedelta(days=30))
 
     total_assigned = leads.count()
-    unique_contacted_count = leads.filter(contacted=True).count()
+    unique_contacted_count = call_logs.filter(lead__assigned_to=caller).values("lead_id").distinct().count()
     completed_count = leads.exclude(status__in=[Lead.Status.NEW, Lead.Status.ASSIGNED]).count()
     pending_count = total_assigned - unique_contacted_count
 
@@ -1191,7 +1198,7 @@ def telecaller_dashboard(request):
 
     today = timezone.now().date()
     assigned_count = len(leads_list)
-    unique_contacted_count = sum(1 for l in leads_list if l.contacted)
+    unique_contacted_count = CallLog.objects.filter(caller=request.user, lead__assigned_to=request.user).values("lead_id").distinct().count()
     total_call_attempts = CallLog.objects.filter(caller=request.user).count()
     today_call_attempts = CallLog.objects.filter(caller=request.user, created_at__date=today).count()
 
