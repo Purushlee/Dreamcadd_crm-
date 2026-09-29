@@ -242,7 +242,6 @@ def md_dashboard(request):
     upload_form = ExcelUploadForm()
     recent_activities = LeadActivity.objects.select_related("lead", "actor").all()[:15]
     
-    from django.db.models import Count, Q
     import_batches = ImportBatch.objects.annotate(
         total_leads_count=Count('leads', distinct=True),
         assigned_count=Count('leads', filter=Q(leads__assigned_to__isnull=False), distinct=True),
