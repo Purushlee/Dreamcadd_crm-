@@ -472,8 +472,19 @@ def bulk_allocate(request):
                     messages.warning(request, "No unassigned leads found matching criteria.")
                 return redirect("bulk_allocate")
 
-        elif "manual_allocate" in request.POST or "lead_ids" in request.POST:
+        elif "manual_allocate" in request.POST or "delete_selected" in request.POST or "lead_ids" in request.POST:
             selected_lead_ids = request.POST.getlist("lead_ids")
+
+            if "delete_selected" in request.POST:
+                if not selected_lead_ids:
+                    messages.warning(request, "No leads selected for deletion.")
+                    return redirect("bulk_allocate")
+                leads_to_delete = Lead.objects.filter(id__in=selected_lead_ids)
+                count = leads_to_delete.count()
+                leads_to_delete.delete()
+                messages.success(request, f"Successfully permanently deleted {count} lead(s) from the database.")
+                return redirect("bulk_allocate")
+
             target_caller_id = request.POST.get("target_caller_id")
 
             if selected_lead_ids and target_caller_id:

@@ -113,11 +113,14 @@
         </select>
       </div>
       <div class="d-flex gap-2" style="padding-top:20px;">
-        <button type="submit" class="btn-neu btn-accent" style="font-size:.82rem;">
+        <button type="submit" name="manual_allocate" class="btn-neu btn-accent" style="font-size:.82rem;">
           <i class="bi bi-check2-circle me-1"></i> Assign Selected
         </button>
         <button type="button" class="btn-neu btn-danger-neu" onclick="confirmUnassignSelected()" style="font-size:.82rem;">
           <i class="bi bi-person-x-fill me-1"></i> Remove Assignment
+        </button>
+        <button type="button" class="btn-neu" style="font-size:.82rem; background: #dc3545; color: white; border: none; padding: .4rem 1rem; border-radius: var(--radius-sm);" onclick="confirmDeleteSelected()">
+          <i class="bi bi-trash-fill me-1"></i> Delete Selected
         </button>
       </div>
     </div>
@@ -221,6 +224,23 @@ function confirmUnassignSelected() {
   if (confirm(`Remove ${selected.length} customer(s) from assigned telecallers and return them to the Unallocated Pool?`)) {
     const form = document.getElementById('manualAllocForm');
     form.action = "{% url 'unassign_leads' %}";
+    form.submit();
+  }
+}
+
+function confirmDeleteSelected() {
+  const selected = document.querySelectorAll('.lead-cb:checked');
+  if (selected.length === 0) {
+    alert('Please select at least one lead to delete.');
+    return;
+  }
+  if (confirm(`⚠️ Delete Selected Leads?\nThis will permanently remove ${selected.length} selected leads from the imported dataset. This action cannot be undone.`)) {
+    const form = document.getElementById('manualAllocForm');
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'delete_selected';
+    input.value = '1';
+    form.appendChild(input);
     form.submit();
   }
 }
