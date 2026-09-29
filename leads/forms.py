@@ -28,11 +28,11 @@ class ExcelUploadForm(forms.Form):
 
 
 class TelecallerCreateForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), min_length=6)
-    first_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), required=False)
-    last_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), required=False)
-    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-control"}), required=False)
-    phone = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), required=False)
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "autocomplete": "new-password"}), min_length=6)
+    first_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "off"}), required=False)
+    last_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "off"}), required=False)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-control", "autocomplete": "off"}), required=False)
+    phone = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "off"}), required=False)
     max_leads = forms.IntegerField(initial=100, widget=forms.NumberInput(attrs={"class": "form-control"}))
     daily_call_target = forms.IntegerField(initial=30, widget=forms.NumberInput(attrs={"class": "form-control"}))
 
@@ -40,7 +40,7 @@ class TelecallerCreateForm(forms.ModelForm):
         model = User
         fields = ["username", "first_name", "last_name", "email", "phone"]
         widgets = {
-            "username": forms.TextInput(attrs={"class": "form-control"}),
+            "username": forms.TextInput(attrs={"class": "form-control", "autocomplete": "new-password"}),
         }
 
     def clean_username(self):

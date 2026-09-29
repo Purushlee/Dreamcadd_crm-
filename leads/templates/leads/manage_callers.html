@@ -206,14 +206,27 @@
         </div>
       </div>
 
-      <form method="post">
+      <form method="post" autocomplete="off">
         {% csrf_token %}
         {% for field in form %}
-        <div class="mb-3">
-          <label class="form-label" style="font-size:.78rem; font-weight:600;">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}<div style="color:var(--danger); font-size:.72rem; margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
-        </div>
+          {% if field.name == 'password' %}
+            <div class="mb-3">
+              <label class="form-label" style="font-size:.78rem; font-weight:600;">{{ field.label }}</label>
+              <div style="position: relative;">
+                {{ field }}
+                <span onclick="togglePasswordVisibility(this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); z-index: 10;">
+                  <i class="bi bi-eye"></i>
+                </span>
+              </div>
+              {% if field.errors %}<div style="color:var(--danger); font-size:.72rem; margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
+            </div>
+          {% else %}
+            <div class="mb-3">
+              <label class="form-label" style="font-size:.78rem; font-weight:600;">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<div style="color:var(--danger); font-size:.72rem; margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
+            </div>
+          {% endif %}
         {% endfor %}
         <button type="submit" name="create_caller" value="1" class="btn-neu btn-accent w-100" style="display:flex; justify-content:center; gap:6px; padding:10px; font-weight:700;">
           <i class="bi bi-person-plus"></i> Create Account
@@ -252,5 +265,20 @@
 
 {% block extra_js %}
 <script>
+function togglePasswordVisibility(spanElement) {
+  const container = spanElement.parentElement;
+  const input = container.querySelector('input');
+  const icon = spanElement.querySelector('i');
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('bi-eye');
+    icon.classList.add('bi-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('bi-eye-slash');
+    icon.classList.add('bi-eye');
+  }
+}
 </script>
 {% endblock %}
