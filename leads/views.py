@@ -247,12 +247,7 @@ def md_dashboard(request):
         assigned_count=Count('leads', filter=Q(leads__assigned_to__isnull=False), distinct=True),
         pending_count=Count('leads', filter=Q(leads__assigned_to__isnull=True), distinct=True)
     ).order_by('-uploaded_at')
-    
-    import_batches = ImportBatch.objects.annotate(
-        total_leads_count=Count('leads', distinct=True),
-        assigned_count=Count('leads', filter=Q(leads__assigned_to__isnull=False), distinct=True),
-        pending_count=Count('leads', filter=Q(leads__assigned_to__isnull=True), distinct=True)
-    ).order_by('-uploaded_at')
+
 
     return render(request, "leads/md_dashboard.html", {
         "stats": stats,
@@ -1985,3 +1980,4 @@ def dataset_leads(request, batch_id):
     batch = get_object_or_404(ImportBatch, id=batch_id)
     leads = batch.leads.select_related("assigned_to", "interested_course", "lead_source").all()
     return render(request, "leads/dataset_leads.html", {"batch": batch, "leads": leads})
+
