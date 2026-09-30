@@ -35,6 +35,7 @@ urlpatterns = [
     path("md/clear-database/", views.clear_database, name="clear_database"),
     path("md/delete-dataset/<int:batch_id>/", views.delete_dataset, name="delete_dataset"),
     path("md/dataset-leads/<int:batch_id>/", views.dataset_leads, name="dataset_leads"),
+    path("api/md/metric-details/", views.api_metric_details, name="api_metric_details"),
 
     # Telecaller & Lead Detail Views
     path("telecaller/", views.telecaller_dashboard, name="telecaller_dashboard"),

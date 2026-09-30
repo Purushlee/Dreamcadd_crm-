@@ -1982,3 +1982,73 @@ def dataset_leads(request, batch_id):
     leads = batch.leads.select_related("assigned_to", "interested_course", "lead_source").all()
     return render(request, "leads/dataset_leads.html", {"batch": batch, "leads": leads})
 
+@user_passes_test(is_md, login_url="login")
+def api_metric_details(request):
+    metric = request.GET.get('metric')
+    now = timezone.now()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    if metric == 'master_dataset':
+        qs = Lead.objects.all()
+    elif metric == 'unallocated':
+        qs = Lead.objects.filter(assigned_to__isnull=True)
+    elif metric == 'allocated':
+        qs = Lead.objects.filter(assigned_to__isnull=False)
+    elif metric == 'calls_today':
+        qs = CallLog.objects.filter(created_at__gte=today_start).select_related('lead', 'caller').order_by('-call_time')
+    elif metric == 'hot_leads':
+        qs = Lead.objects.filter(priority=Lead.Priority.HOT)
+    elif metric == 'interested':
+        qs = Lead.objects.filter(status=Lead.Status.INTERESTED)
+    elif metric == 'overdue_followups':
+        qs = Followup.objects.filter(status=Followup.Status.PENDING, scheduled_date__lt=now).select_related('lead', 'caller').order_by('-scheduled_date')
+    elif metric == 'converted':
+        qs = Lead.objects.filter(status=Lead.Status.CONVERTED)
+    else:
+        return JsonResponse({'error': 'Invalid metric'}, status=400)
+        
+    data = []
+    
+    if metric == 'calls_today':
+        for call in qs[:500]:
+            data.append({
+                'id': call.id,
+                'name': call.lead.name if call.lead else '',
+                'phone': call.lead.phone if call.lead else '',
+                'caller': call.caller.get_full_name() or call.caller.username if call.caller else '',
+                'call_time': call.call_time.strftime("%Y-%m-%d %H:%M"),
+                'status': call.get_call_result_display(),
+                'duration': f"{call.duration_seconds}s",
+                'outcome': call.remarks or '',
+            })
+    elif metric == 'overdue_followups':
+        for f in qs[:500]:
+            data.append({
+                'id': f.id,
+                'name': f.lead.name if f.lead else '',
+                'phone': f.lead.phone if f.lead else '',
+                'course': getattr(f.lead.interested_course, 'course_name', '') if f.lead and getattr(f.lead, 'interested_course', None) else '',
+                'caller': f.caller.get_full_name() or f.caller.username if f.caller else '',
+                'followup_date': f.scheduled_date.strftime("%Y-%m-%d %H:%M"),
+                'days_overdue': (now.date() - f.scheduled_date.date()).days,
+                'status': f.lead.get_status_display() if f.lead else '',
+            })
+    else:
+        # Standard lead query
+        qs = qs.select_related("assigned_to", "interested_course", "preferred_branch", "import_batch").order_by('-created_at')
+        for lead in qs[:500]:
+            data.append({
+                'id': lead.id,
+                'name': lead.name,
+                'phone': lead.phone,
+                'email': lead.email or '',
+                'course': getattr(lead.interested_course, 'course_name', '') if lead.interested_course else '',
+                'branch': getattr(lead.preferred_branch, 'branch_name', '') if lead.preferred_branch else '',
+                'caller': lead.assigned_to.get_full_name() or lead.assigned_to.username if lead.assigned_to else 'Unassigned',
+                'status': lead.get_status_display(),
+                'priority': lead.get_priority_display(),
+                'dataset': getattr(lead.import_batch, 'file_name', '') if lead.import_batch else '',
+                'created_at': lead.created_at.strftime("%Y-%m-%d")
+            })
+
+    return JsonResponse({'status': 'success', 'data': data, 'total_count': qs.count()})

@@ -28,56 +28,56 @@
 
 <!-- ══ KPI STAT CARDS ══ -->
 <div class="grid-stat mb-4">
-  <div class="stat-card stat-accent-blue fade-in fade-in-1">
+  <div class="stat-card stat-accent-blue fade-in fade-in-1 metric-clickable" onclick="openMetricModal('master_dataset', 'Master Dataset Total')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-database-fill"></i></div>
     <div class="stat-card-value">{{ stats.total }}</div>
     <div class="stat-card-label">Master Dataset Total</div>
     <div class="stat-card-trend up"><i class="bi bi-stack"></i> All imported leads</div>
   </div>
 
-  <div class="stat-card stat-accent-purple fade-in fade-in-1">
+  <div class="stat-card stat-accent-purple fade-in fade-in-1 metric-clickable" onclick="openMetricModal('unallocated', 'Unallocated Pool')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-box-arrow-in-down"></i></div>
     <div class="stat-card-value">{{ stats.unallocated }}</div>
     <div class="stat-card-label">Unallocated Pool</div>
     <div class="stat-card-trend up" style="color:var(--accent);"><i class="bi bi-arrow-down-circle"></i> Ready to allocate</div>
   </div>
 
-  <div class="stat-card stat-accent-cyan fade-in fade-in-2">
+  <div class="stat-card stat-accent-cyan fade-in fade-in-2 metric-clickable" onclick="openMetricModal('allocated', 'Allocated Total')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-person-check-fill"></i></div>
     <div class="stat-card-value">{{ stats.allocated }}</div>
     <div class="stat-card-label">Allocated Total</div>
     <div class="stat-card-trend up"><i class="bi bi-headset"></i> With telecallers</div>
   </div>
 
-  <div class="stat-card stat-accent-amber fade-in fade-in-2">
+  <div class="stat-card stat-accent-amber fade-in fade-in-2 metric-clickable" onclick="openMetricModal('calls_today', 'Calls Today')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-telephone-out-fill"></i></div>
     <div class="stat-card-value">{{ stats.today_calls }}</div>
     <div class="stat-card-label">Calls Today</div>
     <div class="stat-card-trend up"><i class="bi bi-activity"></i> Active outbound</div>
   </div>
 
-  <div class="stat-card stat-accent-red fade-in fade-in-3">
+  <div class="stat-card stat-accent-red fade-in fade-in-3 metric-clickable" onclick="openMetricModal('hot_leads', 'Hot Leads 🔥')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-fire"></i></div>
     <div class="stat-card-value">{{ stats.hot_leads }}</div>
     <div class="stat-card-label">Hot Leads 🔥</div>
     <div class="stat-card-trend" style="color:var(--hot)"><i class="bi bi-arrow-up-right"></i> Priority follow-up</div>
   </div>
 
-  <div class="stat-card stat-accent-green fade-in fade-in-3">
+  <div class="stat-card stat-accent-green fade-in fade-in-3 metric-clickable" onclick="openMetricModal('interested', 'Interested Leads')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-star"></i></div>
     <div class="stat-card-value">{{ stats.interested }}</div>
     <div class="stat-card-label">Interested</div>
     <div class="stat-card-trend up"><i class="bi bi-dot"></i> Warm pipeline</div>
   </div>
 
-  <div class="stat-card stat-accent-blue fade-in fade-in-4">
+  <div class="stat-card stat-accent-blue fade-in fade-in-4 metric-clickable" onclick="openMetricModal('overdue_followups', 'Overdue Follow-ups')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-alarm"></i></div>
     <div class="stat-card-value">{{ stats.overdue_followups }}</div>
     <div class="stat-card-label">Overdue Follow-ups</div>
     <div class="stat-card-trend down"><i class="bi bi-arrow-down-right"></i> Action needed</div>
   </div>
 
-  <div class="stat-card stat-accent-green fade-in fade-in-4">
+  <div class="stat-card stat-accent-green fade-in fade-in-4 metric-clickable" onclick="openMetricModal('converted', 'Converted Leads')" title="Click to view data">
     <div class="stat-card-icon"><i class="bi bi-trophy-fill"></i></div>
     <div class="stat-card-value">{{ stats.conversion_rate }}%</div>
     <div class="stat-card-label">Conversion Rate</div>
@@ -441,7 +441,58 @@
       </button>
     </div>
   </div>
+    </div>
+  </div>
 </div>
+
+<!-- ══ Metric Details Modal ══ -->
+<div id="metricDetailsOverlay" style="display:none; position:fixed; inset:0; z-index:9991; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); align-items:center; justify-content:center;">
+  <div style="background:var(--bg,#e4eaf0); border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,0.15); border:1px solid rgba(255,255,255,0.4); width:min(1100px, 95vw); max-height:85vh; display:flex; flex-direction:column; animation:clearDbFadeIn .22s ease; overflow:hidden;">
+    <div style="background:rgba(79,127,250,0.05); border-bottom:1px solid rgba(0,0,0,0.06); padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
+      <h5 style="margin:0; font-weight:800; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+        <i class="bi bi-table text-accent"></i> <span id="metricModalTitle">Data Sheet</span>
+      </h5>
+      <button onclick="closeMetricModal()" style="background:none;border:none;cursor:pointer;font-size:1.4rem;color:var(--text-muted,#888);line-height:1;" aria-label="Close">&times;</button>
+    </div>
+    <div style="padding:12px 20px; border-bottom:1px solid rgba(0,0,0,0.04); display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4);">
+      <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">
+        Showing <span id="metricModalCount" style="color:var(--text);">0</span> records
+      </div>
+      <div>
+        <input type="text" id="metricSearchInput" placeholder="Search table..." oninput="filterMetricTable()" style="padding:6px 12px; font-size:0.8rem; border-radius:8px; border:1px solid rgba(0,0,0,0.1); outline:none;">
+      </div>
+    </div>
+    <div id="metricModalBody" style="padding:0; overflow-y:auto; flex:1; background:var(--bg);">
+      <div id="metricLoadingState" style="padding:40px; text-align:center; color:var(--text-muted);">
+        <i class="bi bi-hourglass-split" style="font-size:2rem; animation:spin 2s linear infinite; display:inline-block; margin-bottom:10px;"></i>
+        <div>Loading data...</div>
+      </div>
+      <table id="metricTable" class="neu-table" style="display:none; width:100%; border-collapse:collapse; font-size:0.8rem;">
+        <thead id="metricTableHead" style="position:sticky; top:0; background:var(--bg); z-index:1; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
+        </thead>
+        <tbody id="metricTableBody">
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:12px 20px; border-top:1px solid rgba(0,0,0,0.06); display:flex; justify-content:flex-end;">
+      <button onclick="closeMetricModal()" style="background:var(--bg); border:none; border-radius:8px; padding:6px 16px; font-weight:600; font-size:.85rem; cursor:pointer; box-shadow:3px 3px 8px rgba(163,177,198,.5), -3px -3px 8px rgba(255,255,255,.8); color:var(--text);">Close</button>
+    </div>
+  </div>
+</div>
+<style>
+.metric-clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.metric-clickable:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 6px 6px 12px var(--sd), -6px -6px 12px var(--sl);
+}
+.metric-clickable:active {
+  transform: translateY(0) scale(0.98);
+}
+@keyframes spin { 100% { transform:rotate(360deg); } }
+</style>
 
 <script>
 let _pendingDeleteBatchId = null;
@@ -539,13 +590,127 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('clearDbOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeClearDbModal();
   });
+  document.getElementById('metricDetailsOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeMetricModal();
+  });
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       if (document.getElementById('clearDbOverlay').style.display === 'flex') closeClearDbModal();
       if (document.getElementById('deleteDatasetOverlay').style.display === 'flex') closeDeleteDatasetModal();
+      if (document.getElementById('metricDetailsOverlay').style.display === 'flex') closeMetricModal();
     }
   });
 });
+
+let metricTableData = [];
+
+function openMetricModal(metricType, title) {
+  document.getElementById('metricModalTitle').textContent = title;
+  document.getElementById('metricDetailsOverlay').style.display = 'flex';
+  document.getElementById('metricLoadingState').style.display = 'block';
+  document.getElementById('metricTable').style.display = 'none';
+  document.getElementById('metricSearchInput').value = '';
+  document.body.style.overflow = 'hidden';
+  
+  fetch(`/api/md/metric-details/?metric=${metricType}`)
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to fetch data');
+      return res.json();
+    })
+    .then(data => {
+      if (data.status === 'success') {
+        metricTableData = data.data;
+        document.getElementById('metricModalCount').textContent = data.total_count;
+        renderMetricTable(metricType, metricTableData);
+      } else {
+        throw new Error(data.error || 'Error fetching data');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('metricLoadingState').innerHTML = `<div class="text-danger"><i class="bi bi-exclamation-triangle"></i> Error loading data</div>`;
+    });
+}
+
+function closeMetricModal() {
+  document.getElementById('metricDetailsOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderMetricTable(metricType, data) {
+  const thead = document.getElementById('metricTableHead');
+  const tbody = document.getElementById('metricTableBody');
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+  
+  if (data.length === 0) {
+    document.getElementById('metricLoadingState').innerHTML = `<div>No records found for this metric.</div>`;
+    return;
+  }
+  
+  let cols = [];
+  if (metricType === 'calls_today') {
+    cols = ['Name', 'Phone', 'Caller', 'Call Time', 'Status', 'Duration', 'Outcome'];
+  } else if (metricType === 'overdue_followups') {
+    cols = ['Name', 'Phone', 'Course', 'Caller', 'Follow-up Date', 'Days Overdue', 'Status'];
+  } else {
+    cols = ['Name', 'Phone', 'Course', 'Branch', 'Caller', 'Dataset', 'Status', 'Priority', 'Created'];
+  }
+  
+  let headerRow = '<tr>';
+  cols.forEach(col => {
+    headerRow += `<th style="padding:10px 12px; text-align:left; font-weight:700; color:var(--text-muted); border-bottom:2px solid rgba(0,0,0,0.05); white-space:nowrap;">${col}</th>`;
+  });
+  headerRow += '</tr>';
+  thead.innerHTML = headerRow;
+  
+  let rowsHtml = '';
+  data.forEach(row => {
+    let tr = '<tr style="border-bottom:1px solid rgba(0,0,0,0.03);">';
+    if (metricType === 'calls_today') {
+      tr += `<td style="padding:8px 12px; font-weight:600;">${row.name}</td>
+             <td style="padding:8px 12px;">${row.phone}</td>
+             <td style="padding:8px 12px;">${row.caller}</td>
+             <td style="padding:8px 12px;">${row.call_time}</td>
+             <td style="padding:8px 12px;"><span class="badge-pill badge-accent">${row.status}</span></td>
+             <td style="padding:8px 12px;">${row.duration}</td>
+             <td style="padding:8px 12px; font-size:0.75rem; color:var(--text-muted); max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${row.outcome}">${row.outcome}</td>`;
+    } else if (metricType === 'overdue_followups') {
+      tr += `<td style="padding:8px 12px; font-weight:600;">${row.name}</td>
+             <td style="padding:8px 12px;">${row.phone}</td>
+             <td style="padding:8px 12px;">${row.course}</td>
+             <td style="padding:8px 12px;">${row.caller}</td>
+             <td style="padding:8px 12px; color:#EF4444; font-weight:600;">${row.followup_date}</td>
+             <td style="padding:8px 12px;"><span class="badge-pill badge-warm">${row.days_overdue} days</span></td>
+             <td style="padding:8px 12px;"><span class="badge-pill badge-muted">${row.status}</span></td>`;
+    } else {
+      tr += `<td style="padding:8px 12px; font-weight:600;">${row.name}</td>
+             <td style="padding:8px 12px;">${row.phone}</td>
+             <td style="padding:8px 12px; font-size:0.75rem;">${row.course}</td>
+             <td style="padding:8px 12px; font-size:0.75rem;">${row.branch}</td>
+             <td style="padding:8px 12px;">${row.caller}</td>
+             <td style="padding:8px 12px; font-size:0.75rem; color:var(--text-muted);">${row.dataset}</td>
+             <td style="padding:8px 12px;"><span class="badge-pill badge-ok">${row.status}</span></td>
+             <td style="padding:8px 12px;">${row.priority === 'HOT' ? '<i class="bi bi-fire text-danger"></i> HOT' : row.priority}</td>
+             <td style="padding:8px 12px; font-size:0.75rem; color:var(--text-muted);">${row.created_at}</td>`;
+    }
+    tr += '</tr>';
+    rowsHtml += tr;
+  });
+  
+  tbody.innerHTML = rowsHtml;
+  document.getElementById('metricLoadingState').style.display = 'none';
+  document.getElementById('metricTable').style.display = 'table';
+}
+
+function filterMetricTable() {
+  const query = document.getElementById('metricSearchInput').value.toLowerCase();
+  const rows = document.querySelectorAll('#metricTableBody tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+  });
+}
+
 
 
 
