@@ -1443,16 +1443,25 @@ def clear_database(request):
 @require_POST
 def delete_dataset(request, batch_id):
     """Permanently deletes an entire dataset (ImportBatch) and all associated leads."""
-    batch = get_object_or_404(ImportBatch, id=batch_id)
-    
-    with transaction.atomic():
-        leads = batch.leads.all()
-        count = leads.count()
-        leads.delete()  # This will cascade delete related activities, assignments, etc.
-        batch.delete()
+    try:
+        batch = get_object_or_404(ImportBatch, id=batch_id)
         
-    messages.success(request, f"Dataset '{batch.file_name}' deleted successfully. {count} leads removed.")
-    return redirect("md_dashboard")
+        with transaction.atomic():
+            leads = batch.leads.all()
+            count = leads.count()
+            leads.delete()  # This will cascade delete related activities, assignments, etc.
+            batch.delete()
+            
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.headers.get('Accept') == 'application/json':
+            return JsonResponse({'status': 'success', 'message': f"Dataset deleted successfully"})
+            
+        messages.success(request, f"Dataset '{batch.file_name}' deleted successfully. {count} leads removed.")
+        return redirect("md_dashboard")
+    except Exception as e:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.headers.get('Accept') == 'application/json':
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        messages.error(request, f"Error deleting dataset: {e}")
+        return redirect("md_dashboard")
 
 
 # ---------------------------------------------------------------------------
@@ -1947,20 +1956,6 @@ def security_audit_log_view(request):
 
 
 
-@user_passes_test(is_md, login_url="login")
-@require_POST
-def delete_dataset(request, batch_id):
-    """Permanently deletes an entire dataset (ImportBatch) and all associated leads."""
-    batch = get_object_or_404(ImportBatch, id=batch_id)
-    
-    with transaction.atomic():
-        leads = batch.leads.all()
-        count = leads.count()
-        leads.delete()  # This will cascade delete related activities, assignments, etc.
-        batch.delete()
-        
-    messages.success(request, f"Dataset '{batch.file_name}' deleted successfully. {count} leads removed.")
-    return redirect("md_dashboard")
 
 @user_passes_test(is_md, login_url="login")
 def dataset_leads(request, batch_id):
