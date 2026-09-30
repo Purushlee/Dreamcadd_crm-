@@ -199,7 +199,7 @@
     <div style="margin-top:12px;font-size:.72rem;color:var(--text-muted);">
       <i class="bi bi-info-circle me-1"></i>
       Required columns: <code>name</code>, <code>phone</code> &nbsp;|&nbsp; Optional: <code>email</code>, <code>education</code>, <code>college</code>, <code>course</code>
-    </div>\n
+    </div>
     <hr style="border:none;border-top:1px solid rgba(0,0,0,0.05);margin:20px 0;">
     <div class="section-title mb-2" style="font-size:1rem;">📂 Imported Lead Datasets</div>
     
@@ -430,13 +430,19 @@
         <strong id="deleteDatasetFileName" style="color:var(--text,#2d3748);"></strong>
       </p>
       <p style="font-size:.85rem; color:var(--text-muted,#666); margin:0 0 18px;">This will permanently delete this imported dataset and all leads associated with it. This cannot be undone.</p>
+      
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-size:.8rem; font-weight:700; margin-bottom:6px; color:var(--text,#2d3748);">To confirm, type "DELETE" below:</label>
+        <input type="text" id="deleteDatasetConfirmInput" oninput="validateDeleteDatasetInput()" autocomplete="off" style="width:100%; padding:10px 12px; border-radius:10px; border:2px solid rgba(220,53,69,0.3); outline:none; font-family:monospace; font-size:1rem; letter-spacing:1px;" placeholder="DELETE">
+      </div>
+
       <div id="deleteDatasetError" style="display:none; color:#dc3545; font-size:.82rem; font-weight:600; margin-bottom:12px; padding:8px 12px; background:rgba(220,53,69,0.08); border-radius:8px; border:1px solid rgba(220,53,69,0.2);">
         <i class="bi bi-exclamation-circle me-1"></i><span id="deleteDatasetErrorMsg"></span>
       </div>
     </div>
     <div style="padding:0 22px 18px; display:flex; gap:10px; justify-content:flex-end;">
       <button onclick="closeDeleteDatasetModal()" id="deleteDatasetCancelBtn" style="background:var(--bg,#e4eaf0); border:none; border-radius:10px; padding:9px 18px; font-weight:600; font-size:.85rem; cursor:pointer; box-shadow:3px 3px 8px rgba(163,177,198,.5),-3px -3px 8px rgba(255,255,255,.8); color:var(--text,#2d3748);">Cancel</button>
-      <button onclick="executeDeleteDataset()" id="deleteDatasetConfirmBtn" style="background:#dc3545; color:#fff; border:none; border-radius:10px; padding:9px 20px; font-weight:700; font-size:.85rem; cursor:pointer; display:flex; align-items:center; gap:6px; transition:opacity .2s;">
+      <button onclick="executeDeleteDataset()" id="deleteDatasetConfirmBtn" disabled style="background:#dc3545; color:#fff; border:none; border-radius:10px; padding:9px 20px; font-weight:700; font-size:.85rem; cursor:not-allowed; opacity:.45; display:flex; align-items:center; gap:6px; transition:opacity .2s, cursor .2s;">
         <i class="bi bi-trash-fill"></i> <span id="deleteDatasetBtnText">Delete Dataset</span>
       </button>
     </div>
@@ -502,11 +508,32 @@ function confirmDeleteDataset(batchId, fileName, leadCount) {
   document.getElementById('deleteDatasetFileName').textContent = `"${fileName}" (${leadCount} leads)`;
   document.getElementById('deleteDatasetError').style.display = 'none';
   document.getElementById('deleteDatasetBtnText').textContent = 'Delete Dataset';
-  document.getElementById('deleteDatasetConfirmBtn').disabled = false;
-  document.getElementById('deleteDatasetConfirmBtn').style.opacity = '1';
+  
+  const confirmBtn = document.getElementById('deleteDatasetConfirmBtn');
+  confirmBtn.disabled = true;
+  confirmBtn.style.opacity = '.45';
+  confirmBtn.style.cursor = 'not-allowed';
+  
+  const inputEl = document.getElementById('deleteDatasetConfirmInput');
+  inputEl.value = '';
+  
   document.getElementById('deleteDatasetCancelBtn').disabled = false;
   document.getElementById('deleteDatasetOverlay').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+
+function validateDeleteDatasetInput() {
+  const inputEl = document.getElementById('deleteDatasetConfirmInput');
+  const confirmBtn = document.getElementById('deleteDatasetConfirmBtn');
+  if (inputEl.value === 'DELETE') {
+    confirmBtn.disabled = false;
+    confirmBtn.style.opacity = '1';
+    confirmBtn.style.cursor = 'pointer';
+  } else {
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '.45';
+    confirmBtn.style.cursor = 'not-allowed';
+  }
 }
 
 function closeDeleteDatasetModal() {
