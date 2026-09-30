@@ -1426,16 +1426,24 @@ def clear_database(request):
         messages.error(request, "Incorrect confirmation. Type DELETE exactly to proceed.")
         return redirect("md_dashboard")
 
-    # Delete in dependency order to avoid FK constraint issues
-    LeadActivity.objects.all().delete()
-    Followup.objects.all().delete()
-    CallLog.objects.all().delete()
-    WhatsAppMessage.objects.all().delete()
-    LeadAssignment.objects.all().delete()
-    Lead.objects.all().delete()
-    ImportBatch.objects.all().delete()
+    try:
+        with transaction.atomic():
+            # Delete in correct dependency order to avoid FK constraint issues
+            LeadActivity.objects.all().delete()
+            Followup.objects.all().delete()
+            CallLog.objects.all().delete()
+            WhatsAppMessage.objects.all().delete()
+            LeadAssignment.objects.all().delete()
+            Notification.objects.all().delete()
+            DailySchedule.objects.all().delete()
+            Lead.objects.all().delete()
+            AllocationBatch.objects.all().delete()
+            ImportBatch.objects.all().delete()
 
-    messages.success(request, "✅ All lead data has been permanently cleared from the database.")
+        messages.success(request, "✅ All lead data has been permanently cleared from the database.")
+    except Exception as e:
+        messages.error(request, f"❌ Error clearing database: {e}")
+
     return redirect("md_dashboard")
 
 
