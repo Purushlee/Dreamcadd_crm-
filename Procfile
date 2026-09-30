@@ -1,3 +1,3 @@
 release: python manage.py migrate --noinput
-web: gunicorn dreamcadd.wsgi:application
+web: python manage.py migrate --noinput && gunicorn dreamcadd.wsgi:application
 
