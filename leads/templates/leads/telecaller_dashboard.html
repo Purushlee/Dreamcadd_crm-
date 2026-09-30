@@ -428,13 +428,6 @@
       <div class="section-subtitle">{{ leads.count }} leads strictly assigned to you</div>
     </div>
     
-    <!-- Complete Workflow Button -->
-    <div style="flex-grow:1; display:flex; justify-content:flex-end;">
-      <button onclick="openCompleteWorkflowModal()" class="btn-neu btn-accent" style="font-size:.8rem; font-weight:700; padding:8px 16px;">
-        <i class="bi bi-check2-all me-1"></i> Complete Today's Calls
-      </button>
-    </div>
-    
     <!-- Search Bar -->
     <div class="search-wrap" style="width:100%;max-width:260px;">
       <i class="bi bi-search search-icon"></i>
@@ -870,93 +863,8 @@
 
 {% endblock %}
 
-<!-- ══ Complete Workflow Modal ══ -->
-<div id="completeWorkflowOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div class="bottom-sheet" style="position:relative; width:90%; max-width:500px; border-radius:20px; background:var(--bg); transform:translateY(0); padding:24px;">
-    <div style="font-size:1.2rem; font-weight:800; margin-bottom:16px;">
-      <i class="bi bi-check2-all text-accent me-2"></i> Complete Assigned Calls
-    </div>
-    
-    <div style="font-size:.85rem; color:var(--text-muted); margin-bottom:20px;">
-      Please enter your in-time and out-time for today's calling session. This will clear your active pool and generate a completion report.
-    </div>
-    
-    <div style="display:flex; gap:16px; margin-bottom:20px;">
-      <div style="flex:1;">
-        <label style="font-size:.75rem; font-weight:700; margin-bottom:6px; display:block;">In-Time</label>
-        <input type="time" id="workflowInTime" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); outline:none;">
-      </div>
-      <div style="flex:1;">
-        <label style="font-size:.75rem; font-weight:700; margin-bottom:6px; display:block;">Out-Time</label>
-        <input type="time" id="workflowOutTime" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); outline:none;">
-      </div>
-    </div>
-    
-    <div id="completeWorkflowError" style="display:none; color:#DC2626; font-size:.8rem; margin-bottom:16px; font-weight:600;"></div>
-    
-    <div style="display:flex; gap:12px; justify-content:flex-end;">
-      <button onclick="closeCompleteWorkflowModal()" class="btn-neu" style="padding:10px 20px; font-size:.85rem; font-weight:600;">Cancel</button>
-      <button onclick="submitCompleteWorkflow()" class="btn-neu btn-accent" style="padding:10px 20px; font-size:.85rem; font-weight:700;">Complete & Submit</button>
-    </div>
-  </div>
-</div>
-
 {% block extra_js %}
 <script>
-function openCompleteWorkflowModal() {
-  const pendingLeads = document.querySelectorAll('.lead-card[data-status="NEW"], .lead-card[data-status="ASSIGNED"]');
-  if (pendingLeads.length > 0) {
-    if (!confirm(`You still have ${pendingLeads.length} unprocessed leads. Are you sure you want to complete your workflow?`)) {
-      return;
-    }
-  }
-  const overlay = document.getElementById('completeWorkflowOverlay');
-  overlay.style.display = 'flex';
-}
-
-function closeCompleteWorkflowModal() {
-  const overlay = document.getElementById('completeWorkflowOverlay');
-  overlay.style.display = 'none';
-}
-
-function submitCompleteWorkflow() {
-  const inTime = document.getElementById('workflowInTime').value;
-  const outTime = document.getElementById('workflowOutTime').value;
-  const errEl = document.getElementById('completeWorkflowError');
-  
-  if (!inTime || !outTime) {
-    errEl.style.display = 'block';
-    errEl.innerText = "Both In-Time and Out-Time are required.";
-    return;
-  }
-  
-  errEl.style.display = 'none';
-  
-  fetch('/api/telecaller/complete-workflow/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-CSRFToken': getCsrfToken()
-    },
-    body: `in_time=${encodeURIComponent(inTime)}&out_time=${encodeURIComponent(outTime)}`
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === 'success') {
-      alert(data.message);
-      window.location.reload();
-    } else {
-      errEl.style.display = 'block';
-      errEl.innerText = data.message;
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    errEl.style.display = 'block';
-    errEl.innerText = "Network error occurred.";
-  });
-}
-
 let currentLeadId = null;
 let selectedOutcome = null;
 
