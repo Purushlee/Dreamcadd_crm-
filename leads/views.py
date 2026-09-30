@@ -1420,9 +1420,17 @@ def lead_whatsapp(request, lead_id):
 def clear_database(request):
     """Permanently delete ALL lead-related data from the database.
     Requires the MD to type 'DELETE' in the confirmation field.
+    Supports both regular POST and AJAX/JSON requests.
     """
+    is_ajax = (
+        request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        or 'application/json' in request.headers.get('Accept', '')
+    )
+
     confirmation = request.POST.get("confirm_text", "").strip()
     if confirmation != "DELETE":
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': 'Incorrect confirmation. Type DELETE exactly.'}, status=400)
         messages.error(request, "Incorrect confirmation. Type DELETE exactly to proceed.")
         return redirect("md_dashboard")
 
@@ -1440,8 +1448,13 @@ def clear_database(request):
             AllocationBatch.objects.all().delete()
             ImportBatch.objects.all().delete()
 
+        if is_ajax:
+            return JsonResponse({'status': 'success', 'message': 'All CRM data has been permanently deleted successfully.'})
+
         messages.success(request, "✅ All lead data has been permanently cleared from the database.")
     except Exception as e:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': f'Failed to delete all data: {e}'}, status=500)
         messages.error(request, f"❌ Error clearing database: {e}")
 
     return redirect("md_dashboard")
