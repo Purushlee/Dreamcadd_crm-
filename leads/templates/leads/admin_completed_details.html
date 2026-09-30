@@ -1,0 +1,106 @@
+{% extends "leads/base.html" %}
+{% load static %}
+{% block title %}Completed Workflow Details{% endblock %}
+{% block nav_completed %}active{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-center mb-4">
+  <div>
+    <h2 class="page-title"><i class="bi bi-file-earmark-check text-accent me-2"></i>Workflow Details: {{ workflow.telecaller.get_full_name|default:workflow.telecaller.username }}</h2>
+    <div class="page-sub">Completed on {{ workflow.completion_date|date:"d M Y" }} | {{ workflow.in_time|time:"h:i A" }} - {{ workflow.out_time|time:"h:i A" }} | Leads: {{ workflow.total_assigned }}</div>
+  </div>
+  <div>
+    <a href="{% url 'admin_completed_reports' %}" class="btn-neu-sm btn-neu" style="text-decoration:none;">
+      <i class="bi bi-arrow-left"></i> Back to Reports
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4 fade-in">
+  <!-- Top filters for outcomes -->
+  <div class="d-flex gap-2" style="overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;">
+    <a href="?category=ALL" class="btn-neu-sm {% if selected_category == 'ALL' %}btn-accent{% else %}btn-neu{% endif %}" style="text-decoration:none; white-space:nowrap;">
+      All Completed ({{ workflow.total_assigned }})
+    </a>
+    <a href="?category=INTERESTED" class="btn-neu-sm {% if selected_category == 'INTERESTED' %}btn-accent{% else %}btn-neu{% endif %}" style="text-decoration:none; white-space:nowrap;">
+      <i class="bi bi-star"></i> Interested ({{ workflow.interested_count }})
+    </a>
+    <a href="?category=CALL_BACK" class="btn-neu-sm {% if selected_category == 'CALL_BACK' %}btn-accent{% else %}btn-neu{% endif %}" style="text-decoration:none; white-space:nowrap;">
+      📞 Call Back ({{ workflow.call_back_count }})
+    </a>
+    <a href="?category=NOT_CONNECTED" class="btn-neu-sm {% if selected_category == 'NOT_CONNECTED' %}btn-accent{% else %}btn-neu{% endif %}" style="text-decoration:none; white-space:nowrap;">
+      📵 Not Answered ({{ workflow.not_answered_count }})
+    </a>
+    <a href="?category=NOT_INTERESTED" class="btn-neu-sm {% if selected_category == 'NOT_INTERESTED' %}btn-accent{% else %}btn-neu{% endif %}" style="text-decoration:none; white-space:nowrap;">
+      Not Interested ({{ workflow.not_interested_count }})
+    </a>
+    <a href="?category=CONVERTED" class="btn-neu-sm {% if selected_category == 'CONVERTED' %}btn-accent{% else %}btn-neu{% endif %}" style="text-decoration:none; white-space:nowrap;">
+      🎉 Converted ({{ workflow.converted_count }})
+    </a>
+  </div>
+</div>
+
+<div class="card fade-in">
+  {% if w_leads %}
+  <div class="table-responsive">
+    <table class="neu-table w-100" style="font-size:0.85rem;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Lead Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Course</th>
+          <th>Branch</th>
+          <th>Education</th>
+          <th>Call Outcome</th>
+          <th>Attempts</th>
+          <th>Call Date & Time</th>
+          <th>Follow-up Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for wl in w_leads %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><strong>{{ wl.lead.name }}</strong></td>
+          <td>{{ wl.lead.phone }}</td>
+          <td>{{ wl.lead.email|default:"-" }}</td>
+          <td>{{ wl.lead.interested_course.course_name|default:"-" }}</td>
+          <td>{{ wl.lead.preferred_branch.branch_name|default:"-" }}</td>
+          <td>{{ wl.lead.education|default:"-" }}</td>
+          <td>
+            <span class="badge-pill 
+              {% if wl.outcome == 'INTERESTED' %}badge-warm{% elif wl.outcome == 'CONVERTED' %}badge-ok{% else %}badge-muted{% endif %}">
+              {{ wl.get_outcome_display|default:wl.outcome }}
+            </span>
+          </td>
+          <td>{{ wl.attempts_in_workflow }}</td>
+          <td>{{ wl.lead.last_call_at|date:"d M, h:i A"|default:"-" }}</td>
+          <td>
+            {% with f=wl.lead.followups.last %}
+            {% if f %}{{ f.scheduled_date|date:"d M Y" }}{% else %}-{% endif %}
+            {% endwith %}
+          </td>
+          <td>
+            <form action="{% url 'api_assign_followup' wl.lead.id %}" method="POST" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="telecaller_id" value="{{ workflow.telecaller.id }}">
+              <button type="submit" class="btn-neu-sm btn-accent" style="font-size:0.7rem; padding:4px 8px; border:none;" onclick="return confirm('Re-assign this lead to {{ workflow.telecaller.username }} for follow-up?');">
+                <i class="bi bi-person-plus-fill"></i> Re-assign Follow-up
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center" style="padding:40px; color:var(--text-muted);">
+    <div>No leads found for this category.</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

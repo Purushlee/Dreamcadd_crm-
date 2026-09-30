@@ -817,6 +817,7 @@ input[type="file"], textarea, select {
     {% if user.is_md %}
       <a href="{% url 'md_dashboard' %}"       class="nav-item {% block nav_dashboard %}{% endblock %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
       <a href="{% url 'bulk_allocate' %}"       class="nav-item {% block nav_leads %}{% endblock %}"><i class="bi bi-person-lines-fill"></i> Leads</a>
+      <a href="{% url 'admin_completed_reports' %}" class="nav-item {% block nav_admin_completed %}{% endblock %}"><i class="bi bi-check2-circle"></i> Completed</a>
       <a href="{% url 'schedule_leads' %}"    class="nav-item {% block nav_schedules %}{% endblock %}"><i class="bi bi-calendar-check-fill"></i> Daily Schedules & Targets</a>
       <a href="{% url 'manage_callers' %}"      class="nav-item {% block nav_callers %}{% endblock %}"><i class="bi bi-headset"></i> Callers</a>
       <a href="{% url 'manage_courses' %}"      class="nav-item {% block nav_courses %}{% endblock %}"><i class="bi bi-journal-bookmark-fill"></i> Courses</a>

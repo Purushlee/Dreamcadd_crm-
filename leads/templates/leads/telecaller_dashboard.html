@@ -526,12 +526,12 @@
 
       <!-- Action Buttons: Call Customer, Record Response, View Details -->
       <div class="card-action-bar" style="display:flex; align-items:center; gap:6px;">
-        <button type="button" class="btn-call-direct" style="flex:1; border:none;" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
-          <i class="bi bi-telephone-fill me-1"></i> Call Customer
+        <button type="button" class="btn-call-direct" id="call-btn-{{ lead.id }}" style="flex:1; border:none;" onclick="triggerCallAndPrepareModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')">
+          <i class="bi bi-telephone-fill me-1" id="call-icon-{{ lead.id }}"></i> <span id="call-text-{{ lead.id }}">Call Customer</span>
         </button>
 
-        <button type="button" class="btn-response-trigger edit-response-btn" id="edit-resp-btn-{{ lead.id }}" onclick="openQuickResponseModal({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')" title="Give / Edit Response">
-          <i class="bi bi-pencil-square text-accent me-1"></i> Response
+        <button type="button" class="btn-response-trigger edit-response-btn" id="edit-resp-btn-{{ lead.id }}" onclick="checkCallBeforeResponse({{ lead.id }}, '{{ lead.name|escapejs }}', '{{ lead.phone|escapejs }}')" title="Give / Edit Response" style="opacity: 0.6; cursor: not-allowed;">
+          <i class="bi bi-lock-fill text-muted me-1" id="resp-icon-{{ lead.id }}"></i> <span id="resp-text-{{ lead.id }}">Response</span>
         </button>
 
         <a href="{% url 'lead_detail' lead.id %}" class="btn-response-trigger" style="text-decoration:none;" title="View Customer Details">
@@ -1090,12 +1090,54 @@ let callStartTime = null;
 
 // Trigger Call AND Pre-Open Response Bottom Sheet for seamless return
 function triggerCallAndPrepareModal(leadId, leadName, leadPhone) {
-  currentCallSessionId = "CS-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-  callStartTime = Date.now();
+  // Call the backend to register the active call session
+  fetch(`/api/leads/${leadId}/initiate-call/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCsrfToken()
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      currentCallSessionId = "CS-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+      callStartTime = Date.now();
+      
+      // Update UI for Call In Progress
+      const callText = document.getElementById(`call-text-${leadId}`);
+      if (callText) callText.innerText = "Call In Progress";
+      
+      // Enable Response button
+      const respBtn = document.getElementById(`edit-resp-btn-${leadId}`);
+      if (respBtn) {
+        respBtn.style.opacity = '1';
+        respBtn.style.cursor = 'pointer';
+        const icon = document.getElementById(`resp-icon-${leadId}`);
+        if (icon) {
+          icon.classList.remove('bi-lock-fill', 'text-muted');
+          icon.classList.add('bi-pencil-square', 'text-accent');
+        }
+      }
+      
+      // Launch native phone dialer
+      window.location.href = "tel:" + leadPhone;
+    } else {
+      alert("Call could not be initiated. Please try again.");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Call could not be initiated. Please try again.");
+  });
+}
+
+function checkCallBeforeResponse(leadId, leadName, leadPhone) {
+  const respBtn = document.getElementById(`edit-resp-btn-${leadId}`);
+  if (respBtn && respBtn.style.cursor === 'not-allowed') {
+    alert("Please call the customer first.");
+    return;
+  }
   openQuickResponseModal(leadId, leadName, leadPhone);
-  
-  // Launch native phone dialer
-  window.location.href = "tel:" + leadPhone;
 }
 
 // Open Bottom Sheet Modal

@@ -407,6 +407,21 @@ class LeadActivity(models.Model):
         return f"Activity [{self.activity_type}]: {self.lead.name} at {self.timestamp}"
 
 
+class ActiveCallSession(models.Model):
+    """
+    Tracks a currently active call. A response cannot be recorded unless an active session exists.
+    """
+    telecaller = models.OneToOneField(User, on_delete=models.CASCADE, related_name="active_call_session")
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+    initiated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "leads_activecallsession"
+
+    def __str__(self):
+        return f"{self.telecaller.username} calling {self.lead.name}"
+
+
 class WhatsAppTemplate(models.Model):
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Draft"

@@ -1700,6 +1700,24 @@ def api_session_check(request):
 @csrf_exempt
 @login_required
 @require_POST
+@csrf_exempt
+@login_required
+@require_POST
+def api_initiate_call(request, lead_id):
+    """
+    Initiates a call session. Required before a response can be recorded.
+    """
+    lead = get_object_or_404(Lead, id=lead_id)
+    if not (request.user.is_md or lead.assigned_to == request.user or request.user.is_superuser):
+        return JsonResponse({"status": "error", "message": "Permission denied."}, status=403)
+        
+    ActiveCallSession.objects.update_or_create(
+        telecaller=request.user,
+        defaults={"lead": lead}
+    )
+    return JsonResponse({"status": "success", "message": "Call initiated"})
+
+
 def api_edit_response(request, lead_id):
     """
     Allows a Telecaller or MD to update a customer's response status.
@@ -1710,6 +1728,14 @@ def api_edit_response(request, lead_id):
     # Permission check: assigned telecaller, MD, or admin
     if not (request.user.is_md or lead.assigned_to == request.user or request.user.is_superuser):
         return JsonResponse({"status": "error", "message": "Permission denied."}, status=403)
+
+    # Validate active call session
+    active_session = getattr(request.user, 'active_call_session', None)
+    if not active_session or active_session.lead_id != lead.id:
+        return JsonResponse({
+            "status": "error", 
+            "message": "Response cannot be recorded before a call is initiated."
+        }, status=400)
 
     if request.content_type == "application/json":
         data = json.loads(request.body.decode("utf-8"))
@@ -1751,6 +1777,10 @@ def api_edit_response(request, lead_id):
         activity_type="RESPONSE_UPDATED",
         description=f"Response updated from '{old_response}' to '{display_name}'. {notes}".strip()
     )
+
+    # Clear the active call session now that a response is logged
+    if hasattr(request.user, 'active_call_session'):
+        request.user.active_call_session.delete()
 
     return JsonResponse({
         "status": "success",
@@ -2169,3 +2199,69 @@ def telecaller_completed_workflow_details(request, workflow_id):
         "selected_category": category,
         "status_choices": Lead.Status.choices
     })
+
+@login_required
+def admin_completed_reports(request):
+    "\"\"Admin view for all completed workflows.\"\"\"
+    if not (request.user.is_superuser or request.user.is_md):
+        return redirect('telecaller_dashboard')
+        
+    telecallers = User.objects.filter(role=User.Role.TELECALLER)
+    workflows = CompletedWorkflow.objects.all().order_by('-completion_date', '-in_time')
+    
+    t_id = request.GET.get('telecaller')
+    if t_id:
+        workflows = workflows.filter(telecaller_id=t_id)
+        
+    return render(request, 'leads/admin_completed_reports.html', {
+        'workflows': workflows,
+        'telecallers': telecallers
+    })
+
+@login_required
+def admin_completed_workflow_details(request, workflow_id):
+    "\"\"Admin view for a specific completed workflow.\"\"\"
+    if not (request.user.is_superuser or request.user.is_md):
+        return redirect('telecaller_dashboard')
+        
+    workflow = get_object_or_404(CompletedWorkflow, id=workflow_id)
+    category = request.GET.get('category', 'ALL')
+    
+    w_leads = workflow.workflow_leads.select_related('lead', 'lead__interested_course', 'lead__preferred_branch')
+    if category != 'ALL':
+        w_leads = w_leads.filter(outcome=category)
+        
+    return render(request, 'leads/admin_completed_details.html', {
+        'workflow': workflow,
+        'w_leads': w_leads,
+        'selected_category': category,
+        'status_choices': Lead.Status.choices
+    })
+
+@login_required
+@require_POST
+def api_assign_followup(request, lead_id):
+    "\"\"Admin creates a follow up assignment for a lead from a completed workflow.\"\"\"
+    if not (request.user.is_superuser or request.user.is_md):
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+        
+    lead = get_object_or_404(Lead, id=lead_id)
+    telecaller_id = request.POST.get('telecaller_id')
+    if not telecaller_id:
+        return JsonResponse({'error': 'Telecaller ID required'}, status=400)
+        
+    telecaller = get_object_or_404(User, id=telecaller_id, role=User.Role.TELECALLER)
+    
+    with transaction.atomic():
+        lead.assigned_to = telecaller
+        lead.status = Lead.Status.ASSIGNED
+        lead.save(update_fields=['assigned_to', 'status', 'updated_at'])
+        
+        LeadAssignment.objects.create(
+            lead=lead,
+            caller=telecaller,
+            status=LeadAssignment.Status.ACTIVE
+        )
+        
+    messages.success(request, f"Lead '{lead.name}' successfully re-assigned to {telecaller.username} for follow-up.")
+    return redirect(request.META.get('HTTP_REFERER', 'admin_completed_reports'))

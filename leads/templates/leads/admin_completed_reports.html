@@ -1,0 +1,132 @@
+{% extends "leads/base.html" %}
+{% load static %}
+{% block title %}Admin Completed Reports{% endblock %}
+{% block nav_completed %}active{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-center mb-4">
+  <div>
+    <h2 class="page-title"><i class="bi bi-file-earmark-bar-graph text-accent me-2"></i>Completed Calls - Report</h2>
+    <div class="page-sub">View all telecaller completed call sessions</div>
+  </div>
+  <div>
+    <button onclick="exportTableToCSV('admin-completed-report.csv')" class="btn-neu-sm btn-accent" style="border:none;">
+      <i class="bi bi-download me-1"></i> Export CSV
+    </button>
+  </div>
+</div>
+
+<div class="card mb-4 fade-in">
+  <form method="GET" class="d-flex flex-wrap gap-3 align-items-end">
+    <div style="flex:1; min-width:200px;">
+      <label class="form-label" style="font-size:0.8rem;">Date Range (Optional)</label>
+      <input type="text" name="daterange" class="form-control" placeholder="Select date range" style="padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); outline:none; width:100%;">
+    </div>
+    <div style="flex:1; min-width:200px;">
+      <label class="form-label" style="font-size:0.8rem;">Telecaller</label>
+      <select name="telecaller" class="form-control" style="padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); outline:none; width:100%;">
+        <option value="">All Telecallers</option>
+        {% for t in telecallers %}
+        <option value="{{ t.id }}" {% if request.GET.telecaller == t.id|stringformat:"s" %}selected{% endif %}>{{ t.get_full_name|default:t.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <button type="submit" class="btn-neu-sm btn-accent" style="border:none; padding:10px 20px;">
+        <i class="bi bi-filter me-1"></i> Filter
+      </button>
+    </div>
+  </form>
+</div>
+
+<div class="card fade-in">
+  {% if workflows %}
+  <div class="table-responsive">
+    <table class="neu-table w-100" style="font-size:0.75rem; white-space:nowrap;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Telecaller</th>
+          <th>Date</th>
+          <th>In-Time</th>
+          <th>Out-Time</th>
+          <th>Duration</th>
+          <th>Total Leads</th>
+          <th>Interested</th>
+          <th>Call Back</th>
+          <th>Not Answered</th>
+          <th>Not Interested</th>
+          <th>Busy</th>
+          <th>Switched Off</th>
+          <th>Connected</th>
+          <th>Wrong Number</th>
+          <th>Invalid Number</th>
+          <th>No Response</th>
+          <th>Converted</th>
+          <th>View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for w in workflows %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><strong>{{ w.telecaller.get_full_name|default:w.telecaller.username }}</strong></td>
+          <td>{{ w.completion_date|date:"d M Y" }}</td>
+          <td>{{ w.in_time|time:"H:i" }}</td>
+          <td>{{ w.out_time|time:"H:i" }}</td>
+          <td>{{ w.total_duration_minutes }}m</td>
+          <td><span class="badge-pill badge-accent">{{ w.total_assigned }}</span></td>
+          <td>{{ w.interested_count }}</td>
+          <td>{{ w.call_back_count }}</td>
+          <td>{{ w.not_answered_count }}</td>
+          <td>{{ w.not_interested_count }}</td>
+          <td>{{ w.busy_count }}</td>
+          <td>{{ w.switched_off_count }}</td>
+          <td>{{ w.connected_count }}</td>
+          <td>{{ w.wrong_number_count }}</td>
+          <td>{{ w.invalid_number_count }}</td>
+          <td>{{ w.no_response_count|default:"0" }}</td>
+          <td>{{ w.converted_count }}</td>
+          <td>
+            <a href="{% url 'admin_completed_workflow_details' w.id %}" class="btn-neu-sm btn-neu" style="text-decoration:none; padding:4px 8px;">
+              <i class="bi bi-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center" style="padding:40px; color:var(--text-muted);">
+    <i class="bi bi-journal-x" style="font-size:3rem; opacity:0.3; margin-bottom:10px;"></i>
+    <div>No completed workflows found matching your criteria.</div>
+  </div>
+  {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+function exportTableToCSV(filename) {
+    const csv = [];
+    const rows = document.querySelectorAll("table tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+        const row = [], cols = rows[i].querySelectorAll("td, th");
+        for (let j = 0; j < cols.length - 1; j++) { 
+            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+        }
+        csv.push(row.join(","));
+    }
+
+    const csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+    const downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
+</script>
+{% endblock %}
+{% endblock %}
