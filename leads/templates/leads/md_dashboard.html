@@ -420,17 +420,35 @@ function confirmDeleteDataset(batchId, fileName, leadCount) {
       btn.disabled = true;
     }
 
+    let csrfToken = '';
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) {
+      csrfToken = csrfInput.value;
+    } else {
+      const match = document.cookie.match(new RegExp('(^| )csrftoken=([^;]+)'));
+      if (match) csrfToken = match[2];
+    }
+
     fetch(`/md/delete-dataset/${batchId}/`, {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '',
+        'X-CSRFToken': csrfToken,
         'X-Requested-With': 'XMLHttpRequest',
         'Accept': 'application/json'
       }
     })
-    .then(res => res.json())
+    .then(async res => {
+      const isJson = res.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await res.json() : null;
+
+      if (!res.ok) {
+        throw new Error((data && data.message) || res.statusText || 'Error from server');
+      }
+      return data;
+    })
     .then(data => {
-      if (data.status === 'success') {
+      if (data && data.status === 'success') {
         const card = document.getElementById(`datasetCard-${batchId}`);
         if (card) {
           card.style.opacity = '0';

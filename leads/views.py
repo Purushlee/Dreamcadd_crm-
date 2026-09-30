@@ -1452,13 +1452,15 @@ def delete_dataset(request, batch_id):
             leads.delete()  # This will cascade delete related activities, assignments, etc.
             batch.delete()
             
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.headers.get('Accept') == 'application/json':
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', '')
+        if is_ajax:
             return JsonResponse({'status': 'success', 'message': f"Dataset deleted successfully"})
             
         messages.success(request, f"Dataset '{batch.file_name}' deleted successfully. {count} leads removed.")
         return redirect("md_dashboard")
     except Exception as e:
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.headers.get('Accept') == 'application/json':
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', '')
+        if is_ajax:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
         messages.error(request, f"Error deleting dataset: {e}")
         return redirect("md_dashboard")
