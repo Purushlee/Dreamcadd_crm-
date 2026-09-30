@@ -527,4 +527,51 @@ def log_security_event(user, action, request=None, details=""):
         details=details
     )
 
+class CompletedWorkflow(models.Model):
+    """
+    Records a completed daily workflow for a telecaller.
+    """
+    telecaller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="completed_workflows")
+    completion_date = models.DateField(default=timezone.now)
+    in_time = models.TimeField()
+    out_time = models.TimeField()
+    total_duration_minutes = models.IntegerField(default=0)
+    
+    total_assigned = models.IntegerField(default=0)
+    total_calls_attempted = models.IntegerField(default=0)
+    
+    # Outcomes snapshot
+    pending_count = models.IntegerField(default=0)
+    interested_count = models.IntegerField(default=0)
+    call_back_count = models.IntegerField(default=0)
+    not_answered_count = models.IntegerField(default=0)
+    not_interested_count = models.IntegerField(default=0)
+    busy_count = models.IntegerField(default=0)
+    switched_off_count = models.IntegerField(default=0)
+    connected_count = models.IntegerField(default=0)
+    wrong_number_count = models.IntegerField(default=0)
+    invalid_number_count = models.IntegerField(default=0)
+    no_response_count = models.IntegerField(default=0)
+    converted_count = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        
+    def __str__(self):
+        return f"{self.telecaller.username} - {self.completion_date}"
+
+
+class CompletedWorkflowLead(models.Model):
+    """
+    Links a specific lead and its outcome to a CompletedWorkflow.
+    """
+    workflow = models.ForeignKey(CompletedWorkflow, on_delete=models.CASCADE, related_name="workflow_leads")
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name="completed_workflows")
+    outcome = models.CharField(max_length=50, blank=True)
+    attempts_in_workflow = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ["-workflow__created_at"]
 
