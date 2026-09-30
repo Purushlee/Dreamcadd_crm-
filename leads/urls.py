@@ -46,6 +46,8 @@ urlpatterns = [
     path("api/leads/<int:lead_id>/send-whatsapp/", views.api_send_whatsapp, name="api_send_whatsapp"),
     path("api/session-check/", views.api_session_check, name="api_session_check"),
     path("api/telecaller/complete-workflow/", views.complete_daily_workflow, name="complete_daily_workflow"),
+    path("telecaller/completed/", views.telecaller_completed, name="telecaller_completed"),
+    path("telecaller/completed/<int:workflow_id>/", views.telecaller_completed_workflow_details, name="telecaller_completed_workflow_details"),
 
     # Meta WhatsApp Webhook Direct
     path("webhook/whatsapp/", views.whatsapp_webhook, name="whatsapp_webhook"),

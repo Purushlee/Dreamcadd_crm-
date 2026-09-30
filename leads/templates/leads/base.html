@@ -831,6 +831,7 @@ input[type="file"], textarea, select {
       <a href="{% url 'import_history' %}"      class="nav-item {% block nav_imports %}{% endblock %}"><i class="bi bi-clock-history"></i> Imports</a>
     {% else %}
       <a href="{% url 'telecaller_dashboard' %}" class="nav-item {% block nav_myLeads %}{% endblock %}"><i class="bi bi-person-lines-fill"></i> My Leads</a>
+      <a href="{% url 'telecaller_completed' %}" class="nav-item {% block nav_completed %}{% endblock %}"><i class="bi bi-check2-circle"></i> Completed</a>
     {% endif %}
   </nav>
 

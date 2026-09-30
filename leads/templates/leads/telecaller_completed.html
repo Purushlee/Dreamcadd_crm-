@@ -1,0 +1,55 @@
+{% extends "leads/base.html" %}
+{% load static %}
+{% block title %}Completed Workflows{% endblock %}
+{% block nav_completed %}active{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-center mb-4">
+  <div>
+    <h2 class="page-title"><i class="bi bi-check2-circle text-accent me-2"></i>Completed Calls</h2>
+    <div class="page-sub">Your completed call sessions and reports</div>
+  </div>
+</div>
+
+<div class="card fade-in">
+  {% if workflows %}
+  <div class="table-responsive">
+    <table class="neu-table w-100">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>In-Time</th>
+          <th>Out-Time</th>
+          <th>Duration</th>
+          <th>Total Leads</th>
+          <th>View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for w in workflows %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ w.completion_date|date:"d M Y" }}</td>
+          <td>{{ w.in_time|time:"h:i A" }}</td>
+          <td>{{ w.out_time|time:"h:i A" }}</td>
+          <td>{{ w.total_duration_minutes }}m</td>
+          <td><span class="badge-pill badge-accent">{{ w.total_assigned }}</span></td>
+          <td>
+            <a href="{% url 'telecaller_completed_workflow_details' w.id %}" class="btn-neu-sm btn-neu" style="text-decoration:none;">
+              <i class="bi bi-eye"></i> View Report
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center" style="padding:40px; color:var(--text-muted);">
+    <i class="bi bi-journal-x" style="font-size:3rem; opacity:0.3; margin-bottom:10px;"></i>
+    <div>No completed workflows found.</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

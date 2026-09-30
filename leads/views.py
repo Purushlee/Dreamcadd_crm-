@@ -2134,3 +2134,38 @@ def complete_daily_workflow(request):
             lead.save(update_fields=["assigned_to"])
             
     return JsonResponse({"status": "success", "message": "Workflow completed successfully."})
+
+@login_required
+def telecaller_completed(request):
+    """
+    Shows all past completed workflows for the logged-in telecaller.
+    """
+    if not request.user.is_telecaller:
+        return redirect("md_dashboard")
+        
+    workflows = CompletedWorkflow.objects.filter(telecaller=request.user)
+    return render(request, "leads/telecaller_completed.html", {"workflows": workflows})
+
+@login_required
+def telecaller_completed_workflow_details(request, workflow_id):
+    """
+    Shows the details and categorized leads of a specific completed workflow.
+    """
+    if not request.user.is_telecaller:
+        return redirect("md_dashboard")
+        
+    workflow = get_object_or_404(CompletedWorkflow, id=workflow_id, telecaller=request.user)
+    
+    category = request.GET.get("category", "ALL")
+    
+    w_leads = workflow.workflow_leads.select_related("lead", "lead__interested_course", "lead__preferred_branch")
+    
+    if category != "ALL":
+        w_leads = w_leads.filter(outcome=category)
+        
+    return render(request, "leads/telecaller_completed_details.html", {
+        "workflow": workflow,
+        "w_leads": w_leads,
+        "selected_category": category,
+        "status_choices": Lead.Status.choices
+    })
